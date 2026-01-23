@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Lakehouse 101 | Learn the Modern Data Architecture</title>
+    <meta name="description"
+        content="Learn what a data lakehouse is, how it works, and how to get started with open lakehouse technologies.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://datalakehouse101.com/">
+    <meta property="og:title" content="Data Lakehouse 101 | Learn the Modern Data Architecture">
+    <meta property="og:description"
+        content="Learn what a data lakehouse is, how it works, and how to get started with open lakehouse technologies.">
+    <meta property="og:image" content="assets/img/favicon.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://datalakehouse101.com/">
+    <meta property="twitter:title" content="Data Lakehouse 101 | Learn the Modern Data Architecture">
+    <meta property="twitter:description"
+        content="Learn what a data lakehouse is, how it works, and how to get started with open lakehouse technologies.">
+    <meta property="twitter:image" content="assets/img/favicon.png">
+
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Data Lakehouse 101",
+        "description": "Educational resource for understanding the data lakehouse architecture.",
+        "url": "https://datalakehouse101.com"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "DataLakehouse101",
+        "url": "https://datalakehouse101.com",
+        "logo": "https://datalakehouse101.com/assets/img/favicon.png",
+        "sameAs": [
+            "https://twitter.com/alexmercedcoder",
+            "https://www.linkedin.com/in/alexmerced/"
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "PodcastSeries",
+        "name": "The Data, Lakehouse and AI Show",
+        "url": "https://open.spotify.com/show/4PG0O7mu36oSI1B4FKVSA0",
+        "image": "https://datalakehouse101.com/assets/img/podcast-data-lakehouse-ai-show.png"
+      },
+       {
+        "@context": "https://schema.org",
+        "@type": "Book",
+        "name": "Apache Iceberg: The Definitive Guide",
+        "author": {
+             "@type": "Organization",
+             "name": "O'Reilly Media"
+         },
+         "url": "https://www.oreilly.com/library/view/apache-iceberg-the/9781098148614"
+      }
+    ]
+    </script>
+</head>
+
+<body>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-content">
+                <h1 class="hero-title">The Data Lakehouse 101</h1>
+                <p class="hero-description">Learn the architecture that combines the flexibility of data lakes with the
+                    performance and governance of data warehouses.</p>
+                <div class="hero-ctas">
+                    <a href="https://youtube.com/shorts/JDqCJUQXWYk?si=w6MYqZzaZkVoZlek" target="_blank"
+                        class="btn btn-secondary">What is a Data Lakehouse?</a>
+                    <a href="https://datalakehousehub.com/blog/2024-10-hands-on-with-iceberg-dremio-laptop/?utm_source=datalakehouse101&utm_medium=influencer&utm_campaign=iceberg&utm_term=datalakehouse101_com-01-23-2026&utm_content=alexmerced"
+                        target="_blank" class="btn btn-primary">Build a Lakehouse on Your Laptop</a>
+                    <a href="https://www.dremio.com/get-started?utm_source=datalakehouse101&utm_medium=influencer&utm_campaign=iceberg&utm_term=datalakehouse101_com-01-23-2026&utm_content=alexmerced"
+                        target="_blank" class="btn btn-accent">Free Trial of a Cloud Data Lakehouse</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="definition">
+            <div class="container">
+                <h2>What Is a Data Lakehouse?</h2>
+                <p>The data lakehouse is a paradigm that uses a data lake as a data warehouse by creating open tables
+                    using table formats such as Apache Iceberg. These tables provide data-warehouse-style performance,
+                    reliability, and governance while remaining compatible with the broader data ecosystem. This
+                    approach enables ACID guarantees, open interoperability, and flexible analytics across engines and
+                    tools.</p>
+                <img src="assets/img/datalakehouse-diagram.png" alt="Data Lakehouse Architecture Diagram"
+                    style="max-width: 800px; margin: 2rem auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <a href="https://developer.dremio.com" class="btn btn-primary" target="_blank">Learn More</a>
+            </div>
+        </section>
+
+        <section class="podcasts">
+            <div class="container">
+                <h2 class="section-title">Data Lakehouse Podcasts</h2>
+                <div class="grid">
+                    <a href="https://open.spotify.com/show/4PG0O7mu36oSI1B4FKVSA0?si=6ac003f6e3c742ff" target="_blank"
+                        class="card">
+                        <img src="assets/img/podcast-data-lakehouse-ai-show.png" alt="The Data, Lakehouse and AI Show">
+                        <h3 class="card-title">The Data, Lakehouse and AI Show</h3>
+                    </a>
+                    <a href="https://open.spotify.com/show/2PRDrWVpgDvKxN6n1oUsJF?si=288dcf3c60d94a5e" target="_blank"
+                        class="card">
+                        <img src="assets/img/podcast-alex-merceds-tech-podcast.jpeg" alt="Alex Merced's Tech Podcast">
+                        <h3 class="card-title">Alex Merced's Tech Podcast</h3>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="books">
+            <div class="container">
+                <h2 class="section-title">Essential Data Lakehouse Books</h2>
+                <div class="grid">
+                    <a href="https://www.oreilly.com/library/view/apache-iceberg-the/9781098148614" target="_blank"
+                        class="card">
+                        <img src="assets/img/cover-apache-iceberg-tdg.jpg" alt="Apache Iceberg: The Definitive Guide">
+                        <h3 class="card-title">Apache Iceberg: The Definitive Guide</h3>
+                        <p class="card-meta">O’Reilly Media • 2024</p>
+                    </a>
+                    <a href="https://www.oreilly.com/library/view/apache-polaris-the/9781098175481" target="_blank"
+                        class="card">
+                        <img src="assets/img/cover-apache-polaris-tdg.jpg" alt="Apache Polaris: The Definitive Guide">
+                        <h3 class="card-title">Apache Polaris: The Definitive Guide</h3>
+                        <p class="card-meta">O’Reilly Media • 2025</p>
+                    </a>
+                    <a href="https://www.manning.com/books/architecting-an-apache-iceberg-lakehouse" target="_blank"
+                        class="card">
+                        <img src="assets/img/cover-architecting-an-apache-iceberg-lakehouse.jpg"
+                            alt="Architecting an Apache Iceberg Lakehouse">
+                        <h3 class="card-title">Architecting an Apache Iceberg Lakehouse</h3>
+                        <p class="card-meta">Manning Publications • 2026</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="newsletter">
+            <div class="container">
+                <h2>Signup for Alex Merced's Newsletter on Open Lakehouses and AI</h2>
+                <a href="https://amdatalakehouse.substack.com/" target="_blank" class="btn btn-primary">Sign Up for the
+                    Newsletter</a>
+            </div>
+        </section>
+
+        <section class="communities">
+            <div class="container">
+                <h2 class="section-title">Lakehouse Communities</h2>
+                <div class="grid">
+                    <div class="card">
+                        <div style="padding: 2rem;">
+                            <h3 class="card-title">Data Lakehouse Hub</h3>
+                            <div class="community-links">
+                                <a href="https://datalakehousehub.com" target="_blank" class="btn btn-secondary"
+                                    style="color: var(--color-primary); border-color: var(--color-primary);">Website</a>
+                                <a href="https://join.slack.com/t/thedatalakehousehub/shared_invite/zt-274yc8sza-mI2zhCW8LGkOh1uxuf8T5Q"
+                                    target="_blank" class="btn btn-primary">Join Slack</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div style="padding: 2rem;">
+                            <h3 class="card-title">Dremio Developer Lakehouse and AI Community</h3>
+                            <div class="community-links">
+                                <a href="https://developer.dremio.com" target="_blank" class="btn btn-secondary"
+                                    style="color: var(--color-primary); border-color: var(--color-primary);">Website</a>
+                                <a href="https://dremio-dev.slack.com/join/shared_invite/zt-3c8zajmhw-b6KfiD343kuIopaaJ1bZ6w#/shared-invite/email"
+                                    target="_blank" class="btn btn-primary">Join Slack</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
