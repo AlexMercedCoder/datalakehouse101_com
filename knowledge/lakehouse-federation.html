@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lakehouse Federation: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what lakehouse federation is, how engines like Dremio and Trino query across Iceberg tables and external databases simultaneously, and why federation eliminates data silos.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/lakehouse-federation.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Lakehouse Federation: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what lakehouse federation is, how engines like Dremio and Trino query across Iceberg tables and external databases simultaneously, and why federation eliminates data silos.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/lakehouse-federation.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Lakehouse Federation: The Definitive Guide",
+      "description": "Learn what lakehouse federation is, how engines like Dremio and Trino query across Iceberg tables and external databases simultaneously, and why federation eliminates data silos.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/lakehouse-federation.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Lakehouse Federation", "item": "https://datalakehouse101.com/knowledge/lakehouse-federation.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is lakehouse federation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Lakehouse federation is the capability to execute SQL queries that span Apache Iceberg tables (in object storage) and external data sources (PostgreSQL, MySQL, MongoDB, Salesforce, etc.) simultaneously — joining, aggregating, and filtering across all sources in a single query without ETL or data movement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which engines support lakehouse federation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio and Trino are the leading engines for lakehouse federation. Dremio provides federation through its source connector model (PostgreSQL, MySQL, MongoDB, Elasticsearch, REST API sources) alongside Iceberg table access. Trino's connector architecture supports dozens of federated sources. Apache Spark can federate via JDBC sources, though with less optimization than dedicated federation engines."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between federation and ETL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ETL copies data from source systems into the lakehouse, creating a latency gap and storage duplication. Federation queries source systems directly at query time — always reading the most current data without any copy lag or storage overhead. Federation is ideal for operational data that changes frequently and must be joined with historical lakehouse data."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Lakehouse Federation</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Analytics & BI</span>
+      <h1>Lakehouse Federation: The Definitive Guide</h1>
+      <p class="hero-lede">Lakehouse federation is the ability to query Apache Iceberg tables alongside external data sources — relational databases, NoSQL stores, SaaS APIs — in a single SQL query, without moving data. It eliminates the 'copy everything into the lakehouse' anti-pattern and enables real-time joins across the entire data estate.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Lakehouse Federation?</a></li>
+        <li><a href="#section-2">How Federation Works</a></li>
+        <li><a href="#section-3">Federation in Dremio</a></li>
+        <li><a href="#section-4">Federation Tradeoffs</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Lakehouse Federation?</h2>
+        <p><strong>Lakehouse federation</strong> is the ability of a query engine to execute SQL queries that seamlessly span multiple heterogeneous data sources simultaneously — <a href="apache-iceberg.html">Apache Iceberg</a> tables in object storage alongside PostgreSQL tables, MySQL databases, MongoDB collections, REST APIs, and other sources — joining and aggregating across all of them in a single SQL query without any data movement or ETL preprocessing.</p><p>Federation eliminates the data lake anti-pattern of 'copy everything into the lake before you can analyze it.' Instead of running an ETL pipeline to copy operational PostgreSQL data into Iceberg tables (introducing latency, storage duplication, and pipeline maintenance), a federated query engine reads PostgreSQL directly at query time — always using the most current operational data, joined in real-time with historical Iceberg analytics data.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>How Federation Works</h2>
+        <p>Federation engines use a <strong>connector</strong> (or source) model: each external data source type has a connector that translates SQL operations into the source's native query protocol:</p><ul><li>A PostgreSQL connector translates SQL predicates into PostgreSQL queries via JDBC, returning results as rows</li><li>A MongoDB connector translates SQL filters into MongoDB queries, returning documents as rows</li><li>An Iceberg connector reads Parquet files from S3 directly via the Iceberg metadata API</li></ul><p><a href="predicate-pushdown.html">Predicate pushdown</a> is critical for federation performance: the engine pushes WHERE clause predicates into each source's native query — so PostgreSQL returns only matching rows (not the entire table), and Iceberg's metadata eliminates irrelevant files. Without predicate pushdown, federation would transfer entire tables over the network for every query.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Lakehouse Federation Architecture diagram" loading="lazy"><figcaption>Figure 1: Lakehouse federation — single SQL query spanning Iceberg tables and external databases simultaneously.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Federation in Dremio</h2>
+        <p><a href="dremio.html">Dremio</a> is architecturally designed for federation. Every data source in Dremio — whether an Iceberg table in its Open Catalog or a PostgreSQL database registered as a source — appears as a table in Dremio's unified namespace. Analysts write standard SQL joining any combination of sources without knowing where each table lives physically.</p><p>Dremio's federation capabilities include: PostgreSQL, MySQL, Oracle, SQL Server, MongoDB, Elasticsearch, S3 files (Parquet, CSV, JSON), and REST API sources. <a href="dremio-reflections.html">Reflections</a> can be created on federated <a href="virtual-datasets.html">Virtual Datasets</a> that join Iceberg with external sources — pre-computing the federated join so subsequent queries hit the Reflection rather than re-executing the cross-source join at query time.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Federation Tradeoffs</h2>
+        <p>Federation is powerful but not always the right pattern:</p><ul><li><strong>Use federation when:</strong> operational data must be current (no ETL lag acceptable), data volume from external sources is small, or the join produces a small result set that doesn't require moving large volumes</li><li><strong>Use ETL instead when:</strong> external source data is large and queries filter a small fraction (ELT to Iceberg is more efficient), the external source has performance constraints that federation queries would overwhelm, or data must be enriched and cleaned before joining with analytical data</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Federation vs ETL Decision Framework diagram" loading="lazy"><figcaption>Figure 2: Federation vs ETL — when to query in place vs when to copy data into the lakehouse.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Lakehouse federation is the capability that makes the <a href="data-lakehouse.html">data lakehouse</a> a unified analytical platform rather than just another data silo. By enabling real-time SQL across Iceberg tables and operational databases, federation eliminates the ETL copy lag for operational analytics and allows analysts to work with current data alongside historical lakehouse data in a single query. <a href="dremio.html">Dremio's</a> federation model — combining multi-source connectivity with Reflection acceleration for federated VDSs — is the most complete federation implementation in the open lakehouse ecosystem.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Leading federation engine for lakehouse + external sources.</span>
+    </a>
+      <a class="related-card" href="trino.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Trino</span>
+      <span class="related-desc">Open-source federation engine with connector model.</span>
+    </a>
+      <a class="related-card" href="predicate-pushdown.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Predicate Pushdown</span>
+      <span class="related-desc">Essential for performant federation queries.</span>
+    </a>
+      <a class="related-card" href="virtual-datasets.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Virtual Datasets</span>
+      <span class="related-desc">VDSs that join federated sources with Iceberg data.</span>
+    </a>
+      <a class="related-card" href="etl.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">Alternative to federation for high-volume external data.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The lakehouse table format federation extends.</span>
+    </a>
+      <a class="related-card" href="catalog-interoperability.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Catalog Interoperability</span>
+      <span class="related-desc">Catalog interop enables federated multi-catalog access.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Federation makes the lakehouse a unified analytical hub.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+  "slug": "ai-semantic-layer",
+  "term": "AI Semantic Layer (Dremio)",
+  "category": "Analytics & BI",
+  "metaTitle": "AI Semantic Layer in Dremio: The Definitive Guide",
+  "metaDescription": "Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents via MCP, and why it is the bridge between enterprise data and agentic AI.",
+  "h1": "AI Semantic Layer in Dremio: The Definitive Guide",
+  "lede": "Dremio's AI Semantic Layer extends the traditional semantic layer with AI-native capabilities \u2014 natural language metric definitions, context-rich descriptions, and an MCP server endpoint that enables AI agents to autonomously discover, understand, and query enterprise lakehouse data without human intervention.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Dremio's AI Semantic Layer?",
+      "a": "Dremio's AI Semantic Layer is an extension of its Virtual Dataset-based semantic layer that adds AI-native capabilities: rich natural language descriptions of data assets, formal metric definitions with dimensional context, and an MCP (Model Context Protocol) server endpoint that enables AI language models to discover and query enterprise data autonomously."
+    },
+    {
+      "q": "What is the Model Context Protocol (MCP) and how does it relate?",
+      "a": "MCP is an open standard for AI agent tool interfaces, allowing language models (like Claude or GPT) to call external services as tools. Dremio's MCP server exposes the AI Semantic Layer as MCP tools \u2014 agents can list available datasets, understand their business meaning, and execute SQL queries against Dremio's engine, all autonomously during an AI conversation."
+    },
+    {
+      "q": "How does the AI Semantic Layer differ from the standard semantic layer?",
+      "a": "The standard semantic layer focuses on SQL-level abstraction for human analysts. The AI Semantic Layer adds: structured natural language descriptions designed for LLM consumption, metric definitions with explicit formula and dimension relationships, context that helps AI models understand data without human guidance, and MCP server endpoints for autonomous agent tool access."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the AI Semantic Layer?",
+      "content": "<p><a href=\"dremio.html\">Dremio's</a> <strong>AI Semantic Layer</strong> is the evolution of the traditional <a href=\"semantic-layer.html\">semantic layer</a> into an AI-native data interface. While the traditional semantic layer translates raw data into business-friendly views for human analysts, the AI Semantic Layer additionally translates those views into machine-interpretable context that enables AI language models and agents to understand, discover, and query enterprise data autonomously \u2014 without requiring a human to explain the data model.</p><p>The AI Semantic Layer is the practical answer to the question: 'How do I give my AI agents reliable, governed access to enterprise data?' Rather than connecting an AI model directly to raw Iceberg tables (where it has no business context and may misinterpret columns), organizations expose the AI Semantic Layer \u2014 a governed, documented, AI-optimized view of business data that agents can navigate and query with confidence.</p>"
+    },
+    {
+      "heading": "MCP Server: AI Agent Data Access",
+      "content": "<p>The most technically significant component of the AI Semantic Layer is the <strong>MCP (Model Context Protocol) server</strong> that Dremio exposes. MCP is an open standard for AI agent tool interfaces \u2014 it defines how language models (Claude, GPT-4, Llama) can discover and call external tools during a conversation.</p><p>Dremio's MCP server exposes the AI Semantic Layer as a set of MCP tools:</p><ul><li><strong>list_datasets:</strong> Returns all accessible Virtual Datasets with their business descriptions</li><li><strong>get_dataset_schema:</strong> Returns the columns, types, and AI-readable descriptions for a specific dataset</li><li><strong>get_metric_definitions:</strong> Returns formal metric definitions (formula, dimensions, filters) for business KPIs</li><li><strong>execute_query:</strong> Executes a SQL query against Dremio's engine and returns results</li></ul><p>An AI agent with access to Dremio's MCP server can autonomously answer business questions: it calls list_datasets to find relevant data, get_dataset_schema to understand structure, generates appropriate SQL, executes it via execute_query, and returns business-accurate answers \u2014 all without human data engineering assistance.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Dremio AI Semantic Layer MCP Architecture",
+      "diagramCaption": "Figure 1: Dremio AI Semantic Layer \u2014 MCP server connecting AI agents to governed enterprise lakehouse data."
+    },
+    {
+      "heading": "Metric Definitions and Dimensional Context",
+      "content": "<p>The AI Semantic Layer extends Dremio's <a href=\"virtual-datasets.html\">Virtual Datasets</a> with structured metric definitions that give AI models the context to use metrics correctly:</p><ul><li><strong>Metric name:</strong> The business name (Customer Lifetime Value)</li><li><strong>Formula:</strong> The precise SQL calculation (SUM(order_value - returns) WHERE customer_status = 'active')</li><li><strong>Dimensions:</strong> Valid grouping dimensions for this metric (region, segment, cohort_month \u2014 but NOT product_category, which is not meaningful for LTV)</li><li><strong>Description:</strong> Natural language explanation of what the metric measures, what it excludes, and when to use it</li><li><strong>Grain:</strong> The level at which the metric is calculated (per customer, per transaction, per day)</li></ul><p>This structured context prevents AI model hallucinations about metric definitions \u2014 the model reads the formal definition rather than inferring it from column names alone.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "AI Semantic Layer Metric Definitions",
+      "diagramCaption": "Figure 2: Structured metric definitions in the AI Semantic Layer \u2014 giving AI agents precise business context."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Dremio's AI Semantic Layer represents the next evolution of enterprise analytics infrastructure \u2014 a data layer designed not just for human analysts but for AI agents that can autonomously query, analyze, and reason about enterprise data. By combining <a href=\"virtual-datasets.html\">Virtual Datasets</a>, rich natural language metadata, formal metric definitions, and an MCP server endpoint, the AI Semantic Layer makes the open <a href=\"data-lakehouse.html\">data lakehouse</a> AI-ready \u2014 providing governed, contextualized data access that enables trustworthy agentic analytics without sacrificing enterprise governance.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "The traditional semantic layer the AI version extends."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The platform providing the AI Semantic Layer."
+    },
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "The VDS foundation of the AI Semantic Layer."
+    },
+    {
+      "slug": "self-service-analytics",
+      "term": "Self-Service Analytics",
+      "category": "Analytics & BI",
+      "desc": "AI Semantic Layer enables AI-driven self-service."
+    },
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "Reflections accelerate queries through the AI Semantic Layer."
+    },
+    {
+      "slug": "metadata-management",
+      "term": "Metadata Management",
+      "category": "Catalogs & Metadata",
+      "desc": "AI Semantic Layer requires rich, AI-optimized metadata."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Governance enforced through AI Semantic Layer access."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The AI Semantic Layer makes the lakehouse AI-ready."
+    }
+  ]
+}

@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Decoupled Storage and Compute: The Definitive Guide | Data Lakehouse 101</title>
-  <meta name="description" content="Learn what decoupled storage and compute means in the data lakehouse, why it replaced monolithic warehouse architectures, and how Dremio and Apache Iceberg implement it.">
+  <meta name="description" content="Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/decoupled-storage-compute.html">
   <meta property="og:type" content="article">
   <meta property="og:title" content="Decoupled Storage and Compute: The Definitive Guide | Data Lakehouse 101">
-  <meta property="og:description" content="Learn what decoupled storage and compute means in the data lakehouse, why it replaced monolithic warehouse architectures, and how Dremio and Apache Iceberg implement it.">
+  <meta property="og:description" content="Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/decoupled-storage-compute.html">
   <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -23,7 +23,7 @@
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Decoupled Storage and Compute: The Definitive Guide",
-      "description": "Learn what decoupled storage and compute means in the data lakehouse, why it replaced monolithic warehouse architectures, and how Dremio and Apache Iceberg implement it.",
+      "description": "Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.",
       "author": { "@type": "Person", "name": "Alex Merced" },
       "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
       "datePublished": "2026-05-14",
@@ -47,23 +47,23 @@
       "name": "What does decoupled storage and compute mean?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Decoupled storage and compute means that the system storing data and the system processing data are independent — they can be scaled, priced, and operated separately. In the data lakehouse, data is stored in cloud object storage (S3, ADLS, GCS) and compute engines (Dremio, Spark, Trino) are provisioned independently to query that data."
+        "text": "Decoupled storage and compute means that data storage (files in S3, ADLS, GCS) is completely separate from query processing infrastructure (Dremio executors, Spark clusters, Trino workers). Storage scales independently of compute. Compute scales independently of storage. Storage is always-on; compute can be turned off when not in use. They are billed separately."
       }
     },
     {
       "@type": "Question",
-      "name": "Why is decoupled storage and compute better than a traditional database?",
+      "name": "How is decoupled architecture different from a traditional data warehouse?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Traditional databases tightly couple storage and compute — you pay for both together and cannot scale one without the other. Decoupling allows you to scale compute only when queries are running (and shut it down when they're not), while storage scales independently and cheaply as data grows."
+        "text": "In a traditional data warehouse (Redshift, Snowflake in early versions, Teradata), storage and compute are tightly coupled — you provision a cluster that determines both storage capacity and compute power together. More data requires more nodes which adds both storage and compute. In the lakehouse, adding data requires only more object storage; scaling queries requires only more compute nodes."
       }
     },
     {
       "@type": "Question",
-      "name": "Which systems use decoupled storage and compute?",
+      "name": "What technologies enable decoupled storage and compute in the lakehouse?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "All modern data lakehouse platforms use decoupled storage and compute, including Dremio, Apache Spark on S3, Trino, Presto, and cloud data warehouses like Snowflake and BigQuery (which partially decouple). Apache Iceberg is the table format that makes true multi-engine decoupling possible."
+        "text": "Three technologies work together: object storage (S3, ADLS, GCS) provides the decoupled storage layer; Apache Iceberg provides the shared data format and metadata model that multiple compute engines can read simultaneously; and elastic compute services (Dremio Cloud, EMR, Databricks) provide on-demand query processing that can scale to zero when idle."
       }
     }
   ]
@@ -98,7 +98,7 @@
     <div class="hero-inner">
       <span class="hero-category">Core Concepts</span>
       <h1>Decoupled Storage and Compute: The Definitive Guide</h1>
-      <p class="hero-lede">Decoupled storage and compute is the foundational architectural principle of the modern data lakehouse. By separating where data lives from where it is processed, organizations gain independent scalability, multi-engine flexibility, and dramatically lower costs.</p>
+      <p class="hero-lede">Decoupled storage and compute is the defining architectural principle of the data lakehouse — separating data storage (cheap, infinite object storage) from query processing (elastic, pay-per-use compute). It enables organizations to store unlimited data at minimal cost and scale query engines independently based on workload demand.</p>
       <div class="hero-meta">
         <span>By Alex Merced</span>
         <span id="reading-time">Loading…</span>
@@ -112,15 +112,9 @@
       <h2>On This Page</h2>
       <ol>
         <li><a href="#section-1">What Is Decoupled Storage and Compute?</a></li>
-        <li><a href="#section-2">The History: From Coupled to Decoupled</a></li>
-        <li><a href="#section-3">How Decoupled Storage and Compute Works</a></li>
-        <li><a href="#section-4">Benefits of Decoupled Storage and Compute</a></li>
-        <li><a href="#section-5">Decoupled Storage and Compute vs. Coupled Architectures</a></li>
-        <li><a href="#section-6">Challenges of Decoupled Architectures</a></li>
-        <li><a href="#section-7">Dremio and Decoupled Storage and Compute</a></li>
-        <li><a href="#section-8">The Future: Serverless and Elastic Compute</a></li>
-        <li><a href="#section-9">Best Practices for Decoupled Lakehouse Design</a></li>
-        <li><a href="#section-10">Summary</a></li>
+        <li><a href="#section-2">Economic Advantages Over Coupled Architectures</a></li>
+        <li><a href="#section-3">Multi-Engine Concurrent Access</a></li>
+        <li><a href="#section-4">Summary</a></li>
       </ol>
     </aside>
 
@@ -128,61 +122,25 @@
       
       <section id="section-1">
         <h2>What Is Decoupled Storage and Compute?</h2>
-        <p><strong>Decoupled storage and compute</strong> is the architectural principle that the system responsible for <em>storing</em> data and the system responsible for <em>processing</em> that data should be independent, separately scalable, and separately priced components of the overall data platform.</p><p>In a <strong>coupled</strong> architecture — like a traditional on-premises data warehouse or a relational database — storage and compute are bound together in the same physical infrastructure. To store more data, you buy more servers. To process queries faster, you add more of the same servers. You cannot scale compute without also scaling storage, or vice versa. During periods of low query activity, you are paying for idle compute capacity. During periods of high query activity, you may be constrained by the storage capacity of your compute nodes.</p><p>In a <strong>decoupled</strong> architecture — like the modern <a href="data-lakehouse.html">data lakehouse</a> — data is stored separately in cloud object storage (<a href="amazon-s3.html">Amazon S3</a>, <a href="azure-adls.html">Azure ADLS</a>, <a href="google-cloud-storage.html">GCS</a>), and compute engines (<a href="dremio.html">Dremio</a>, Apache Spark, Trino) connect to that storage over the network to process queries. Storage scales independently as data grows — you pay only for the bytes stored. Compute scales independently as query demand changes — you spin up large clusters for heavy workloads and shut them down when idle.</p><p>This decoupling is not just an operational convenience — it is a fundamental architectural shift that enables the <a href="multi-engine-interoperability.html">multi-engine interoperability</a> that defines the lakehouse. Because data is stored in open formats in neutral object storage, any engine can access it — not just the vendor that sold you the compute platform.</p>
+        <p><strong>Decoupled storage and compute</strong> is the architectural principle that separates data storage infrastructure from query processing infrastructure, allowing each to scale independently. In the <a href="data-lakehouse.html">data lakehouse</a>, this means:</p><ul><li><strong>Storage:</strong> Data lives in <a href="object-storage.html">object storage</a> (<a href="amazon-s3.html">S3</a>, <a href="azure-adls.html">ADLS</a>, <a href="google-cloud-storage.html">GCS</a>) — infinitely scalable, always-on, billed per byte stored per month, independent of any compute infrastructure</li><li><strong>Compute:</strong> Query engines (<a href="dremio.html">Dremio</a>, <a href="apache-spark.html">Spark</a>, <a href="trino.html">Trino</a>, <a href="apache-flink.html">Flink</a>) are elastic compute clusters that connect to object storage on demand, execute queries, and scale down (or shut off entirely) when workloads are idle</li></ul><p>The decoupling is enabled by a common interface: <a href="apache-iceberg.html">Apache Iceberg's</a> open table format stored in object storage provides the shared data contract that any compute engine can read. No proprietary storage format or engine-specific storage protocol — just open Parquet files on S3.
         
       </section>
 
       <section id="section-2">
-        <h2>The History: From Coupled to Decoupled</h2>
-        <p>The path from coupled to decoupled architectures is the story of how the economics of computing changed over the past two decades.</p><h3>The Coupled Era: On-Premises Warehouses</h3><p>Traditional on-premises data warehouses — Teradata, Oracle Exadata, IBM Netezza — were shared-nothing MPP systems where each node held both storage and compute. Adding capacity meant adding nodes, each with both disks and CPUs. These systems delivered excellent performance for their time, but the coupling meant that storage and compute scaled together — even if you needed more query capacity but had plenty of storage, you had to buy storage anyway.</p><h3>The First Decoupling: Hadoop HDFS</h3><p>Apache Hadoop introduced the first large-scale decoupling experiment in enterprise data processing. HDFS (Hadoop Distributed File System) was a networked file system across commodity hardware, and MapReduce compute jobs ran separately. In theory, compute could be scaled independently. In practice, HDFS still collocated compute and storage on the same nodes for data locality — moving data over the network was expensive with 10GbE connections.</p><h3>The Cloud Revolution: True Decoupling</h3><p>The rise of cloud object storage — S3 (2006), GCS (2010), ADLS (2015) — and high-speed networking (25GbE, 100GbE) made true decoupling practical. With 100Gbps network connections, reading data from remote object storage became fast enough that data locality was no longer a performance requirement. Compute engines could run on separate virtual machines, reading from S3 at network speeds that rivaled local disk reads.</p><p>Snowflake's 2012 architecture was a landmark: completely decoupled storage (in S3) from compute (virtual warehouses). This architecture proved that a cloud data warehouse could deliver excellent analytical performance without collocating storage and compute — and the entire cloud data platform industry followed.</p>
-        
+        <h2>Economic Advantages Over Coupled Architectures</h2>
+        <p>Decoupling storage and compute provides dramatic economic advantages over tightly coupled alternatives:</p><h3>Storage Cost</h3><p>Object storage costs $0.023/GB/month (S3 Standard). A coupled data warehouse that uses proprietary storage costs 5–10x more for equivalent durability and capacity. For petabyte-scale data, this difference is millions of dollars per year.</p><h3>Compute Elasticity</h3><p>Decoupled compute can scale to zero when idle — no queries running means no compute costs. A coupled warehouse runs at full capacity 24/7, even during nights and weekends when no one is querying. Lakehouse organizations report 60–80% lower total compute costs through elasticity.</p><h3>Independent Scaling</h3><p>Data grows faster than query volume in most organizations. Decoupled storage allows data to grow without proportionally growing compute — a 10x data increase doesn't require a 10x compute increase, only more object storage capacity (free at current scale, billing increases incrementally).
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Decoupled Storage Compute Architecture diagram" loading="lazy"><figcaption>Figure 1: Decoupled lakehouse architecture — object storage shared by multiple independent compute engines.</figcaption></figure>
       </section>
 
       <section id="section-3">
-        <h2>How Decoupled Storage and Compute Works</h2>
-        <p>In a decoupled lakehouse architecture, the data path from storage to query result has several components:</p><h3>Storage Layer: Cloud Object Storage</h3><p>Data lives in cloud object storage as immutable files — primarily <a href="apache-parquet.html">Apache Parquet</a> for tabular data. Object storage provides 11-nines (99.999999999%) durability, essentially unlimited capacity, and very low per-GB pricing. The storage layer is completely passive — it does nothing with the data except store it durably and serve file read requests.</p><h3>Table Format Layer: Apache Iceberg</h3><p><a href="apache-iceberg.html">Apache Iceberg</a> sits logically between storage and compute. It maintains metadata — <a href="iceberg-manifest-files.html">manifest files</a> and snapshot logs — that tell compute engines which files belong to which table, what schemas those tables have, and what the current committed state of each table is. This metadata layer is what enables concurrent, safe access from multiple compute engines simultaneously.</p><h3>Catalog Layer</h3><p>The <a href="iceberg-rest-catalog.html">Iceberg REST Catalog</a> (implemented by <a href="apache-polaris.html">Apache Polaris</a>, <a href="project-nessie.html">Project Nessie</a>, or cloud-managed catalogs) provides a central registry that maps table names to their current metadata location. When a compute engine wants to query a table, it asks the catalog where the table's metadata is, then follows the metadata pointers to find the actual data files.</p><h3>Compute Layer: Query Engines</h3><p>Query engines — Dremio, Spark, Trino, Flink — connect to the catalog to discover tables, read Iceberg metadata to plan query execution (identifying which files are relevant, which partitions to prune), and then read only the necessary Parquet files from object storage. The engine's compute nodes apply vectorized execution, aggregation, and filtering in memory and return results to the user.
-        <figure class="diagram-block"><img src="../assets/img/knowledge/data-lakehouse-diagram-1.png" alt="Decoupled Storage and Compute Architecture diagram" loading="lazy"><figcaption>Figure 1: Storage and compute operate independently — multiple engines access the same Iceberg tables on shared object storage.</figcaption></figure>
+        <h2>Multi-Engine Concurrent Access</h2>
+        <p>A critical capability enabled by decoupled storage is <strong>simultaneous multi-engine access</strong>: multiple compute engines can read from and write to the same <a href="apache-iceberg.html">Iceberg</a> tables in object storage simultaneously, with <a href="acid-transactions.html">ACID</a> isolation ensuring consistency.</p><p>In a coupled warehouse, adding a second query engine means either duplicating data or complex synchronization mechanisms. In the decoupled lakehouse: Spark writes new data while Dremio serves BI queries and Flink ingests streaming events — all on the same Iceberg tables, in the same S3 bucket, simultaneously. Each engine's writes are committed atomically via the Iceberg catalog; each engine reads a consistent snapshot without locking others out.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Multi-Engine Decoupled Access diagram" loading="lazy"><figcaption>Figure 2: Multiple engines concurrently accessing the same Iceberg tables — the decoupled lakehouse advantage.</figcaption></figure>
       </section>
 
       <section id="section-4">
-        <h2>Benefits of Decoupled Storage and Compute</h2>
-        <p>Decoupling delivers concrete, measurable benefits across cost, flexibility, and resilience:</p><h3>Independent Scaling</h3><p>Storage and compute scale on entirely different curves. Data volume grows linearly over time — you can predict next year's storage cost fairly accurately. Query demand is spiky — heavy during business hours, light overnight and on weekends. In a decoupled architecture, you provision compute for peak demand and scale it back or shut it down when demand drops. Storage costs remain fixed regardless of compute scaling decisions.</p><h3>Multi-Engine Interoperability</h3><p>Because data is in neutral object storage in open format, any compliant engine can read it. Your data engineering team can use Apache Spark for batch ETL. Your data science team can use Python with PyIceberg for ML feature engineering. Your BI team can use <a href="dremio.html">Dremio</a> for interactive SQL. Your streaming team can use Apache Flink for real-time ingestion. All from the same <a href="apache-iceberg.html">Apache Iceberg</a> tables, simultaneously, without copying data.</p><h3>Cost Efficiency</h3><p>Cloud object storage costs approximately $0.023/GB/month for standard S3 tiers. A proprietary cloud data warehouse stores data at 5–15x that cost. At petabyte scale, this difference is worth millions of dollars per year. Decoupling eliminates the proprietary storage tax.</p><h3>No Vendor Lock-In</h3><p>When your data lives in open format in object storage you own, changing compute vendors becomes a configuration change, not a data migration. If a better query engine emerges, you adopt it without moving data. This shifts pricing power from the vendor to the customer.</p><h3>Disaster Recovery and Multi-Region</h3><p>In a coupled architecture, disaster recovery requires replicating both storage and compute. In a decoupled architecture, object storage replication (S3 Cross-Region Replication, for example) is sufficient — because compute is stateless, it can be provisioned in any region that has access to the replicated storage.</p>
-        
-      </section>
-
-      <section id="section-5">
-        <h2>Decoupled Storage and Compute vs. Coupled Architectures</h2>
-        <p>The performance and cost trade-offs between coupled and decoupled architectures have shifted dramatically as network speeds have improved:</p><table class="comparison-table"><thead><tr><th>Dimension</th><th>Coupled (Traditional DW)</th><th>Decoupled (Lakehouse)</th></tr></thead><tbody><tr><td>Storage cost</td><td>$0.20–$0.50/GB/month</td><td>$0.023/GB/month (S3 std.)</td></tr><tr><td>Compute cost</td><td>Always-on, fixed</td><td>Pay-per-query or auto-scaling</td></tr><tr><td>Engine flexibility</td><td>Single vendor only</td><td>Any Iceberg-compatible engine</td></tr><tr><td>Data format</td><td>Proprietary</td><td>Open (Parquet + Iceberg)</td></tr><tr><td>Multi-engine access</td><td>❌ Not possible</td><td>✅ Yes (simultaneous)</td></tr><tr><td>Read performance</td><td>Fast (local disk)</td><td>Excellent (100GbE + metadata optimization)</td></tr><tr><td>Write performance</td><td>Fast (local disk)</td><td>Good (Iceberg commit protocol)</td></tr><tr><td>Operational simplicity</td><td>Single system to manage</td><td>Multiple components (catalog, engine, storage)</td></tr></tbody></table><p>The main trade-off of decoupling is operational complexity — more components to configure, monitor, and maintain. Purpose-built lakehouse platforms like <a href="dremio.html">Dremio</a> significantly reduce this complexity by integrating the catalog, query engine, and management layer into a cohesive product.</p>
-        <figure class="diagram-block"><img src="../assets/img/knowledge/data-lakehouse-diagram-2.png" alt="Coupled vs Decoupled Architecture Comparison diagram" loading="lazy"><figcaption>Figure 2: Coupled warehouse vs. decoupled lakehouse — independent scaling and multi-engine access.</figcaption></figure>
-      </section>
-
-      <section id="section-6">
-        <h2>Challenges of Decoupled Architectures</h2>
-        <p>Despite its benefits, decoupled architecture introduces challenges that practitioners must design for:</p><h3>Network Latency</h3><p>Reading data from object storage over the network introduces latency compared to reading from local disk. Modern solutions mitigate this through aggressive <a href="predicate-pushdown.html">predicate pushdown</a> (reading fewer files), <a href="column-pruning.html">column pruning</a> (reading fewer bytes), local SSD caching (Dremio caches frequently accessed Parquet files on local NVMe), and vectorized I/O (reading data in large, sequential chunks). In practice, well-optimized lakehouse queries on properly maintained Iceberg tables match or exceed warehouse query performance.</p><h3>The Small File Problem</h3><p>Frequent small writes — common in streaming ingestion scenarios — produce many small Parquet files. Reading thousands of small files from object storage involves high latency overhead (one HTTP request per file). <a href="compaction.html">Compaction</a> — merging small files into optimally sized ones (typically 128MB–512MB) — is the solution. Dremio's automated table optimization handles this transparently.</p><h3>Consistency Across Engines</h3><p>When multiple engines write to the same table concurrently, ensuring consistency requires a robust transaction protocol. <a href="apache-iceberg.html">Apache Iceberg's</a> optimistic concurrency control — where each writer atomically swaps the current table metadata pointer — provides serializable isolation between writers without requiring a distributed lock manager.</p><h3>Catalog as a Single Point of Failure</h3><p>The catalog is the central coordinator of the decoupled architecture — if it is unavailable, engines cannot discover or access tables. High-availability deployment of the catalog (multiple replicas, health checks, automatic failover) is essential for production lakehouses.</p>
-        
-      </section>
-
-      <section id="section-7">
-        <h2>Dremio and Decoupled Storage and Compute</h2>
-        <p><a href="dremio.html">Dremio</a> is architected specifically for the decoupled storage and compute paradigm. Every aspect of its design assumes that data lives in open format on cloud object storage, and that Dremio's role is to provide the fastest, most efficient compute layer on top of that open storage.</p><h3>Intelligent Query Engine</h3><p>Dremio's query engine is built on <a href="apache-arrow.html">Apache Arrow</a> for vectorized in-memory processing and uses Iceberg metadata aggressively to minimize the data scanned from object storage. Its <a href="predicate-pushdown.html">predicate pushdown</a> capability evaluates filter conditions against Iceberg file-level statistics, skipping files that cannot contain relevant data before issuing any storage read requests.</p><h3>Reflections: Compute-Side Acceleration</h3><p><a href="dremio-reflections.html">Dremio Reflections</a> are a form of compute-side caching: pre-computed, materialized representations of Iceberg data, stored as optimized Iceberg files and automatically selected by the query optimizer. Reflections live in storage (they are Iceberg tables themselves), but the decision to use them is made at compute time by Dremio's optimizer — perfectly aligned with the decoupled model.</p><h3>Open Catalog Integration</h3><p>Dremio's <a href="dremio-open-catalog.html">Open Catalog</a> implements the Iceberg REST Catalog specification, meaning any Iceberg-compatible engine can connect to it — not just Dremio. This is the embodiment of decoupled architecture: one open catalog, many compute engines, all operating on the same shared storage.</p>
-        
-      </section>
-
-      <section id="section-8">
-        <h2>The Future: Serverless and Elastic Compute</h2>
-        <p>The logical endpoint of decoupled storage and compute is <strong>serverless query execution</strong>: compute that is provisioned per-query, scales from zero in milliseconds, and costs nothing when no queries are running. Cloud services like AWS Athena, Google BigQuery, and Dremio Cloud are moving toward this model.</p><p>In a fully serverless lakehouse, there is no "always-on" compute infrastructure. A query submitted at 3 AM provisions the necessary compute, executes against Iceberg tables in S3, returns results, and the compute evaporates — all in seconds. The only persistent cost is the storage of data and metadata in object storage.</p><p>This model is ideal for workloads with unpredictable or highly variable query volumes — it eliminates the need to provision for peak demand and pay for idle capacity during off-peak hours. For steady-state, high-concurrency workloads, dedicated compute pools remain more economical.</p><p>The decoupled architecture makes this evolution possible: because compute and storage are already fully independent, adding serverless execution is an operational change to the compute layer, not a fundamental architectural redesign. Organizations that adopted the decoupled lakehouse model early are positioned to take advantage of serverless compute advances as they mature.</p>
-        
-      </section>
-
-      <section id="section-9">
-        <h2>Best Practices for Decoupled Lakehouse Design</h2>
-        <p>Organizations implementing a decoupled storage and compute architecture should follow these proven best practices:</p><ul><li><strong>Choose object storage in the same cloud region as your compute.</strong> Cross-region data transfer introduces latency and egress cost. Keep storage and compute in the same region.</li><li><strong>Right-size files for read performance.</strong> Target 128MB–512MB Parquet files. Smaller files hurt read performance; larger files hurt partial reads. Automate compaction to maintain this range as data accumulates.</li><li><strong>Cache hot data in compute-local SSD.</strong> Dremio and other engines support caching frequently accessed Iceberg files on local NVMe storage, dramatically reducing cold-read latency for repeated query patterns.</li><li><strong>Deploy the catalog with high availability.</strong> The catalog is the only stateful component in the decoupled architecture. Deploy it with at least two replicas and configure health checks and automatic failover.</li><li><strong>Use the Iceberg REST Catalog specification.</strong> Choosing a catalog that implements the standard REST spec ensures compatibility with all future compute engines, protecting your metadata investment.</li><li><strong>Monitor storage I/O, not just compute.</strong> In decoupled architectures, query slowness is often caused by excessive file reads (poor partitioning or missing compaction) rather than compute bottlenecks. Monitor bytes scanned per query as a key performance metric.</li></ul>
-        
-      </section>
-
-      <section id="section-10">
         <h2>Summary</h2>
-        <p>Decoupled storage and compute is the architectural principle that makes the <a href="data-lakehouse.html">data lakehouse</a> possible — and economically superior to traditional coupled architectures at scale. By separating data persistence in cheap, open cloud object storage from data processing in flexible, elastic compute engines, the lakehouse delivers independent scalability, multi-engine interoperability, dramatic cost reduction, and freedom from vendor lock-in.</p><p><a href="apache-iceberg.html">Apache Iceberg</a> is the metadata layer that makes decoupling safe at scale — its transaction protocol ensures that multiple compute engines can safely read and write the same tables concurrently. <a href="apache-polaris.html">Apache Polaris</a> and <a href="project-nessie.html">Project Nessie</a> provide the open catalog layer that coordinates engine access. And <a href="dremio.html">Dremio</a> provides the intelligent, high-performance compute layer that queries decoupled lakehouse data with sub-second latency.</p><p>For any organization evaluating data platform architecture in 2025 and beyond, decoupled storage and compute is not an optional design choice — it is the baseline assumption of every modern data platform.</p>
+        <p>Decoupled storage and compute is the foundational economic and architectural principle that makes the <a href="data-lakehouse.html">data lakehouse</a> superior to tightly coupled data warehouse architectures for most modern analytical workloads. By storing data in open <a href="apache-parquet.html">Parquet</a> files on cheap <a href="object-storage.html">object storage</a> and processing it with elastic compute engines, organizations achieve unlimited data scale at minimal cost, pay only for active compute, and maintain the freedom to choose any engine for any workload — without the vendor lock-in, storage costs, or scaling constraints of proprietary coupled systems.</p>
         
       </section>
     </article>
@@ -192,45 +150,45 @@
     <div class="container">
       <h2>Related Concepts</h2>
       <div class="related-grid">
-        <a class="related-card" href="data-lakehouse.html">
-      <span class="related-label">Core Concepts</span>
-      <span class="related-term">Data Lakehouse</span>
-      <span class="related-desc">The architecture built on decoupled storage and compute.</span>
+        <a class="related-card" href="object-storage.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Object Storage</span>
+      <span class="related-desc">The decoupled storage layer.</span>
     </a>
       <a class="related-card" href="apache-iceberg.html">
       <span class="related-label">Table Formats</span>
       <span class="related-term">Apache Iceberg</span>
-      <span class="related-desc">The table format enabling safe multi-engine access to shared storage.</span>
-    </a>
-      <a class="related-card" href="object-storage.html">
-      <span class="related-label">Storage</span>
-      <span class="related-term">Object Storage</span>
-      <span class="related-desc">The storage layer in the decoupled architecture.</span>
+      <span class="related-desc">The shared format enabling decoupled multi-engine access.</span>
     </a>
       <a class="related-card" href="dremio.html">
-      <span class="related-label">Query Engines</span>
+      <span class="related-label">Query Engines & Platforms</span>
       <span class="related-term">Dremio</span>
-      <span class="related-desc">Purpose-built compute engine for decoupled lakehouse storage.</span>
+      <span class="related-desc">Elastic decoupled compute engine for BI.</span>
     </a>
-      <a class="related-card" href="apache-polaris.html">
-      <span class="related-label">Catalogs</span>
-      <span class="related-term">Apache Polaris</span>
-      <span class="related-desc">The open catalog coordinating multi-engine access.</span>
-    </a>
-      <a class="related-card" href="compaction.html">
-      <span class="related-label">Table Formats</span>
-      <span class="related-term">Compaction</span>
-      <span class="related-desc">Maintaining optimal file sizes for decoupled read performance.</span>
+      <a class="related-card" href="amazon-s3.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Amazon S3</span>
+      <span class="related-desc">Primary decoupled storage implementation.</span>
     </a>
       <a class="related-card" href="multi-engine-interoperability.html">
       <span class="related-label">Analytics & BI</span>
       <span class="related-term">Multi-Engine Interoperability</span>
-      <span class="related-desc">The key benefit of decoupling storage from compute.</span>
+      <span class="related-desc">Decoupling enables concurrent multi-engine access.</span>
     </a>
-      <a class="related-card" href="predicate-pushdown.html">
-      <span class="related-label">Analytics & BI</span>
-      <span class="related-term">Predicate Pushdown</span>
-      <span class="related-desc">Minimizing data read from object storage at query time.</span>
+      <a class="related-card" href="dremio-cloud.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Cloud</span>
+      <span class="related-desc">Managed decoupled compute connecting to your S3 bucket.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture defined by decoupled storage and compute.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Elastic decoupled compute engine for batch ETL.</span>
     </a>
       </div>
     </div>

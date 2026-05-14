@@ -1,0 +1,98 @@
+{
+  "slug": "data-skipping",
+  "term": "Data Skipping",
+  "category": "Analytics & BI",
+  "metaTitle": "Data Skipping: The Definitive Guide",
+  "metaDescription": "Learn what data skipping is in Apache Iceberg, how file-level statistics enable skipping irrelevant data files, and why data skipping is critical for lakehouse query performance.",
+  "h1": "Data Skipping: The Definitive Guide",
+  "lede": "Data skipping is the query optimization technique of eliminating irrelevant data files from a scan before reading any bytes \u2014 using per-file column statistics stored in Iceberg manifest files. Combined with partitioning and Z-ordering, data skipping can eliminate 99%+ of data files for selective queries.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is data skipping in Apache Iceberg?",
+      "a": "Data skipping is the process where Iceberg's query engine reads per-file column statistics (min/max values, null counts) from manifest files and eliminates any data files whose statistics prove they cannot contain rows satisfying the query's WHERE clause. Files with min > filter_value or max < filter_value cannot contain matches and are skipped entirely."
+    },
+    {
+      "q": "How do column statistics enable data skipping?",
+      "a": "Each data file entry in an Iceberg manifest stores lower_bounds and upper_bounds for each column \u2014 the minimum and maximum values of that column in the file. If a query filters WHERE order_date = '2026-01-15', any file whose order_date max < '2026-01-15' or min > '2026-01-15' cannot contain matching rows and is skipped without reading its Parquet content."
+    },
+    {
+      "q": "What is the difference between partition pruning and data skipping?",
+      "a": "Partition pruning eliminates files based on partition metadata \u2014 it works at a coarser grain (entire partition boundaries). Data skipping uses per-file column statistics \u2014 it works at the individual file level regardless of partitioning. Both operate before any Parquet bytes are read. Z-ordering improves data skipping by clustering related values, making per-file statistics more selective."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Data Skipping?",
+      "content": "<p><strong>Data skipping</strong> is the query optimization technique where a query engine eliminates data files from a scan before reading their content \u2014 using <strong>per-file column statistics</strong> stored in <a href=\"iceberg-manifest-files.html\">Iceberg manifest files</a> to prove that certain files cannot contain rows satisfying the query's filter conditions.</p><p>Data skipping is the second level of <a href=\"predicate-pushdown.html\">predicate pushdown</a> in the Iceberg hierarchy (after partition pruning, before Parquet row group pruning). While partition pruning eliminates entire partitions worth of files coarsely, data skipping operates at the individual file level \u2014 eliminating files within a partition whose column value ranges don't overlap with the query's filter values.</p>"
+    },
+    {
+      "heading": "How Column Statistics Enable Skipping",
+      "content": "<p>Each data file entry in an <a href=\"iceberg-manifest-files.html\">Iceberg manifest file</a> stores per-column statistics:</p><ul><li><strong>lower_bound:</strong> The minimum value of that column across all rows in the file</li><li><strong>upper_bound:</strong> The maximum value of that column across all rows in the file</li><li><strong>null_value_count:</strong> The count of null values for that column in the file</li></ul><p>These statistics are written when data files are created (during Iceberg writes) and stored in the manifest. They require no separate indexing step \u2014 they are a natural part of the Iceberg commit process.</p><p>For a query with <code>WHERE revenue > 10000</code>, the engine reads manifest statistics and skips any file where <code>upper_bound(revenue) &lt;= 10000</code> \u2014 those files contain no rows with revenue above 10,000 and cannot contribute to the result.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Data Skipping Column Statistics",
+      "diagramCaption": "Figure 1: Data skipping \u2014 manifest statistics eliminate files before any Parquet bytes are read."
+    },
+    {
+      "heading": "Z-Ordering Amplifies Data Skipping",
+      "content": "<p><a href=\"z-ordering.html\">Z-Ordering</a> dramatically improves data skipping effectiveness. In an unordered table, data files contain a random mixture of values \u2014 the min/max range for most columns in each file spans nearly the entire value domain. A filter like <code>WHERE customer_id = 'C12345'</code> would find that almost every file's customer_id range includes 'C12345', requiring every file to be read.</p><p>After Z-Ordering by customer_id, files cluster data with similar customer IDs together. Now most files have a narrow customer_id range that doesn't include 'C12345', and are skipped. Only the 1\u20133 files whose range includes 'C12345' are read \u2014 reducing I/O from 100% of files to 1\u20133%.</p><p>The combination of <a href=\"compaction.html\">compaction</a> (optimal file sizes) + Z-Ordering (clustered values) + Iceberg manifest statistics (data skipping) is the most powerful trifecta for improving lakehouse query performance on large tables.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Z-Ordering Amplifying Data Skipping",
+      "diagramCaption": "Figure 2: Z-Ordering narrows file statistics, making data skipping dramatically more selective."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Data skipping is a foundational <a href=\"query-optimization.html\">query optimization</a> for the <a href=\"data-lakehouse.html\">data lakehouse</a>. By reading per-file column statistics from <a href=\"iceberg-manifest-files.html\">Iceberg manifest files</a> and eliminating files whose value ranges cannot satisfy query filters, data skipping reduces physical I/O from petabytes to gigabytes for selective queries. Maximizing data skipping effectiveness requires pairing it with good table management practices: <a href=\"compaction.html\">compaction</a> for right-sized files, and <a href=\"z-ordering.html\">Z-ordering</a> for clustered, narrow statistics. Together, these techniques are what make sub-second analytical queries on petabyte-scale Iceberg tables consistently achievable.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "iceberg-manifest-files",
+      "term": "Iceberg Manifest Files",
+      "category": "Table Formats",
+      "desc": "The metadata files storing column statistics for skipping."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Data skipping as a level of predicate pushdown."
+    },
+    {
+      "slug": "z-ordering",
+      "term": "Z-Ordering",
+      "category": "Table Formats",
+      "desc": "Z-ordering amplifies data skipping effectiveness."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Compaction creates right-sized files with good statistics."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format providing per-file statistics for skipping."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "Parquet row group stats complement file-level skipping."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "Data skipping as a key optimization technique."
+    },
+    {
+      "slug": "column-pruning",
+      "term": "Column Pruning",
+      "category": "Query Engines & Platforms",
+      "desc": "Companion optimization \u2014 prune columns after skipping files."
+    }
+  ]
+}

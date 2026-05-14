@@ -69,17 +69,17 @@ Each page is a ~4,000-word authoritative reference article.
 | 58 | Google Cloud Storage (GCS) | google-cloud-storage | File Formats & Storage | ✅ |
 | 59 | MinIO | minio | File Formats & Storage | ✅ |
 | 60 | Apache Hadoop HDFS | hdfs | File Formats & Storage | ✅ |
-| 61 | Semantic Layer | semantic-layer | Analytics & BI | ❌ |
-| 62 | AI Semantic Layer (Dremio) | ai-semantic-layer | Analytics & BI | ❌ |
+| 61 | Semantic Layer | semantic-layer | Analytics & BI | ✅ |
+| 62 | AI Semantic Layer (Dremio) | ai-semantic-layer | Analytics & BI | ✅ |
 | 63 | SQL Analytics | sql-analytics | Analytics & BI | ❌ |
-| 64 | Self-Service Analytics | self-service-analytics | Analytics & BI | ❌ |
-| 65 | Lakehouse Federation | lakehouse-federation | Analytics & BI | ❌ |
-| 66 | Multi-Engine Interoperability | multi-engine-interoperability | Analytics & BI | ❌ |
-| 67 | Query Optimization | query-optimization | Analytics & BI | ❌ |
-| 68 | Z-Ordering (Data Sorting) | z-ordering | Analytics & BI | ❌ |
-| 69 | Data Skipping | data-skipping | Analytics & BI | ❌ |
+| 64 | Self-Service Analytics | self-service-analytics | Analytics & BI | ✅ |
+| 65 | Lakehouse Federation | lakehouse-federation | Analytics & BI | ✅ |
+| 66 | Multi-Engine Interoperability | multi-engine-interoperability | Analytics & BI | ✅ |
+| 67 | Query Optimization | query-optimization | Analytics & BI | ✅ |
+| 68 | Z-Ordering (Data Sorting) | z-ordering | Analytics & BI | ✅ |
+| 69 | Data Skipping | data-skipping | Analytics & BI | ✅ |
 | 70 | Automated Table Optimization | automated-table-optimization | Analytics & BI | ❌ |
-| 71 | Data Governance | data-governance | Governance & Quality | ❌ |
+| 71 | Data Governance | data-governance | Governance & Quality | ✅ |
 | 72 | Data Lineage | data-lineage | Governance & Quality | ❌ |
 | 73 | Data Quality | data-quality | Governance & Quality | ❌ |
 | 74 | Data Observability | data-observability | Governance & Quality | ❌ |
@@ -89,8 +89,8 @@ Each page is a ~4,000-word authoritative reference article.
 | 78 | Data Fabric | data-fabric | Governance & Quality | ❌ |
 | 79 | Role-Based Access Control (RBAC) | rbac | Governance & Quality | ❌ |
 | 80 | Column-Level Security | column-level-security | Governance & Quality | ❌ |
-| 81 | Apache Kafka | apache-kafka | Ingestion & Streaming | ❌ |
-| 82 | Change Data Capture (CDC) | change-data-capture | Ingestion & Streaming | ❌ |
+| 81 | Apache Kafka | apache-kafka | Ingestion & Streaming | ✅ |
+| 82 | Change Data Capture (CDC) | change-data-capture | Ingestion & Streaming | ✅ |
 | 83 | Stream Processing | stream-processing | Ingestion & Streaming | ❌ |
 | 84 | Batch Processing | batch-processing | Ingestion & Streaming | ❌ |
 | 85 | Real-Time Analytics | real-time-analytics | Ingestion & Streaming | ❌ |

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Governance in the Data Lakehouse: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what data governance means in the data lakehouse, how access control, lineage, quality, and catalog management implement it, and why governance is essential for enterprise lakehouses.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-governance.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Data Governance in the Data Lakehouse: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what data governance means in the data lakehouse, how access control, lineage, quality, and catalog management implement it, and why governance is essential for enterprise lakehouses.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-governance.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Data Governance in the Data Lakehouse: The Definitive Guide",
+      "description": "Learn what data governance means in the data lakehouse, how access control, lineage, quality, and catalog management implement it, and why governance is essential for enterprise lakehouses.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/data-governance.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Data Governance", "item": "https://datalakehouse101.com/knowledge/data-governance.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is data governance in the data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data governance in the data lakehouse is the set of policies, controls, and processes that ensure: only authorized users can access specific data (access control), data quality is measured and maintained (data quality), data origins and transformations are traceable (lineage), regulatory requirements are met (compliance), and data assets are properly documented and owned (stewardship)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is access control enforced in a governed lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Best practice is to enforce access control at the catalog layer — in the Iceberg REST Catalog (Apache Polaris, Dremio Open Catalog) or in AWS Lake Formation. Catalog-layer enforcement is engine-agnostic: regardless of which engine queries the data (Spark, Dremio, Trino), the catalog API enforces access policies consistently by returning or withholding table metadata and storage credentials."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Apache Iceberg support data governance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Iceberg supports governance through: its catalog integration (access control enforced at catalog API), column-level statistics in manifests (enabling quality checks), time travel and snapshot history (enabling audit of historical data states), and its structured metadata (enabling lineage tools to parse the transformation history from snapshot to snapshot)."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Data Governance</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance</span>
+      <h1>Data Governance in the Data Lakehouse: The Definitive Guide</h1>
+      <p class="hero-lede">Data governance is the framework of policies, processes, and technologies that ensure data is accurate, accessible to the right people, compliant with regulations, and trustworthy for decision-making. In the lakehouse, governance spans access control at the catalog layer, lineage tracking, data quality enforcement, and classification policies.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Data Governance?</a></li>
+        <li><a href="#section-2">Access Control: The Catalog Layer</a></li>
+        <li><a href="#section-3">Data Quality Governance</a></li>
+        <li><a href="#section-4">Data Lineage and Compliance</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Data Governance?</h2>
+        <p><strong>Data governance</strong> is the organizational framework — policies, processes, roles, and technologies — that ensures data assets are managed as strategic organizational resources: accurate, trustworthy, accessible to authorized users, protected from unauthorized access, and compliant with applicable regulations.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a>, data governance is both more critical and more technically complex than in traditional data warehouses. More critical because the lakehouse's openness (multiple engines, open formats, direct storage access) creates more potential access paths that must be governed. More complex because governance must span the catalog layer, storage layer, query engine layer, and semantic layer — with policies enforced consistently regardless of which engine or interface accesses the data.</p><p>Enterprise lakehouse governance has six pillars: access control, data quality, data lineage, metadata management, data classification, and regulatory compliance.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Access Control: The Catalog Layer</h2>
+        <p>The most important architectural decision in lakehouse governance is where to enforce access control. The correct answer is the <strong>catalog layer</strong> — enforcing policies in the <a href="iceberg-rest-catalog.html">Iceberg REST Catalog</a> API, where table metadata and storage credentials are served.</p><p>Catalog-layer enforcement is engine-agnostic: every engine (Spark, Dremio, Trino, Flink) must load table metadata from the catalog before accessing any data files. If the catalog denies metadata access to an unauthorized principal, that principal cannot access the table regardless of engine. This is fundamentally superior to engine-layer enforcement, where each engine must independently implement and maintain the same access policies.</p><p>Leading catalog-layer access control implementations: <a href="apache-polaris.html">Apache Polaris</a> RBAC, <a href="dremio-open-catalog.html">Dremio Open Catalog</a> access policies, <a href="aws-glue-catalog.html">AWS Lake Formation</a> column-level and row-level policies, and <a href="unity-catalog.html">Unity Catalog</a> fine-grained access control.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Lakehouse Governance Architecture diagram" loading="lazy"><figcaption>Figure 1: Governance enforcement at the catalog layer — engine-agnostic access control for the open lakehouse.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Data Quality Governance</h2>
+        <p>Data quality governance ensures that data meets defined standards for completeness, accuracy, consistency, timeliness, and uniqueness. In the lakehouse context:</p><ul><li><strong>Quality rules:</strong> Defined expectations for each table (e.g., 'order_value must be positive', 'customer_id must be non-null', 'event_date must be within the last 90 days for new records')</li><li><strong>Quality checks:</strong> Automated validation runs (via dbt tests, Great Expectations, or Soda) that evaluate rules against actual data and produce quality metrics</li><li><strong>Quality metadata:</strong> Quality scores and check results stored in the <a href="data-catalog.html">data catalog</a> alongside table descriptions — enabling analysts to assess data trustworthiness before using it</li><li><strong>Quality gates:</strong> Pipeline stages that halt promotion of data to the next Medallion layer if quality checks fail</li></ul>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Data Lineage and Compliance</h2>
+        <p>Data lineage tracks how data flows from source systems through transformations to analytical outputs — which upstream tables each table depends on, which downstream tables and reports depend on each table. Lineage enables: impact analysis (if source table schema changes, which downstream tables break?), root cause investigation (if a metric is wrong, which upstream transformation introduced the error?), and regulatory compliance (prove to auditors that financial report data originated from validated, controlled source systems).</p><p>In the lakehouse, lineage is captured at multiple levels: pipeline-level lineage (which Spark jobs produce which Iceberg tables), column-level lineage (which source columns contribute to each target column), and query-level lineage (which tables are read by each query that produces a dashboard or report).
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Data Lineage in the Lakehouse diagram" loading="lazy"><figcaption>Figure 2: Data lineage across the Medallion Architecture — source systems to reports with full traceability.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Data governance is the foundation that transforms a technical data lakehouse into a trusted enterprise asset. Without governance, the lakehouse's openness becomes a liability — inconsistent data access, quality issues, regulatory exposure. With governance — catalog-layer access control, quality management, lineage tracking, and metadata stewardship — the lakehouse becomes an organizationally trustworthy platform where data consumers at every level can confidently use data knowing it is accurate, authorized, and compliant. The open lakehouse governed by <a href="apache-polaris.html">Apache Polaris</a> or <a href="dremio-open-catalog.html">Dremio Open Catalog</a> provides the same governance rigor as proprietary cloud warehouses without the vendor lock-in.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">ASF catalog with comprehensive RBAC governance.</span>
+    </a>
+      <a class="related-card" href="dremio-open-catalog.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Open Catalog</span>
+      <span class="related-desc">Dremio's governed REST catalog.</span>
+    </a>
+      <a class="related-card" href="data-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Data Catalog</span>
+      <span class="related-desc">Business metadata governance and stewardship.</span>
+    </a>
+      <a class="related-card" href="metadata-management.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Metadata Management</span>
+      <span class="related-desc">Metadata quality is a governance responsibility.</span>
+    </a>
+      <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">The catalog layer where governance is enforced.</span>
+    </a>
+      <a class="related-card" href="unity-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Unity Catalog</span>
+      <span class="related-desc">Databricks governance catalog with fine-grained access.</span>
+    </a>
+      <a class="related-card" href="aws-glue-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">AWS Glue Data Catalog</span>
+      <span class="related-desc">AWS Lake Formation governance via Glue.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture governance makes trustworthy.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

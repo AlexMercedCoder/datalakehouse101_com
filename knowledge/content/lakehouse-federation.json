@@ -1,0 +1,102 @@
+{
+  "slug": "lakehouse-federation",
+  "term": "Lakehouse Federation",
+  "category": "Analytics & BI",
+  "metaTitle": "Lakehouse Federation: The Definitive Guide",
+  "metaDescription": "Learn what lakehouse federation is, how engines like Dremio and Trino query across Iceberg tables and external databases simultaneously, and why federation eliminates data silos.",
+  "h1": "Lakehouse Federation: The Definitive Guide",
+  "lede": "Lakehouse federation is the ability to query Apache Iceberg tables alongside external data sources \u2014 relational databases, NoSQL stores, SaaS APIs \u2014 in a single SQL query, without moving data. It eliminates the 'copy everything into the lakehouse' anti-pattern and enables real-time joins across the entire data estate.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is lakehouse federation?",
+      "a": "Lakehouse federation is the capability to execute SQL queries that span Apache Iceberg tables (in object storage) and external data sources (PostgreSQL, MySQL, MongoDB, Salesforce, etc.) simultaneously \u2014 joining, aggregating, and filtering across all sources in a single query without ETL or data movement."
+    },
+    {
+      "q": "Which engines support lakehouse federation?",
+      "a": "Dremio and Trino are the leading engines for lakehouse federation. Dremio provides federation through its source connector model (PostgreSQL, MySQL, MongoDB, Elasticsearch, REST API sources) alongside Iceberg table access. Trino's connector architecture supports dozens of federated sources. Apache Spark can federate via JDBC sources, though with less optimization than dedicated federation engines."
+    },
+    {
+      "q": "What is the difference between federation and ETL?",
+      "a": "ETL copies data from source systems into the lakehouse, creating a latency gap and storage duplication. Federation queries source systems directly at query time \u2014 always reading the most current data without any copy lag or storage overhead. Federation is ideal for operational data that changes frequently and must be joined with historical lakehouse data."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Lakehouse Federation?",
+      "content": "<p><strong>Lakehouse federation</strong> is the ability of a query engine to execute SQL queries that seamlessly span multiple heterogeneous data sources simultaneously \u2014 <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables in object storage alongside PostgreSQL tables, MySQL databases, MongoDB collections, REST APIs, and other sources \u2014 joining and aggregating across all of them in a single SQL query without any data movement or ETL preprocessing.</p><p>Federation eliminates the data lake anti-pattern of 'copy everything into the lake before you can analyze it.' Instead of running an ETL pipeline to copy operational PostgreSQL data into Iceberg tables (introducing latency, storage duplication, and pipeline maintenance), a federated query engine reads PostgreSQL directly at query time \u2014 always using the most current operational data, joined in real-time with historical Iceberg analytics data.</p>"
+    },
+    {
+      "heading": "How Federation Works",
+      "content": "<p>Federation engines use a <strong>connector</strong> (or source) model: each external data source type has a connector that translates SQL operations into the source's native query protocol:</p><ul><li>A PostgreSQL connector translates SQL predicates into PostgreSQL queries via JDBC, returning results as rows</li><li>A MongoDB connector translates SQL filters into MongoDB queries, returning documents as rows</li><li>An Iceberg connector reads Parquet files from S3 directly via the Iceberg metadata API</li></ul><p><a href=\"predicate-pushdown.html\">Predicate pushdown</a> is critical for federation performance: the engine pushes WHERE clause predicates into each source's native query \u2014 so PostgreSQL returns only matching rows (not the entire table), and Iceberg's metadata eliminates irrelevant files. Without predicate pushdown, federation would transfer entire tables over the network for every query.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Lakehouse Federation Architecture",
+      "diagramCaption": "Figure 1: Lakehouse federation \u2014 single SQL query spanning Iceberg tables and external databases simultaneously."
+    },
+    {
+      "heading": "Federation in Dremio",
+      "content": "<p><a href=\"dremio.html\">Dremio</a> is architecturally designed for federation. Every data source in Dremio \u2014 whether an Iceberg table in its Open Catalog or a PostgreSQL database registered as a source \u2014 appears as a table in Dremio's unified namespace. Analysts write standard SQL joining any combination of sources without knowing where each table lives physically.</p><p>Dremio's federation capabilities include: PostgreSQL, MySQL, Oracle, SQL Server, MongoDB, Elasticsearch, S3 files (Parquet, CSV, JSON), and REST API sources. <a href=\"dremio-reflections.html\">Reflections</a> can be created on federated <a href=\"virtual-datasets.html\">Virtual Datasets</a> that join Iceberg with external sources \u2014 pre-computing the federated join so subsequent queries hit the Reflection rather than re-executing the cross-source join at query time."
+    },
+    {
+      "heading": "Federation Tradeoffs",
+      "content": "<p>Federation is powerful but not always the right pattern:</p><ul><li><strong>Use federation when:</strong> operational data must be current (no ETL lag acceptable), data volume from external sources is small, or the join produces a small result set that doesn't require moving large volumes</li><li><strong>Use ETL instead when:</strong> external source data is large and queries filter a small fraction (ELT to Iceberg is more efficient), the external source has performance constraints that federation queries would overwhelm, or data must be enriched and cleaned before joining with analytical data</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Federation vs ETL Decision Framework",
+      "diagramCaption": "Figure 2: Federation vs ETL \u2014 when to query in place vs when to copy data into the lakehouse."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Lakehouse federation is the capability that makes the <a href=\"data-lakehouse.html\">data lakehouse</a> a unified analytical platform rather than just another data silo. By enabling real-time SQL across Iceberg tables and operational databases, federation eliminates the ETL copy lag for operational analytics and allows analysts to work with current data alongside historical lakehouse data in a single query. <a href=\"dremio.html\">Dremio's</a> federation model \u2014 combining multi-source connectivity with Reflection acceleration for federated VDSs \u2014 is the most complete federation implementation in the open lakehouse ecosystem.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Leading federation engine for lakehouse + external sources."
+    },
+    {
+      "slug": "trino",
+      "term": "Trino",
+      "category": "Query Engines & Platforms",
+      "desc": "Open-source federation engine with connector model."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Essential for performant federation queries."
+    },
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "VDSs that join federated sources with Iceberg data."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Core Concepts",
+      "desc": "Alternative to federation for high-volume external data."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The lakehouse table format federation extends."
+    },
+    {
+      "slug": "catalog-interoperability",
+      "term": "Catalog Interoperability",
+      "category": "Catalogs & Metadata",
+      "desc": "Catalog interop enables federated multi-catalog access."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Federation makes the lakehouse a unified analytical hub."
+    }
+  ]
+}

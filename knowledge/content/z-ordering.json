@@ -1,106 +1,98 @@
 {
   "slug": "z-ordering",
-  "term": "Z-Ordering",
+  "term": "Z-Ordering (Data Sorting)",
   "category": "Table Formats",
-  "metaTitle": "Z-Ordering in Apache Iceberg: The Definitive Guide",
-  "metaDescription": "Learn what Z-ordering is, how it enables multi-dimensional data clustering in Apache Iceberg, and how Z-ordering improves query performance through data skipping.",
-  "h1": "Z-Ordering in Apache Iceberg: The Definitive Guide",
-  "lede": "Z-ordering is a multi-dimensional data clustering technique that co-locates rows with similar values for multiple columns within the same data files. Applied to Apache Iceberg tables, Z-ordering enables aggressive data skipping for queries filtering on any combination of the clustered columns.",
+  "metaTitle": "Z-Ordering: The Definitive Guide for Apache Iceberg",
+  "metaDescription": "Learn what Z-Ordering is in Apache Iceberg, how it clusters data to improve data skipping, and how to use OPTIMIZE with Z-ORDER BY for lakehouse query performance.",
+  "h1": "Z-Ordering: The Definitive Guide for Apache Iceberg",
+  "lede": "Z-Ordering is a multi-dimensional data clustering technique that sorts data by multiple columns simultaneously to maximize data skipping effectiveness. In Apache Iceberg, running OPTIMIZE with Z-ORDER BY clusters related rows together, making per-file column statistics highly selective and dramatically reducing I/O for filtered analytical queries.",
   "datePublished": "2026-05-14",
   "faqs": [
     {
-      "q": "What is Z-ordering in Apache Iceberg?",
-      "a": "Z-ordering is a data layout optimization that sorts rows by interleaving the bits of multiple sort key columns using a space-filling Z-curve. The result is that rows with similar values across all clustered dimensions end up in the same data files, enabling effective data skipping for queries filtering on any subset of the clustered columns."
+      "q": "What is Z-Ordering in Apache Iceberg?",
+      "a": "Z-Ordering (also called Z-order curve clustering) is a data layout optimization that sorts table data by multiple columns simultaneously using a space-filling curve. In Apache Iceberg, the OPTIMIZE TABLE ... REWRITE DATA ... STRATEGY z-order USING COLUMNS (...) command rewrites data files clustering rows with similar values in the specified columns together, making file-level statistics more selective for queries filtering on those columns."
     },
     {
-      "q": "How is Z-ordering different from simple sorting?",
-      "a": "Simple sorting by a single column is optimal only for queries filtering on that column. Z-ordering by multiple columns creates a layout that is reasonably good for queries filtering on any subset of those columns \u2014 a significant advantage for ad-hoc analytics with variable filter patterns."
+      "q": "How does Z-Ordering improve query performance?",
+      "a": "By clustering rows with similar values together in the same data files, Z-Ordering narrows each file's per-column min/max statistics range. When a query filters WHERE region = 'US-WEST', only files whose region range includes 'US-WEST' need to be read. With Z-Ordering, very few files will have a range including 'US-WEST' \u2014 most files contain only rows from other regions and are skipped entirely."
     },
     {
-      "q": "Does Dremio support Z-ordering?",
-      "a": "Yes. Dremio supports Z-ordering as part of its Automated Table Optimization feature. Data engineers can specify clustering columns for Iceberg tables, and Dremio will automatically apply Z-ordering during compaction runs to maintain optimal data layout."
+      "q": "When should I use Z-Ordering vs standard partitioning?",
+      "a": "Use both together: partitioning provides coarse-grained elimination at the partition level (eliminates entire groups of files), Z-Ordering provides fine-grained clustering within partitions (eliminates individual files using statistics). Z-Ordering is most valuable for high-cardinality columns where partitioning would create too many partitions (user_id, product_sku) or for multi-dimensional filtering where a single partition column cannot capture all filter dimensions."
     }
   ],
   "sections": [
     {
       "heading": "What Is Z-Ordering?",
-      "content": "<p><strong>Z-ordering</strong> (also called Z-order clustering or multi-dimensional clustering) is a data layout optimization technique that physically organizes rows in data files to maximize the effectiveness of data skipping for multi-dimensional query filters. Unlike simple sorting by a single column (which is only optimal for queries filtering on that column), Z-ordering produces a data layout that is efficient for queries filtering on any combination of the clustered columns.</p><p>The technique is named for the Z-shaped path (resembling the letter Z or the Morton code curve) that the Z-curve traces when applied to two-dimensional integer coordinates. Applied to columnar data: the Z-curve interleaves the binary representations of multiple column values into a single composite sort key, such that rows with similar values across all dimensions cluster together in sorted order.</p><p>In practical terms: if a table is Z-ordered by <code>(customer_id, product_category)</code>, then data files will tend to contain rows with similar customer_ids AND similar product_categories. A query filtering on <code>customer_id = 'abc'</code> alone can skip most files. A query filtering on <code>product_category = 'Electronics'</code> alone can skip most files. A query filtering on both can skip even more files. All three query patterns benefit from data skipping \u2014 no single-column sort provides this multi-dimensional coverage."
+      "content": "<p><strong>Z-Ordering</strong> is a data layout optimization technique based on the Z-order space-filling curve \u2014 a mathematical curve that maps multi-dimensional data to one-dimensional order while preserving locality in multiple dimensions simultaneously. In the context of <a href=\"apache-iceberg.html\">Apache Iceberg</a> table optimization, Z-Ordering means sorting (or clustering) data files so that rows with similar values across multiple filter columns are physically located in the same files \u2014 maximizing the effectiveness of <a href=\"data-skipping.html\">data skipping</a> based on file-level column statistics.</p><p>The problem Z-Ordering solves: standard sorting by a single column clusters rows by that column but disperses rows along all other columns. A table sorted by date has excellent date statistics (narrow date ranges per file) but poor statistics for region, product, or user \u2014 filters on those columns must read nearly every file. Z-Ordering clusters by multiple columns simultaneously, providing good (though not perfect) statistics for all specified columns in all files.</p>"
     },
     {
-      "heading": "How Z-Ordering Improves Data Skipping",
-      "content": "<p>Data skipping in <a href=\"apache-iceberg.html\">Apache Iceberg</a> works through per-file column statistics: each data file records the min and max value for each column it contains. At query time, the engine uses these statistics to skip files whose min-max range does not overlap with the query's filter predicates.</p><p>For data skipping to be effective, files must contain rows with similar values for the queried columns \u2014 so that their min-max ranges are narrow and don't overlap with ranges that contain no relevant rows. Poor data layout (random file assignment) produces wide min-max ranges for every file, and no files can be skipped.</p><p>Z-ordering produces narrow per-file min-max ranges for all clustered dimensions simultaneously. A file in a Z-ordered table by <code>(region, product_id)</code> contains rows from a limited range of regions and a limited range of product IDs \u2014 its min-max statistics are tight. A query for a specific region AND product_id can skip all files whose region range or product_id range does not include the query values.",
-      "diagram": "apache-iceberg-diagram-1.png",
-      "diagramAlt": "Z-Ordering Multi-Dimensional Data Skipping",
-      "diagramCaption": "Figure 1: Z-ordering clusters rows by multiple dimensions, enabling aggressive data skipping for any filter combination."
+      "heading": "Z-Ordering vs Single-Column Sorting",
+      "content": "<p>Consider a 100-file Iceberg table with 100M rows, queried by both date AND region frequently:</p><p><strong>Sorted by date only:</strong> Queries filtering by date alone are fast (most files skipped). Queries filtering by region alone must read all 100 files (region is randomly distributed across all files \u2014 no statistics benefit).</p><p><strong>Z-Ordered by (date, region):</strong> Files cluster rows with similar date + region combinations together. Queries filtering by date skip ~90% of files. Queries filtering by region skip ~80% of files. Queries filtering by both date AND region skip ~95% of files. The Z-order curve's locality property ensures related (date, region) combinations cluster near each other in sort order.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Z-Ordering vs Single Column Sort",
+      "diagramCaption": "Figure 1: Z-Ordering vs single-column sort \u2014 multi-dimensional clustering for multi-column query patterns."
     },
     {
-      "heading": "Z-Ordering vs. Single-Column Sorting",
-      "content": "<table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>Single-Column Sort</th><th>Z-Ordering</th></tr></thead><tbody><tr><td>Best query filter</td><td>Sort column only</td><td>Any clustered column or combination</td></tr><tr><td>File skipping for filter on col A</td><td>Excellent (if sorted on A)</td><td>Good</td></tr><tr><td>File skipping for filter on col B</td><td>Poor (if sorted on A)</td><td>Good</td></tr><tr><td>File skipping for filter on A AND B</td><td>Good for A, poor for B</td><td>Excellent</td></tr><tr><td>Best for</td><td>Predictable, single-column query patterns</td><td>Ad-hoc analytics with variable filters</td></tr></tbody></table><p>Z-ordering is most valuable for tables used in exploratory analytics where query patterns vary \u2014 analysts filter on different column combinations depending on the question they are answering. For operational dashboards with fixed, predictable filters, simple sorting on the primary filter column is often sufficient and has lower computational overhead."
-    },
-    {
-      "heading": "Z-Ordering in Practice with Dremio",
-      "content": "<p><a href=\"dremio.html\">Dremio</a> applies Z-ordering as part of its Automated Table Optimization feature. When Z-ordering is configured for an Iceberg table, Dremio's background optimization process applies the Z-curve algorithm to the table's data files during compaction runs, rewriting files with optimally clustered row ordering.</p><p>Configuring Z-ordering in Dremio: <code>ALTER TABLE my_table CLUSTER BY (region, product_category, customer_segment)</code>. After configuration, Dremio's optimizer automatically maintains the clustering during future compaction cycles. Dremio can also combine Z-ordering with file size optimization \u2014 ensuring that Z-ordered files are also optimally sized, not just optimally ordered.",
-      "diagram": "apache-iceberg-diagram-2.png",
-      "diagramAlt": "Z-Ordering Compaction Result",
-      "diagramCaption": "Figure 2: Compaction with Z-ordering produces optimally clustered files for multi-dimensional data skipping."
-    },
-    {
-      "heading": "Z-Ordering Best Practices",
-      "content": "<p>Applying Z-ordering effectively requires careful column selection:</p><ul><li><strong>Cluster by 2\u20134 high-impact columns.</strong> Z-ordering effectiveness diminishes with more than 4 columns \u2014 the Z-curve space becomes too high-dimensional for effective clustering. Choose the 2\u20134 columns most commonly used in query filters.</li><li><strong>Prioritize high-cardinality filter columns.</strong> Z-ordering is most effective for columns with many distinct values (product_id, customer_id, transaction_id). Low-cardinality columns (status, region) benefit more from <a href=\"hidden-partitioning.html\">partitioning</a> than Z-ordering.</li><li><strong>Apply Z-ordering at the Gold layer.</strong> The <a href=\"gold-layer.html\">Gold layer</a> tables queried by BI tools benefit most from Z-ordering \u2014 the query patterns are known, and the read performance improvement directly impacts user-facing dashboard latency.</li><li><strong>Combine with partitioning.</strong> Z-ordering works within partitions. A table partitioned by <code>days(event_date)</code> and Z-ordered by <code>(customer_id, product_id)</code> within partitions benefits from partition pruning for date filters AND Z-order skipping for customer/product filters.</li></ul>"
+      "heading": "Running Z-Order Optimization in Iceberg",
+      "content": "<p>Apache Iceberg supports Z-Order optimization via the OPTIMIZE (or REWRITE DATA) command available in Spark, Dremio, and Trino:</p><p>In Spark with Iceberg:</p><pre><code>CALL catalog.system.rewrite_data_files(\n  table =&gt; 'silver.orders',\n  strategy =&gt; 'sort',\n  sort_order =&gt; 'zorder(region, product_category, order_date)'\n);</code></pre><p>In Dremio SQL:</p><pre><code>OPTIMIZE TABLE silver.orders\nUSING SORT (region, product_category, order_date);</code></pre><p>Z-Order optimization is typically run as a scheduled maintenance job (daily or weekly for large tables) via Apache Airflow, as part of the table maintenance pipeline alongside <a href=\"compaction.html\">compaction</a>.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Z-Order Optimization Workflow",
+      "diagramCaption": "Figure 2: Z-Order optimization workflow \u2014 scheduled maintenance producing clustered, statistics-rich files."
     },
     {
       "heading": "Summary",
-      "content": "<p>Z-ordering is the most powerful data layout optimization for tables with diverse, multi-dimensional query patterns. By co-locating rows with similar values across multiple clustered dimensions, Z-ordering enables aggressive data skipping for any combination of filter predicates \u2014 making it ideal for the ad-hoc analytical workloads of the <a href=\"gold-layer.html\">Gold layer</a>.</p><p>Combined with <a href=\"hidden-partitioning.html\">hidden partitioning</a> (for coarse-grained file elimination) and file size <a href=\"compaction.html\">compaction</a> (for optimal I/O), Z-ordering is the final layer of a comprehensive data layout optimization strategy for <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables. <a href=\"dremio.html\">Dremio's</a> automated table optimization applies all three layers transparently, maintaining optimal table performance without manual DBA intervention."
+      "content": "<p>Z-Ordering is one of the highest-ROI table optimization techniques available in the open <a href=\"data-lakehouse.html\">data lakehouse</a>. By clustering rows with similar multi-column values into the same Parquet files, it dramatically narrows per-file column statistics and enables <a href=\"data-skipping.html\">data skipping</a> to eliminate 80\u201399% of data files for typical analytical filters. The combination of <a href=\"compaction.html\">compaction</a> (right-sized files), Z-Ordering (clustered layout), and <a href=\"dremio-reflections.html\">Reflections</a> (pre-computed materializations) represents the complete optimization stack for high-performance <a href=\"apache-iceberg.html\">Apache Iceberg</a> lakehouses \u2014 the toolkit that delivers sub-second analytics at petabyte scale.</p>"
     }
   ],
   "related": [
     {
-      "slug": "apache-iceberg",
-      "term": "Apache Iceberg",
-      "category": "Table Formats",
-      "desc": "The table format where Z-ordering is applied."
+      "slug": "data-skipping",
+      "term": "Data Skipping",
+      "category": "Analytics & BI",
+      "desc": "Z-ordering maximizes data skipping effectiveness."
     },
     {
       "slug": "compaction",
       "term": "Compaction",
       "category": "Table Formats",
-      "desc": "Z-ordering is applied during compaction rewrites."
+      "desc": "Z-ordering runs alongside compaction in maintenance."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format implementing Z-order optimization."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Z-ordering improves predicate pushdown selectivity."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "Z-ordering as a data layout optimization technique."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "Z-ordered data stored in Parquet files with narrow statistics."
+    },
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "Reflections complement Z-ordering for maximum performance."
     },
     {
       "slug": "hidden-partitioning",
       "term": "Hidden Partitioning",
       "category": "Table Formats",
-      "desc": "Coarse-grained file elimination that complements Z-ordering."
-    },
-    {
-      "slug": "data-skipping",
-      "term": "Data Skipping",
-      "category": "Analytics & BI",
-      "desc": "The query performance benefit of Z-ordering."
-    },
-    {
-      "slug": "dremio",
-      "term": "Dremio",
-      "category": "Query Engines",
-      "desc": "Applies Z-ordering automatically via Automated Table Optimization."
-    },
-    {
-      "slug": "gold-layer",
-      "term": "Gold Layer",
-      "category": "Architecture Patterns",
-      "desc": "Primary beneficiary of Z-ordering for BI query performance."
-    },
-    {
-      "slug": "dremio-reflections",
-      "term": "Dremio Reflections",
-      "category": "Dremio",
-      "desc": "Complementary acceleration for Z-ordered Gold tables."
-    },
-    {
-      "slug": "predicate-pushdown",
-      "term": "Predicate Pushdown",
-      "category": "Analytics & BI",
-      "desc": "Filters pushed to Iceberg metadata to leverage Z-ordering."
+      "desc": "Partitioning and Z-ordering work together for optimal layout."
     }
   ]
 }

@@ -1,0 +1,98 @@
+{
+  "slug": "self-service-analytics",
+  "term": "Self-Service Analytics",
+  "category": "Analytics & BI",
+  "metaTitle": "Self-Service Analytics: The Definitive Guide",
+  "metaDescription": "Learn what self-service analytics is, how the data lakehouse enables it at scale, and why the semantic layer, data catalog, and governed access are essential for true self-service.",
+  "h1": "Self-Service Analytics: The Definitive Guide",
+  "lede": "Self-service analytics enables business users and analysts to find, access, and analyze data independently \u2014 without requiring data engineering support for every question. It is the organizational goal that every lakehouse investment ultimately serves, and its success depends on the semantic layer, data catalog, and governed data access working together.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is self-service analytics?",
+      "a": "Self-service analytics is the organizational capability for business users, analysts, and data scientists to independently discover, access, analyze, and share data insights without requiring data engineering or IT support for each new question. It requires governed data access, business-friendly data interfaces (semantic layers), and analytics tools that non-technical users can operate effectively."
+    },
+    {
+      "q": "What is the difference between self-service and democratized analytics?",
+      "a": "Self-service analytics focuses on the technical and process infrastructure that enables independent data access (semantic layers, governed catalogs, BI tools). Data democratization is the broader organizational outcome \u2014 when data-driven decision making is accessible throughout the organization, not just to technical teams. Self-service is the means; democratization is the end."
+    },
+    {
+      "q": "What are the biggest obstacles to self-service analytics in lakehouses?",
+      "a": "The primary obstacles are: lack of a semantic layer (raw Iceberg tables are too technical for business users), inadequate data catalog (users cannot find or understand available data), poor data quality (users distrust data they cannot verify), performance issues (slow queries frustrate self-service workflows), and insufficient access governance (too permissive or too restrictive access policies)."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Self-Service Analytics?",
+      "content": "<p><strong>Self-service analytics</strong> is the organizational capability that allows business users, analysts, and data scientists to independently discover data, access it through governed interfaces, perform analysis, and share insights \u2014 without requiring a data engineering ticket for each new question, a DBA to write queries, or an IT team to provision database access.</p><p>Self-service analytics is the primary business justification for most <a href=\"data-lakehouse.html\">data lakehouse</a> investments. Organizations invest in Iceberg pipelines, query engines, and governance tooling because they want business teams to be able to answer their own questions faster \u2014 reducing the time from question to insight from days (waiting for data engineering) to minutes (self-service query).</p><p>True self-service \u2014 as opposed to 'let analysts write their own SQL against raw tables' \u2014 requires five enabling components working together: a <a href=\"semantic-layer.html\">semantic layer</a>, a <a href=\"data-catalog.html\">data catalog</a>, governed data access, performant query infrastructure, and intuitive analytics tooling. Without all five, self-service is either too difficult (requiring technical skills most users lack) or too ungoverned (leading to inconsistent metrics and data quality issues)."
+    },
+    {
+      "heading": "The Five Pillars of Self-Service Analytics",
+      "content": "<ul><li><strong>1. Semantic Layer:</strong> Business-friendly views of data (Dremio <a href=\"virtual-datasets.html\">Virtual Datasets</a>) that hide physical complexity and present data in business vocabulary \u2014 essential for non-technical users</li><li><strong>2. Data Catalog:</strong> Searchable inventory of available data assets with descriptions, owners, quality ratings, and lineage \u2014 so users can find relevant data without tribal knowledge</li><li><strong>3. Governed Access:</strong> Role-based access policies that give users access to the data they are authorized for and nothing more \u2014 enabling confident sharing without compliance risk</li><li><strong>4. Query Performance:</strong> Sub-second query responses for BI tools (via <a href=\"dremio-reflections.html\">Reflections</a>) so self-service workflows are not frustrated by slow queries that require engineering optimization</li><li><strong>5. Analytics Tooling:</strong> BI tools (Tableau, Power BI, Looker) that non-technical users can operate, connected to the semantic layer via standard ODBC/JDBC or Arrow Flight SQL</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Self-Service Analytics Five Pillars",
+      "diagramCaption": "Figure 1: The five pillars of self-service analytics \u2014 semantic layer, catalog, governance, performance, and tooling."
+    },
+    {
+      "heading": "Self-Service in the Dremio Lakehouse",
+      "content": "<p>The <a href=\"dremio.html\">Dremio</a> platform is architecturally designed for self-service analytics:</p><ul><li><a href=\"virtual-datasets.html\">Virtual Datasets</a> provide the semantic layer \u2014 business-friendly views organized in a logical namespace</li><li>Dremio's built-in wiki and description features allow data owners to document datasets inline</li><li><a href=\"dremio-reflections.html\">Reflections</a> ensure that self-service queries against semantic layer views return in milliseconds, not minutes</li><li>Role-based access control at the VDS level ensures users see only the data they are authorized for</li><li>ODBC/JDBC and Arrow Flight SQL drivers connect every major BI tool to Dremio's semantic layer without any tool-specific configuration</li></ul><p>The result: a business analyst opens Tableau, connects to Dremio, sees a clean list of business-friendly VDSs (not raw Iceberg table names), and creates a dashboard in 20 minutes \u2014 independently, without a data engineering ticket.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Dremio Self-Service Analytics Flow",
+      "diagramCaption": "Figure 2: Dremio self-service flow \u2014 analyst to dashboard without data engineering support."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Self-service analytics is the organizational outcome that validates every lakehouse investment \u2014 the proof that data engineering work has created value for the business, not just for the data team. Building a lakehouse that is genuinely self-service requires more than fast queries and good pipelines: it requires a <a href=\"semantic-layer.html\">semantic layer</a> that speaks business language, a <a href=\"data-catalog.html\">data catalog</a> that enables discovery, governed access that enables confident sharing, and performance that removes friction from the self-service workflow. <a href=\"dremio.html\">Dremio</a>'s architecture assembles all five pillars in a single platform \u2014 making it the most complete solution for enterprise self-service analytics on the open lakehouse.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "Semantic layers enable self-service by hiding complexity."
+    },
+    {
+      "slug": "data-catalog",
+      "term": "Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Catalogs enable data discovery for self-service."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's architecture targets self-service analytics."
+    },
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "Reflections provide the performance self-service needs."
+    },
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "VDSs are the business-friendly interface for self-service."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Governance enables confident, compliant self-service."
+    },
+    {
+      "slug": "ai-semantic-layer",
+      "term": "AI Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "AI extends self-service to autonomous agent analytics."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture enabling enterprise self-service analytics."
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "slug": "multi-engine-interoperability",
+  "term": "Multi-Engine Interoperability",
+  "category": "Analytics & BI",
+  "metaTitle": "Multi-Engine Interoperability: The Definitive Guide",
+  "metaDescription": "Learn what multi-engine interoperability means in the data lakehouse, how Apache Iceberg and the REST Catalog spec enable it, and why it protects against vendor lock-in.",
+  "h1": "Multi-Engine Interoperability: The Definitive Guide",
+  "lede": "Multi-engine interoperability is the ability to use multiple query engines \u2014 Dremio, Spark, Trino, Flink \u2014 against the same Apache Iceberg tables through a shared catalog. It is the open lakehouse's most important architectural property, enabling right-tool-for-the-job engine selection without data silos or lock-in.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is multi-engine interoperability?",
+      "a": "Multi-engine interoperability is the ability for multiple different query engines (Dremio, Apache Spark, Trino, Apache Flink, PyIceberg) to read and write the same Apache Iceberg tables through a shared catalog, with each engine seeing consistent table state and schema \u2014 enabling different engines to be used for different workloads on the same data."
+    },
+    {
+      "q": "How does Apache Iceberg enable multi-engine interoperability?",
+      "a": "Iceberg's standardized metadata model (snapshot-based, catalog-tracked) ensures all engines see the same consistent table state. The Iceberg REST Catalog specification provides a standard API for catalog access. Iceberg's ACID commit protocol prevents concurrent write conflicts between engines. Together, these make Iceberg the shared data contract that enables multi-engine access."
+    },
+    {
+      "q": "What is the practical benefit of multi-engine interoperability?",
+      "a": "Right-tool-for-the-job workload routing: use Spark for complex batch ETL (where Spark's Python ecosystem and batch throughput excel), Flink for real-time streaming ingestion, Trino for ad-hoc federated queries, and Dremio for BI/semantic layer/Reflections \u2014 all on the same Iceberg tables without duplicating data."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Multi-Engine Interoperability?",
+      "content": "<p><strong>Multi-engine interoperability</strong> is the architectural property of the open <a href=\"data-lakehouse.html\">data lakehouse</a> that allows multiple different query engines to access the same data \u2014 read it, write it, transform it, and query it \u2014 through a shared catalog and table format, with each engine seeing consistent, up-to-date table state. It is the foundational property that distinguishes the open lakehouse from proprietary data warehouse architectures where data is locked to a single engine.</p><p>In practice, multi-engine interoperability means: a table created by <a href=\"apache-spark.html\">Apache Spark</a> is immediately queryable by <a href=\"dremio.html\">Dremio</a>. A streaming write from <a href=\"apache-flink.html\">Apache Flink</a> is immediately visible to <a href=\"trino.html\">Trino</a>. A schema change made by Dremio (ALTER TABLE ADD COLUMN) is immediately reflected in Spark's view of the table. No data copying, no synchronization delay, no format conversion required."
+    },
+    {
+      "heading": "The Technology Stack Enabling Interoperability",
+      "content": "<p>Multi-engine interoperability requires three aligned technology components:</p><h3>Open Table Format: Apache Iceberg</h3><p><a href=\"apache-iceberg.html\">Apache Iceberg's</a> standardized metadata model \u2014 snapshot lists, manifests, data files \u2014 is the shared data contract. Every engine reads the same metadata files and interprets the same Parquet data files. Schema is stored in the metadata, not in the engine \u2014 so all engines see the current schema.</p><h3>Shared Catalog: Iceberg REST Catalog</h3><p>The <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> spec provides the shared metadata service that all engines communicate through. Each engine reads the current metadata file pointer from the catalog before accessing table data. The catalog's optimistic concurrency control ensures atomic commits prevent write conflicts.</p><h3>Standard File Format: Apache Parquet</h3><p><a href=\"apache-parquet.html\">Apache Parquet</a> as the data file format ensures that every engine can read every data file \u2014 there is no proprietary encoding that would prevent cross-engine access.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Multi-Engine Interoperability Stack",
+      "diagramCaption": "Figure 1: The three-layer stack enabling multi-engine interoperability \u2014 Iceberg + REST Catalog + Parquet."
+    },
+    {
+      "heading": "Right-Tool-for-the-Job Architecture",
+      "content": "<p>Multi-engine interoperability enables the 'right tool for the right job' lakehouse architecture \u2014 routing each workload type to the engine that handles it best:</p><table class=\"comparison-table\"><thead><tr><th>Workload</th><th>Best Engine</th><th>Why</th></tr></thead><tbody><tr><td>Batch ETL transformation</td><td>Apache Spark</td><td>PySpark ecosystem, throughput, ML integration</td></tr><tr><td>Real-time CDC ingestion</td><td>Apache Flink</td><td>Exactly-once streaming, Debezium integration</td></tr><tr><td>Interactive BI analytics</td><td>Dremio</td><td>Reflections, semantic layer, BI tool optimization</td></tr><tr><td>Ad-hoc federated SQL</td><td>Trino</td><td>Multi-catalog, ANSI SQL, connector breadth</td></tr><tr><td>Python data science</td><td>PyIceberg + DuckDB</td><td>Local Iceberg access, zero cluster overhead</td></tr></tbody></table>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Multi-Engine Right Tool Architecture",
+      "diagramCaption": "Figure 2: Multi-engine lakehouse \u2014 each workload type routed to its optimal engine on shared Iceberg data."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Multi-engine interoperability is the architectural moat of the open <a href=\"data-lakehouse.html\">data lakehouse</a>. Enabled by <a href=\"apache-iceberg.html\">Apache Iceberg's</a> standardized table format, the <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> specification, and <a href=\"apache-parquet.html\">Apache Parquet's</a> universal file format, it allows organizations to build a best-of-breed analytics stack where each workload uses its optimal engine \u2014 without creating data silos, duplicating storage, or accepting vendor lock-in. The open lakehouse's multi-engine architecture is fundamentally more flexible, more cost-effective, and more future-proof than any single-vendor proprietary platform.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The shared table format enabling interoperability."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "The shared catalog API connecting all engines."
+    },
+    {
+      "slug": "catalog-interoperability",
+      "term": "Catalog Interoperability",
+      "category": "Catalogs & Metadata",
+      "desc": "Catalog-level interoperability enabling multi-engine access."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "BI and semantic layer engine in the multi-engine stack."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "ETL engine in the multi-engine stack."
+    },
+    {
+      "slug": "apache-flink",
+      "term": "Apache Flink",
+      "category": "Query Engines & Platforms",
+      "desc": "Streaming engine in the multi-engine stack."
+    },
+    {
+      "slug": "trino",
+      "term": "Trino",
+      "category": "Query Engines & Platforms",
+      "desc": "Federated SQL engine in the multi-engine stack."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture where multi-engine interoperability lives."
+    }
+  ]
+}

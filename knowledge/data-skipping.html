@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Skipping: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what data skipping is in Apache Iceberg, how file-level statistics enable skipping irrelevant data files, and why data skipping is critical for lakehouse query performance.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-skipping.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Data Skipping: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what data skipping is in Apache Iceberg, how file-level statistics enable skipping irrelevant data files, and why data skipping is critical for lakehouse query performance.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-skipping.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Data Skipping: The Definitive Guide",
+      "description": "Learn what data skipping is in Apache Iceberg, how file-level statistics enable skipping irrelevant data files, and why data skipping is critical for lakehouse query performance.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/data-skipping.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Data Skipping", "item": "https://datalakehouse101.com/knowledge/data-skipping.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is data skipping in Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data skipping is the process where Iceberg's query engine reads per-file column statistics (min/max values, null counts) from manifest files and eliminates any data files whose statistics prove they cannot contain rows satisfying the query's WHERE clause. Files with min > filter_value or max < filter_value cannot contain matches and are skipped entirely."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do column statistics enable data skipping?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each data file entry in an Iceberg manifest stores lower_bounds and upper_bounds for each column — the minimum and maximum values of that column in the file. If a query filters WHERE order_date = '2026-01-15', any file whose order_date max < '2026-01-15' or min > '2026-01-15' cannot contain matching rows and is skipped without reading its Parquet content."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between partition pruning and data skipping?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Partition pruning eliminates files based on partition metadata — it works at a coarser grain (entire partition boundaries). Data skipping uses per-file column statistics — it works at the individual file level regardless of partitioning. Both operate before any Parquet bytes are read. Z-ordering improves data skipping by clustering related values, making per-file statistics more selective."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Data Skipping</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Analytics & BI</span>
+      <h1>Data Skipping: The Definitive Guide</h1>
+      <p class="hero-lede">Data skipping is the query optimization technique of eliminating irrelevant data files from a scan before reading any bytes — using per-file column statistics stored in Iceberg manifest files. Combined with partitioning and Z-ordering, data skipping can eliminate 99%+ of data files for selective queries.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Data Skipping?</a></li>
+        <li><a href="#section-2">How Column Statistics Enable Skipping</a></li>
+        <li><a href="#section-3">Z-Ordering Amplifies Data Skipping</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Data Skipping?</h2>
+        <p><strong>Data skipping</strong> is the query optimization technique where a query engine eliminates data files from a scan before reading their content — using <strong>per-file column statistics</strong> stored in <a href="iceberg-manifest-files.html">Iceberg manifest files</a> to prove that certain files cannot contain rows satisfying the query's filter conditions.</p><p>Data skipping is the second level of <a href="predicate-pushdown.html">predicate pushdown</a> in the Iceberg hierarchy (after partition pruning, before Parquet row group pruning). While partition pruning eliminates entire partitions worth of files coarsely, data skipping operates at the individual file level — eliminating files within a partition whose column value ranges don't overlap with the query's filter values.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>How Column Statistics Enable Skipping</h2>
+        <p>Each data file entry in an <a href="iceberg-manifest-files.html">Iceberg manifest file</a> stores per-column statistics:</p><ul><li><strong>lower_bound:</strong> The minimum value of that column across all rows in the file</li><li><strong>upper_bound:</strong> The maximum value of that column across all rows in the file</li><li><strong>null_value_count:</strong> The count of null values for that column in the file</li></ul><p>These statistics are written when data files are created (during Iceberg writes) and stored in the manifest. They require no separate indexing step — they are a natural part of the Iceberg commit process.</p><p>For a query with <code>WHERE revenue > 10000</code>, the engine reads manifest statistics and skips any file where <code>upper_bound(revenue) &lt;= 10000</code> — those files contain no rows with revenue above 10,000 and cannot contribute to the result.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Data Skipping Column Statistics diagram" loading="lazy"><figcaption>Figure 1: Data skipping — manifest statistics eliminate files before any Parquet bytes are read.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Z-Ordering Amplifies Data Skipping</h2>
+        <p><a href="z-ordering.html">Z-Ordering</a> dramatically improves data skipping effectiveness. In an unordered table, data files contain a random mixture of values — the min/max range for most columns in each file spans nearly the entire value domain. A filter like <code>WHERE customer_id = 'C12345'</code> would find that almost every file's customer_id range includes 'C12345', requiring every file to be read.</p><p>After Z-Ordering by customer_id, files cluster data with similar customer IDs together. Now most files have a narrow customer_id range that doesn't include 'C12345', and are skipped. Only the 1–3 files whose range includes 'C12345' are read — reducing I/O from 100% of files to 1–3%.</p><p>The combination of <a href="compaction.html">compaction</a> (optimal file sizes) + Z-Ordering (clustered values) + Iceberg manifest statistics (data skipping) is the most powerful trifecta for improving lakehouse query performance on large tables.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Z-Ordering Amplifying Data Skipping diagram" loading="lazy"><figcaption>Figure 2: Z-Ordering narrows file statistics, making data skipping dramatically more selective.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Data skipping is a foundational <a href="query-optimization.html">query optimization</a> for the <a href="data-lakehouse.html">data lakehouse</a>. By reading per-file column statistics from <a href="iceberg-manifest-files.html">Iceberg manifest files</a> and eliminating files whose value ranges cannot satisfy query filters, data skipping reduces physical I/O from petabytes to gigabytes for selective queries. Maximizing data skipping effectiveness requires pairing it with good table management practices: <a href="compaction.html">compaction</a> for right-sized files, and <a href="z-ordering.html">Z-ordering</a> for clustered, narrow statistics. Together, these techniques are what make sub-second analytical queries on petabyte-scale Iceberg tables consistently achievable.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="iceberg-manifest-files.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg Manifest Files</span>
+      <span class="related-desc">The metadata files storing column statistics for skipping.</span>
+    </a>
+      <a class="related-card" href="predicate-pushdown.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Predicate Pushdown</span>
+      <span class="related-desc">Data skipping as a level of predicate pushdown.</span>
+    </a>
+      <a class="related-card" href="z-ordering.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Z-Ordering</span>
+      <span class="related-desc">Z-ordering amplifies data skipping effectiveness.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Compaction creates right-sized files with good statistics.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format providing per-file statistics for skipping.</span>
+    </a>
+      <a class="related-card" href="apache-parquet.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Parquet</span>
+      <span class="related-desc">Parquet row group stats complement file-level skipping.</span>
+    </a>
+      <a class="related-card" href="query-optimization.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Query Optimization</span>
+      <span class="related-desc">Data skipping as a key optimization technique.</span>
+    </a>
+      <a class="related-card" href="column-pruning.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Column Pruning</span>
+      <span class="related-desc">Companion optimization — prune columns after skipping files.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

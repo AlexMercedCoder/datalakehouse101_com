@@ -1,0 +1,98 @@
+{
+  "slug": "apache-kafka",
+  "term": "Apache Kafka",
+  "category": "Ingestion",
+  "metaTitle": "Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion",
+  "metaDescription": "Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipelines, and how Kafka connects operational systems to Apache Iceberg tables.",
+  "h1": "Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion",
+  "lede": "Apache Kafka is the distributed event streaming platform that connects operational systems to the data lakehouse. As the message bus for CDC events, application logs, clickstreams, and IoT data, Kafka enables the real-time data pipelines that feed Bronze Iceberg tables with seconds-fresh operational data.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Kafka?",
+      "a": "Apache Kafka is an open-source distributed event streaming platform designed for high-throughput, fault-tolerant, real-time data pipelines. It stores messages as ordered, immutable logs partitioned across a cluster, allowing millions of events per second to be published and consumed by multiple independent consumers simultaneously."
+    },
+    {
+      "q": "How does Apache Kafka fit into a data lakehouse architecture?",
+      "a": "Kafka serves as the real-time ingestion layer between operational systems and the lakehouse. Applications, databases (via Debezium CDC), IoT devices, and SaaS webhooks publish events to Kafka topics. Downstream consumers (Apache Flink, Spark Structured Streaming) read from Kafka and write to Bronze Apache Iceberg tables, creating a continuously updated real-time data pipeline."
+    },
+    {
+      "q": "What is Kafka Connect and how does it relate to lakehouse ingestion?",
+      "a": "Kafka Connect is Kafka's connector framework for integrating external systems. Debezium runs as a Kafka Connect source connector, reading database WALs and publishing CDC events to Kafka. Kafka Connect sink connectors can write Kafka topics directly to Iceberg tables without requiring Flink or Spark \u2014 simplifying simple ingestion scenarios."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Kafka?",
+      "content": "<p><strong>Apache Kafka</strong> is an open-source distributed event streaming platform originally developed at LinkedIn and donated to the Apache Software Foundation. Kafka stores events (messages) in ordered, immutable, partitioned logs called <strong>topics</strong> \u2014 organized streams of events that producers write to and consumers read from independently, at any time, and at any pace.</p><p>Kafka's design provides four properties critical for lakehouse ingestion pipelines: <strong>durability</strong> (events are replicated across the Kafka cluster and persisted to disk), <strong>scalability</strong> (topics are partitioned across brokers to handle millions of events/second), <strong>replayability</strong> (consumers can re-read events from any point in a topic's history), and <strong>fan-out</strong> (multiple independent consumers can read the same topic simultaneously \u2014 Flink for Iceberg writes, a monitoring consumer for alerting, a ML consumer for real-time feature computation)."
+    },
+    {
+      "heading": "Kafka in the Lakehouse Ingestion Architecture",
+      "content": "<p>Kafka is the <strong>ingestion backbone</strong> of the real-time lakehouse \u2014 the central nervous system connecting data producers (operational systems, applications, devices) to data consumers (Flink, Spark, Iceberg sinks):</p><p><strong>Producers \u2192 Kafka Topics:</strong> Application services emit events (user actions, transactions, IoT readings) to Kafka. Debezium connectors read PostgreSQL/MySQL WALs and publish CDC events. SaaS webhook receivers forward events from external systems.</p><p><strong>Kafka Topics \u2192 Iceberg Sinks:</strong> Apache Flink reads topics, applies transformations and stateful aggregations, and writes to Bronze Iceberg tables. Spark Structured Streaming reads topics and writes batch micro-batches to Iceberg. Kafka Connect Iceberg sink connectors write directly without Flink or Spark for simple passthrough ingestion.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Kafka Lakehouse Ingestion Architecture",
+      "diagramCaption": "Figure 1: Kafka as the ingestion backbone \u2014 connecting operational producers to Iceberg lakehouse consumers."
+    },
+    {
+      "heading": "Kafka Schema Registry and Iceberg",
+      "content": "<p>The <strong>Confluent Schema Registry</strong> (and its open-source equivalent Apicurio) is a critical companion to Kafka in the lakehouse ingestion pipeline. It manages <a href=\"apache-avro.html\">Avro</a> schemas for Kafka messages \u2014 ensuring that producers and consumers use compatible schemas and that schema changes are backward-compatible.</p><p>Schema Registry integration with Iceberg is valuable for schema evolution: when a producer adds a new field to their Avro schema (registered in Schema Registry), the Flink consumer detects the new field and Iceberg's schema evolution capability allows the Bronze table schema to be updated to include the new column \u2014 without breaking existing queries on the table. This automatic schema propagation from Kafka Schema Registry \u2192 Flink \u2192 Iceberg schema evolution is one of the most powerful features of the Kafka-to-Iceberg pipeline.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Kafka Schema Registry to Iceberg Schema Evolution",
+      "diagramCaption": "Figure 2: Kafka Schema Registry + Flink \u2192 Iceberg schema evolution \u2014 new fields propagate automatically."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Kafka is the real-time ingestion platform that transforms the <a href=\"data-lakehouse.html\">data lakehouse</a> from a batch-oriented historical archive into a live, continuously updated operational intelligence platform. By acting as the durable, scalable message bus between operational systems and <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables, Kafka enables <a href=\"change-data-capture.html\">CDC pipelines</a>, application event streaming, and IoT data ingestion with seconds-level data freshness. Combined with <a href=\"apache-flink.html\">Apache Flink</a> for stream processing and Iceberg's V2 DML for CDC writes, Kafka completes the real-time lakehouse ingestion stack.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC events flow through Kafka to Iceberg."
+    },
+    {
+      "slug": "apache-flink",
+      "term": "Apache Flink",
+      "category": "Query Engines & Platforms",
+      "desc": "Primary Kafka consumer writing to Iceberg."
+    },
+    {
+      "slug": "apache-avro",
+      "term": "Apache Avro",
+      "category": "File Formats & Storage",
+      "desc": "Standard Kafka message serialization format."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Destination table format for Kafka-sourced events."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Kafka feeds Bronze layer in the Medallion pattern."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "Kafka enables real-time streaming ETL."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Spark Structured Streaming also consumes from Kafka."
+    },
+    {
+      "slug": "schema-evolution",
+      "term": "Schema Evolution",
+      "category": "Table Formats",
+      "desc": "Kafka Schema Registry enables Iceberg schema evolution."
+    }
+  ]
+}

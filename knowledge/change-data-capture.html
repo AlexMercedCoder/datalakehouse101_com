@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Data Capture (CDC): The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/change-data-capture.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Change Data Capture (CDC): The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/change-data-capture.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Change Data Capture (CDC): The Definitive Guide",
+      "description": "Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/change-data-capture.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Change Data Capture (CDC)", "item": "https://datalakehouse101.com/knowledge/change-data-capture.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Change Data Capture (CDC)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Change Data Capture (CDC) is a data integration technique that monitors a source database's transaction log (WAL — Write-Ahead Log) and captures every row-level change (INSERT, UPDATE, DELETE) as a structured event. These events are then streamed to downstream systems (Kafka, Iceberg tables) to replicate the source database's changes in near-real-time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does CDC work with Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CDC events (typically captured by Debezium and published to Kafka) are processed by Apache Flink using the Flink CDC connectors. Flink writes INSERTs as new rows, UPDATEs as updates (using Iceberg V2 equality delete files in MoR mode), and DELETEs as deletions to target Iceberg Silver tables. The result is a Silver Iceberg table that continuously mirrors the current state of the source operational database."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Debezium and why is it used for CDC?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Debezium is the leading open-source CDC platform. It connects to source databases (PostgreSQL, MySQL, Oracle, MongoDB, SQL Server) as a replication client, reads the WAL, and publishes change events to Apache Kafka in a structured JSON or Avro format. Debezium's Kafka Connect integration makes it the standard CDC source for Kafka-based streaming pipelines feeding Apache Iceberg lakehouses."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Change Data Capture (CDC)</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Ingestion</span>
+      <h1>Change Data Capture (CDC): The Definitive Guide</h1>
+      <p class="hero-lede">Change Data Capture (CDC) continuously captures row-level changes — inserts, updates, and deletes — from operational databases and streams them to the lakehouse. With Debezium + Apache Flink + Apache Iceberg, CDC enables near-real-time data freshness in the lakehouse without full table scans or expensive batch ETL windows.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Change Data Capture?</a></li>
+        <li><a href="#section-2">CDC Architecture: Debezium → Kafka → Flink → Iceberg</a></li>
+        <li><a href="#section-3">CDC and Iceberg V2 DML</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Change Data Capture?</h2>
+        <p><strong>Change Data Capture (CDC)</strong> is a data integration technique that captures row-level changes from operational databases in near-real-time by reading the database's transaction log (called the Write-Ahead Log, or WAL, in PostgreSQL; the binlog in MySQL). Instead of periodically querying the source database for changed records (slow, expensive, misses deletes), CDC monitors the WAL — the same log the database itself uses for crash recovery — and publishes each committed INSERT, UPDATE, or DELETE as a structured change event.</p><p>CDC is the key technology enabling the transition from batch ETL (where lakehouse data is hours or days old) to near-real-time lakehouse analytics (where data is seconds or minutes old). For business use cases requiring current operational data — inventory levels, real-time order status, live customer activity — CDC is the pipeline pattern that makes the lakehouse competitive with direct database queries for freshness.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>CDC Architecture: Debezium → Kafka → Flink → Iceberg</h2>
+        <p>The standard lakehouse CDC architecture has four components:</p><ol><li><strong>Debezium:</strong> Connects to source databases (PostgreSQL, MySQL, etc.) as a logical replication client. Reads WAL entries and publishes change events (before/after row images plus change type: INSERT/UPDATE/DELETE) to Kafka topics in Debezium JSON or Avro format.</li><li><strong>Apache Kafka:</strong> The durable, scalable message queue that buffers change events between Debezium and downstream consumers. Provides fault tolerance and allows multiple consumers (Flink, other processors) to read the same events independently.</li><li><strong>Apache Flink:</strong> Reads Debezium events from Kafka using the flink-cdc-connectors library. Applies transformations (optional). Writes to Iceberg using the Flink Iceberg sink in UPSERT mode — INSERTs become new rows, UPDATE/DELETE become equality delete files.</li><li><strong>Apache Iceberg:</strong> The destination Silver table maintains current-state records. V2 equality delete files record deleted/updated rows; compaction periodically merges these into CoW data files for read performance.</li></ol>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="CDC Architecture Debezium Flink Iceberg diagram" loading="lazy"><figcaption>Figure 1: CDC pipeline — Debezium captures WAL changes, Kafka buffers, Flink processes, Iceberg stores.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>CDC and Iceberg V2 DML</h2>
+        <p>CDC pipelines require <a href="apache-iceberg.html">Apache Iceberg</a> V2 table format support for UPDATE and DELETE operations:</p><ul><li><strong>Inserts:</strong> New records from CDC are appended as new data files using standard Iceberg append operations</li><li><strong>Updates:</strong> CDC updates generate an equality delete file (marking the old row as deleted by its primary key) plus a new data file (the updated row) — this is <a href="merge-on-read.html">Merge-on-Read</a> semantics</li><li><strong>Deletes:</strong> CDC deletes generate equality delete files marking the deleted row's primary key</li></ul><p>The accumulation of equality delete files over time requires periodic <a href="compaction.html">compaction</a> to merge them into <a href="copy-on-write.html">CoW</a> data files for read performance. Without compaction, queries on heavily updated Silver tables must read many delete files to determine current row state.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="CDC Iceberg V2 MoR Delete Files diagram" loading="lazy"><figcaption>Figure 2: CDC writes to Iceberg — equality delete files for updates/deletes, compaction for read performance.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Change Data Capture is the data integration technology that makes the <a href="data-lakehouse.html">data lakehouse</a> competitive with operational databases for data freshness. The Debezium → Kafka → <a href="apache-flink.html">Flink</a> → <a href="apache-iceberg.html">Iceberg</a> pipeline delivers near-real-time data from operational source databases into governed, analytically optimized Silver Iceberg tables — without the latency of batch ETL windows or the performance impact of direct database queries. Combined with <a href="compaction.html">compaction</a> for read performance and <a href="dremio.html">Dremio's</a> query engine for BI analytics, CDC-fed Iceberg tables close the gap between operational and analytical data to seconds.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-flink.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Flink</span>
+      <span class="related-desc">Primary streaming engine for CDC-to-Iceberg pipelines.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Destination table format for CDC events.</span>
+    </a>
+      <a class="related-card" href="merge-on-read.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Merge-on-Read</span>
+      <span class="related-desc">MoR semantics used for CDC update/delete writes.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Essential maintenance for CDC-fed Iceberg tables.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">CDC feeds Silver layer tables in the Medallion pattern.</span>
+    </a>
+      <a class="related-card" href="etl.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">CDC enables real-time ETL replacing batch extraction.</span>
+    </a>
+      <a class="related-card" href="apache-kafka.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Apache Kafka</span>
+      <span class="related-desc">Message queue buffering CDC events from Debezium.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">CDC enables near-real-time freshness in the lakehouse.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

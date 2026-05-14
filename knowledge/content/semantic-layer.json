@@ -1,0 +1,98 @@
+{
+  "slug": "semantic-layer",
+  "term": "Semantic Layer",
+  "category": "Analytics & BI",
+  "metaTitle": "Semantic Layer: The Definitive Guide",
+  "metaDescription": "Learn what a semantic layer is, how it translates raw data into business-friendly metrics, and why it is the critical bridge between data engineers and business analysts in the lakehouse.",
+  "h1": "Semantic Layer: The Definitive Guide",
+  "lede": "The semantic layer is the translation layer between raw data and business understanding \u2014 transforming technical table schemas into business metrics, KPIs, and dimensions that analysts can query in their own language. It is the difference between a data lake that only engineers can use and a lakehouse that the entire organization uses.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is a semantic layer?",
+      "a": "A semantic layer is an abstraction layer that maps raw technical data (tables, columns, joins) to business concepts (revenue, customer, order status) and metrics (LTV, churn rate, conversion rate). It provides a consistent, governed business vocabulary that all analytics tools and users query against, rather than each analyst writing their own SQL interpretation of raw tables."
+    },
+    {
+      "q": "Why does the data lakehouse need a semantic layer?",
+      "a": "Without a semantic layer, every analyst writing SQL must understand the physical table structure, join logic, business rules, and metric definitions independently \u2014 leading to inconsistent numbers, duplicated logic, and errors. A semantic layer centralizes this business logic so it is defined once, maintained by data experts, and reused by everyone \u2014 including BI tools and AI agents."
+    },
+    {
+      "q": "How does Dremio implement the semantic layer?",
+      "a": "Dremio implements the semantic layer through Virtual Datasets (VDS) \u2014 named, reusable SQL views that define business logic transformations on top of Iceberg tables. The AI Semantic Layer extends this with natural language understanding, metric definitions with dimensional context, and MCP server integration for AI agent access."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is a Semantic Layer?",
+      "content": "<p>The <strong>semantic layer</strong> is an abstraction layer in the analytics architecture that sits between raw data storage (Iceberg tables, databases) and data consumers (BI tools, SQL analysts, AI agents). It translates the physical data model \u2014 with its technical table names, cryptic column names, normalized join structures, and implicit business rules \u2014 into a clean, business-friendly logical model where data is expressed in the vocabulary of the business.</p><p>A semantic layer answers the question that every analyst asks when they first encounter a new data source: 'What does this table actually mean, and how do I use it correctly?' Without a semantic layer, each analyst answers this question independently, often incorrectly or inconsistently. With a semantic layer, the answer is defined once by data experts and reused by everyone.</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a>, the semantic layer is what makes the difference between a sophisticated data storage system that only engineers can navigate and a business intelligence platform that the entire organization can use effectively for self-service analytics.</p>"
+    },
+    {
+      "heading": "Components of a Semantic Layer",
+      "content": "<p>A complete semantic layer has five components:</p><ul><li><strong>Logical tables/views:</strong> Named representations of business entities (Customer, Order, Product) that may join multiple physical tables and apply business filters \u2014 the equivalent of <a href=\"virtual-datasets.html\">Virtual Datasets</a> in Dremio</li><li><strong>Business metrics:</strong> Named, formally defined calculations (LTV = SUM(order_value) per customer, Churn Rate = churned_customers / total_customers) that are computed consistently everywhere they appear</li><li><strong>Dimensions:</strong> The axes along which metrics are analyzed \u2014 time dimensions (day, week, month, quarter, year), organizational dimensions (region, segment, product category)</li><li><strong>Business glossary linkages:</strong> Connections between semantic objects and their formal business definitions in the data catalog</li><li><strong>Access control:</strong> User and role-based visibility of semantic objects \u2014 some metrics visible only to finance, some dimensions visible only to specific regions</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Semantic Layer Architecture",
+      "diagramCaption": "Figure 1: The semantic layer sits between raw Iceberg tables and all data consumers \u2014 one definition, reused everywhere."
+    },
+    {
+      "heading": "Semantic Layer in Dremio",
+      "content": "<p><a href=\"dremio.html\">Dremio's</a> semantic layer is built on <a href=\"virtual-datasets.html\">Virtual Datasets</a> \u2014 named SQL views that define business logic transformations on top of Iceberg tables. These VDSs form a hierarchy: foundation VDSs that clean and organize raw Iceberg data, business logic VDSs that implement metric calculations and joins, and BI-ready VDSs that are optimized for specific analytical domains.</p><p><a href=\"dremio-reflections.html\">Reflections</a> can be created on top of VDSs \u2014 pre-computing the semantic layer's transformations so that queries against business-friendly views return in milliseconds rather than re-executing complex joins at query time. This combines semantic clarity with sub-second BI performance.</p><p>The <a href=\"ai-semantic-layer.html\">AI Semantic Layer</a> extends Dremio's VDS model with richer natural language descriptions, metric definitions with dimensional context, and an MCP server endpoint \u2014 enabling AI agents to autonomously discover and query business metrics by name and concept, not by technical table path.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Dremio Semantic Layer VDS Hierarchy",
+      "diagramCaption": "Figure 2: Dremio's semantic layer \u2014 VDS hierarchy from raw Iceberg to BI-ready business views."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The semantic layer is the organizational intelligence layer of the <a href=\"data-lakehouse.html\">data lakehouse</a> \u2014 encoding business knowledge into reusable, governed data objects that translate raw technical data into consistent business metrics and dimensions. For organizations that have invested in building beautiful lakehouse pipelines but struggle with analyst adoption and inconsistent numbers, investing in the semantic layer is the highest-ROI next step. Implemented in <a href=\"dremio.html\">Dremio</a> through <a href=\"virtual-datasets.html\">Virtual Datasets</a> and the AI Semantic Layer, the semantic layer is what transforms the open lakehouse into a trusted, self-service analytics platform for the entire organization.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's implementation of the semantic layer."
+    },
+    {
+      "slug": "ai-semantic-layer",
+      "term": "AI Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "AI-powered extension of the semantic layer."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Provides built-in semantic layer capabilities."
+    },
+    {
+      "slug": "self-service-analytics",
+      "term": "Self-Service Analytics",
+      "category": "Analytics & BI",
+      "desc": "Semantic layers enable self-service at scale."
+    },
+    {
+      "slug": "data-catalog",
+      "term": "Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Catalog and semantic layer together govern data access."
+    },
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "Accelerate semantic layer queries to sub-second."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Semantic layers enforce consistent governance."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture the semantic layer makes usable."
+    }
+  ]
+}

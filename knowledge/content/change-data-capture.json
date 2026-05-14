@@ -1,0 +1,98 @@
+{
+  "slug": "change-data-capture",
+  "term": "Change Data Capture (CDC)",
+  "category": "Ingestion",
+  "metaTitle": "Change Data Capture (CDC): The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.",
+  "h1": "Change Data Capture (CDC): The Definitive Guide",
+  "lede": "Change Data Capture (CDC) continuously captures row-level changes \u2014 inserts, updates, and deletes \u2014 from operational databases and streams them to the lakehouse. With Debezium + Apache Flink + Apache Iceberg, CDC enables near-real-time data freshness in the lakehouse without full table scans or expensive batch ETL windows.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Change Data Capture (CDC)?",
+      "a": "Change Data Capture (CDC) is a data integration technique that monitors a source database's transaction log (WAL \u2014 Write-Ahead Log) and captures every row-level change (INSERT, UPDATE, DELETE) as a structured event. These events are then streamed to downstream systems (Kafka, Iceberg tables) to replicate the source database's changes in near-real-time."
+    },
+    {
+      "q": "How does CDC work with Apache Iceberg?",
+      "a": "CDC events (typically captured by Debezium and published to Kafka) are processed by Apache Flink using the Flink CDC connectors. Flink writes INSERTs as new rows, UPDATEs as updates (using Iceberg V2 equality delete files in MoR mode), and DELETEs as deletions to target Iceberg Silver tables. The result is a Silver Iceberg table that continuously mirrors the current state of the source operational database."
+    },
+    {
+      "q": "What is Debezium and why is it used for CDC?",
+      "a": "Debezium is the leading open-source CDC platform. It connects to source databases (PostgreSQL, MySQL, Oracle, MongoDB, SQL Server) as a replication client, reads the WAL, and publishes change events to Apache Kafka in a structured JSON or Avro format. Debezium's Kafka Connect integration makes it the standard CDC source for Kafka-based streaming pipelines feeding Apache Iceberg lakehouses."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Change Data Capture?",
+      "content": "<p><strong>Change Data Capture (CDC)</strong> is a data integration technique that captures row-level changes from operational databases in near-real-time by reading the database's transaction log (called the Write-Ahead Log, or WAL, in PostgreSQL; the binlog in MySQL). Instead of periodically querying the source database for changed records (slow, expensive, misses deletes), CDC monitors the WAL \u2014 the same log the database itself uses for crash recovery \u2014 and publishes each committed INSERT, UPDATE, or DELETE as a structured change event.</p><p>CDC is the key technology enabling the transition from batch ETL (where lakehouse data is hours or days old) to near-real-time lakehouse analytics (where data is seconds or minutes old). For business use cases requiring current operational data \u2014 inventory levels, real-time order status, live customer activity \u2014 CDC is the pipeline pattern that makes the lakehouse competitive with direct database queries for freshness."
+    },
+    {
+      "heading": "CDC Architecture: Debezium \u2192 Kafka \u2192 Flink \u2192 Iceberg",
+      "content": "<p>The standard lakehouse CDC architecture has four components:</p><ol><li><strong>Debezium:</strong> Connects to source databases (PostgreSQL, MySQL, etc.) as a logical replication client. Reads WAL entries and publishes change events (before/after row images plus change type: INSERT/UPDATE/DELETE) to Kafka topics in Debezium JSON or Avro format.</li><li><strong>Apache Kafka:</strong> The durable, scalable message queue that buffers change events between Debezium and downstream consumers. Provides fault tolerance and allows multiple consumers (Flink, other processors) to read the same events independently.</li><li><strong>Apache Flink:</strong> Reads Debezium events from Kafka using the flink-cdc-connectors library. Applies transformations (optional). Writes to Iceberg using the Flink Iceberg sink in UPSERT mode \u2014 INSERTs become new rows, UPDATE/DELETE become equality delete files.</li><li><strong>Apache Iceberg:</strong> The destination Silver table maintains current-state records. V2 equality delete files record deleted/updated rows; compaction periodically merges these into CoW data files for read performance.</li></ol>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "CDC Architecture Debezium Flink Iceberg",
+      "diagramCaption": "Figure 1: CDC pipeline \u2014 Debezium captures WAL changes, Kafka buffers, Flink processes, Iceberg stores."
+    },
+    {
+      "heading": "CDC and Iceberg V2 DML",
+      "content": "<p>CDC pipelines require <a href=\"apache-iceberg.html\">Apache Iceberg</a> V2 table format support for UPDATE and DELETE operations:</p><ul><li><strong>Inserts:</strong> New records from CDC are appended as new data files using standard Iceberg append operations</li><li><strong>Updates:</strong> CDC updates generate an equality delete file (marking the old row as deleted by its primary key) plus a new data file (the updated row) \u2014 this is <a href=\"merge-on-read.html\">Merge-on-Read</a> semantics</li><li><strong>Deletes:</strong> CDC deletes generate equality delete files marking the deleted row's primary key</li></ul><p>The accumulation of equality delete files over time requires periodic <a href=\"compaction.html\">compaction</a> to merge them into <a href=\"copy-on-write.html\">CoW</a> data files for read performance. Without compaction, queries on heavily updated Silver tables must read many delete files to determine current row state.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "CDC Iceberg V2 MoR Delete Files",
+      "diagramCaption": "Figure 2: CDC writes to Iceberg \u2014 equality delete files for updates/deletes, compaction for read performance."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Change Data Capture is the data integration technology that makes the <a href=\"data-lakehouse.html\">data lakehouse</a> competitive with operational databases for data freshness. The Debezium \u2192 Kafka \u2192 <a href=\"apache-flink.html\">Flink</a> \u2192 <a href=\"apache-iceberg.html\">Iceberg</a> pipeline delivers near-real-time data from operational source databases into governed, analytically optimized Silver Iceberg tables \u2014 without the latency of batch ETL windows or the performance impact of direct database queries. Combined with <a href=\"compaction.html\">compaction</a> for read performance and <a href=\"dremio.html\">Dremio's</a> query engine for BI analytics, CDC-fed Iceberg tables close the gap between operational and analytical data to seconds.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-flink",
+      "term": "Apache Flink",
+      "category": "Query Engines & Platforms",
+      "desc": "Primary streaming engine for CDC-to-Iceberg pipelines."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Destination table format for CDC events."
+    },
+    {
+      "slug": "merge-on-read",
+      "term": "Merge-on-Read",
+      "category": "Table Formats",
+      "desc": "MoR semantics used for CDC update/delete writes."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Essential maintenance for CDC-fed Iceberg tables."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "CDC feeds Silver layer tables in the Medallion pattern."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "CDC enables real-time ETL replacing batch extraction."
+    },
+    {
+      "slug": "apache-kafka",
+      "term": "Apache Kafka",
+      "category": "Ingestion",
+      "desc": "Message queue buffering CDC events from Debezium."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "CDC enables near-real-time freshness in the lakehouse."
+    }
+  ]
+}

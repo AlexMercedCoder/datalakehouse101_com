@@ -1,0 +1,102 @@
+{
+  "slug": "data-governance",
+  "term": "Data Governance",
+  "category": "Governance",
+  "metaTitle": "Data Governance in the Data Lakehouse: The Definitive Guide",
+  "metaDescription": "Learn what data governance means in the data lakehouse, how access control, lineage, quality, and catalog management implement it, and why governance is essential for enterprise lakehouses.",
+  "h1": "Data Governance in the Data Lakehouse: The Definitive Guide",
+  "lede": "Data governance is the framework of policies, processes, and technologies that ensure data is accurate, accessible to the right people, compliant with regulations, and trustworthy for decision-making. In the lakehouse, governance spans access control at the catalog layer, lineage tracking, data quality enforcement, and classification policies.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is data governance in the data lakehouse?",
+      "a": "Data governance in the data lakehouse is the set of policies, controls, and processes that ensure: only authorized users can access specific data (access control), data quality is measured and maintained (data quality), data origins and transformations are traceable (lineage), regulatory requirements are met (compliance), and data assets are properly documented and owned (stewardship)."
+    },
+    {
+      "q": "Where is access control enforced in a governed lakehouse?",
+      "a": "Best practice is to enforce access control at the catalog layer \u2014 in the Iceberg REST Catalog (Apache Polaris, Dremio Open Catalog) or in AWS Lake Formation. Catalog-layer enforcement is engine-agnostic: regardless of which engine queries the data (Spark, Dremio, Trino), the catalog API enforces access policies consistently by returning or withholding table metadata and storage credentials."
+    },
+    {
+      "q": "How does Apache Iceberg support data governance?",
+      "a": "Iceberg supports governance through: its catalog integration (access control enforced at catalog API), column-level statistics in manifests (enabling quality checks), time travel and snapshot history (enabling audit of historical data states), and its structured metadata (enabling lineage tools to parse the transformation history from snapshot to snapshot)."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Data Governance?",
+      "content": "<p><strong>Data governance</strong> is the organizational framework \u2014 policies, processes, roles, and technologies \u2014 that ensures data assets are managed as strategic organizational resources: accurate, trustworthy, accessible to authorized users, protected from unauthorized access, and compliant with applicable regulations.</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a>, data governance is both more critical and more technically complex than in traditional data warehouses. More critical because the lakehouse's openness (multiple engines, open formats, direct storage access) creates more potential access paths that must be governed. More complex because governance must span the catalog layer, storage layer, query engine layer, and semantic layer \u2014 with policies enforced consistently regardless of which engine or interface accesses the data.</p><p>Enterprise lakehouse governance has six pillars: access control, data quality, data lineage, metadata management, data classification, and regulatory compliance."
+    },
+    {
+      "heading": "Access Control: The Catalog Layer",
+      "content": "<p>The most important architectural decision in lakehouse governance is where to enforce access control. The correct answer is the <strong>catalog layer</strong> \u2014 enforcing policies in the <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> API, where table metadata and storage credentials are served.</p><p>Catalog-layer enforcement is engine-agnostic: every engine (Spark, Dremio, Trino, Flink) must load table metadata from the catalog before accessing any data files. If the catalog denies metadata access to an unauthorized principal, that principal cannot access the table regardless of engine. This is fundamentally superior to engine-layer enforcement, where each engine must independently implement and maintain the same access policies.</p><p>Leading catalog-layer access control implementations: <a href=\"apache-polaris.html\">Apache Polaris</a> RBAC, <a href=\"dremio-open-catalog.html\">Dremio Open Catalog</a> access policies, <a href=\"aws-glue-catalog.html\">AWS Lake Formation</a> column-level and row-level policies, and <a href=\"unity-catalog.html\">Unity Catalog</a> fine-grained access control.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Lakehouse Governance Architecture",
+      "diagramCaption": "Figure 1: Governance enforcement at the catalog layer \u2014 engine-agnostic access control for the open lakehouse."
+    },
+    {
+      "heading": "Data Quality Governance",
+      "content": "<p>Data quality governance ensures that data meets defined standards for completeness, accuracy, consistency, timeliness, and uniqueness. In the lakehouse context:</p><ul><li><strong>Quality rules:</strong> Defined expectations for each table (e.g., 'order_value must be positive', 'customer_id must be non-null', 'event_date must be within the last 90 days for new records')</li><li><strong>Quality checks:</strong> Automated validation runs (via dbt tests, Great Expectations, or Soda) that evaluate rules against actual data and produce quality metrics</li><li><strong>Quality metadata:</strong> Quality scores and check results stored in the <a href=\"data-catalog.html\">data catalog</a> alongside table descriptions \u2014 enabling analysts to assess data trustworthiness before using it</li><li><strong>Quality gates:</strong> Pipeline stages that halt promotion of data to the next Medallion layer if quality checks fail</li></ul>"
+    },
+    {
+      "heading": "Data Lineage and Compliance",
+      "content": "<p>Data lineage tracks how data flows from source systems through transformations to analytical outputs \u2014 which upstream tables each table depends on, which downstream tables and reports depend on each table. Lineage enables: impact analysis (if source table schema changes, which downstream tables break?), root cause investigation (if a metric is wrong, which upstream transformation introduced the error?), and regulatory compliance (prove to auditors that financial report data originated from validated, controlled source systems).</p><p>In the lakehouse, lineage is captured at multiple levels: pipeline-level lineage (which Spark jobs produce which Iceberg tables), column-level lineage (which source columns contribute to each target column), and query-level lineage (which tables are read by each query that produces a dashboard or report).",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Data Lineage in the Lakehouse",
+      "diagramCaption": "Figure 2: Data lineage across the Medallion Architecture \u2014 source systems to reports with full traceability."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Data governance is the foundation that transforms a technical data lakehouse into a trusted enterprise asset. Without governance, the lakehouse's openness becomes a liability \u2014 inconsistent data access, quality issues, regulatory exposure. With governance \u2014 catalog-layer access control, quality management, lineage tracking, and metadata stewardship \u2014 the lakehouse becomes an organizationally trustworthy platform where data consumers at every level can confidently use data knowing it is accurate, authorized, and compliant. The open lakehouse governed by <a href=\"apache-polaris.html\">Apache Polaris</a> or <a href=\"dremio-open-catalog.html\">Dremio Open Catalog</a> provides the same governance rigor as proprietary cloud warehouses without the vendor lock-in.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs & Metadata",
+      "desc": "ASF catalog with comprehensive RBAC governance."
+    },
+    {
+      "slug": "dremio-open-catalog",
+      "term": "Dremio Open Catalog",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's governed REST catalog."
+    },
+    {
+      "slug": "data-catalog",
+      "term": "Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Business metadata governance and stewardship."
+    },
+    {
+      "slug": "metadata-management",
+      "term": "Metadata Management",
+      "category": "Catalogs & Metadata",
+      "desc": "Metadata quality is a governance responsibility."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "The catalog layer where governance is enforced."
+    },
+    {
+      "slug": "unity-catalog",
+      "term": "Unity Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Databricks governance catalog with fine-grained access."
+    },
+    {
+      "slug": "aws-glue-catalog",
+      "term": "AWS Glue Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "AWS Lake Formation governance via Glue."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture governance makes trustworthy."
+    }
+  ]
+}
