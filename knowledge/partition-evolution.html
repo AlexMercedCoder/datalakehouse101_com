@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Partition Evolution in Apache Iceberg: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn how Apache Iceberg partition evolution works, why it solves the static partitioning problem, and how to change partition schemes without rewriting data.">
+  <meta name="keywords" content="Partition Evolution, data lakehouse, Apache Iceberg, Hidden Partitioning, Schema Evolution, Compaction, Dremio, Iceberg Snapshots, Data Skipping, Data Lakehouse">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/partition-evolution.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Partition Evolution in Apache Iceberg: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn how Apache Iceberg partition evolution works, why it solves the static partitioning problem, and how to change partition schemes without rewriting data.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/partition-evolution.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Table Formats">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Partition Evolution in Apache Iceberg: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn how Apache Iceberg partition evolution works, why it solves the static partitioning problem, and how to change partition schemes without rewriting data.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Partition Evolution in Apache Iceberg: The Definitive Guide",
-      "description": "Learn how Apache Iceberg partition evolution works, why it solves the static partitioning problem, and how to change partition schemes without rewriting data.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/partition-evolution.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Partition Evolution in Apache Iceberg: The Definitive Guide",
+    "description": "Learn how Apache Iceberg partition evolution works, why it solves the static partitioning problem, and how to change partition schemes without rewriting data.",
+    "keywords": "Partition Evolution, data lakehouse, Apache Iceberg, Hidden Partitioning, Schema Evolution, Compaction, Dremio, Iceberg Snapshots, Data Skipping, Data Lakehouse",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Partition Evolution", "item": "https://datalakehouse101.com/knowledge/partition-evolution.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is partition evolution in Apache Iceberg?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Partition evolution is the ability to change a table's partitioning scheme without rewriting historical data. In Iceberg, each data file is tagged with the partition spec that was active when it was written, so the query engine can correctly handle files with different partition layouts within the same table."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "Why can't traditional systems change partitioning without a rewrite?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "In Hive-partitioned tables, the partition scheme is global and fixed. All data files must conform to the current partition layout. Changing the partition scheme requires reading all existing data and rewriting it in the new layout — an expensive, time-consuming operation that often takes days for large tables."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/partition-evolution.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/partition-evolution.html"
     },
-    {
-      "@type": "Question",
-      "name": "Does partition evolution affect query performance?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. Iceberg's query planner handles mixed partition specs correctly — applying the appropriate pruning logic for each file group based on the partition spec under which each file was written. Query writers do not need to know which partition spec is active or handle mixed specs manually."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Partition Evolution",
+        "item": "https://datalakehouse101.com/knowledge/partition-evolution.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is partition evolution in Apache Iceberg?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Partition evolution is the ability to change a table's partitioning scheme without rewriting historical data. In Iceberg, each data file is tagged with the partition spec that was active when it was written, so the query engine can correctly handle files with different partition layouts within the same table."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why can't traditional systems change partitioning without a rewrite?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In Hive-partitioned tables, the partition scheme is global and fixed. All data files must conform to the current partition layout. Changing the partition scheme requires reading all existing data and rewriting it in the new layout — an expensive, time-consuming operation that often takes days for large tables."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does partition evolution affect query performance?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Iceberg's query planner handles mixed partition specs correctly — applying the appropriate pruning logic for each file group based on the partition spec under which each file was written. Query writers do not need to know which partition spec is active or handle mixed specs manually."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Partition Evolution in Apache Iceberg: The Definitive Guide</h1>
       <p class="hero-lede">Partition evolution is Apache Iceberg's ability to change a table's partitioning scheme — from daily to hourly, from hash to range — without rewriting historical data. Old data retains its original partition layout; new data uses the new scheme. Query engines handle both correctly and automatically.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

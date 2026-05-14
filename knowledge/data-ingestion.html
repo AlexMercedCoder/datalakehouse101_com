@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Data Ingestion: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
   <meta name="description" content="Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to choose between streaming, batch, and federated ingestion approaches.">
+  <meta name="keywords" content="Data Ingestion, data lakehouse, Apache Iceberg, Change Data Capture, Batch Processing, Stream Processing, Apache Kafka, Medallion Architecture, ETL, Lakehouse Federation">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-ingestion.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Data Ingestion: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
   <meta property="og:description" content="Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to choose between streaming, batch, and federated ingestion approaches.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-ingestion.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Ingestion & Streaming">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Data Ingestion: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to choose between streaming, batch, and federated ingestion approaches.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Data Ingestion: The Definitive Guide",
-      "description": "Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to choose between streaming, batch, and federated ingestion approaches.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/data-ingestion.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Data Ingestion: The Definitive Guide",
+    "description": "Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to choose between streaming, batch, and federated ingestion approaches.",
+    "keywords": "Data Ingestion, data lakehouse, Apache Iceberg, Change Data Capture, Batch Processing, Stream Processing, Apache Kafka, Medallion Architecture, ETL, Lakehouse Federation",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Data Ingestion", "item": "https://datalakehouse101.com/knowledge/data-ingestion.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is data ingestion in the data lakehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Data ingestion is the process of moving data from source systems (operational databases, SaaS APIs, event streams, files, IoT sensors) into Bronze Apache Iceberg tables in the lakehouse. Ingestion patterns include streaming CDC (near-real-time), batch ETL (scheduled loads), file-based landing (S3 drop zone), and federated query (read-in-place without moving data)."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "What are the main data ingestion patterns for Apache Iceberg?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Four main patterns: (1) Streaming CDC — Debezium + Kafka + Flink writes change events continuously to Bronze Iceberg; (2) Batch ETL — Spark jobs read source databases via JDBC and write to Iceberg on a schedule; (3) File landing — source systems drop CSV/JSON/Parquet files to S3, Spark converts them to Iceberg; (4) Federated query — Dremio reads source systems directly without physically ingesting data."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/data-ingestion.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/data-ingestion.html"
     },
-    {
-      "@type": "Question",
-      "name": "What tools handle data ingestion for Apache Iceberg?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Key ingestion tools: Debezium (CDC capture from databases), Apache Kafka (event transport), Apache Flink (streaming ingestion to Iceberg), Apache Spark (batch ingestion via JDBC or file conversion), Airbyte and Fivetran (managed ELT connectors that write to Iceberg), dbt (transformation-layer ELT after initial load), and Dremio (federated query eliminating physical ingestion)."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Data Ingestion",
+        "item": "https://datalakehouse101.com/knowledge/data-ingestion.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is data ingestion in the data lakehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Data ingestion is the process of moving data from source systems (operational databases, SaaS APIs, event streams, files, IoT sensors) into Bronze Apache Iceberg tables in the lakehouse. Ingestion patterns include streaming CDC (near-real-time), batch ETL (scheduled loads), file-based landing (S3 drop zone), and federated query (read-in-place without moving data)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the main data ingestion patterns for Apache Iceberg?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Four main patterns: (1) Streaming CDC — Debezium + Kafka + Flink writes change events continuously to Bronze Iceberg; (2) Batch ETL — Spark jobs read source databases via JDBC and write to Iceberg on a schedule; (3) File landing — source systems drop CSV/JSON/Parquet files to S3, Spark converts them to Iceberg; (4) Federated query — Dremio reads source systems directly without physically ingesting data."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What tools handle data ingestion for Apache Iceberg?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Key ingestion tools: Debezium (CDC capture from databases), Apache Kafka (event transport), Apache Flink (streaming ingestion to Iceberg), Apache Spark (batch ingestion via JDBC or file conversion), Airbyte and Fivetran (managed ELT connectors that write to Iceberg), dbt (transformation-layer ELT after initial load), and Dremio (federated query eliminating physical ingestion)."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Data Ingestion: The Definitive Guide</h1>
       <p class="hero-lede">Data ingestion is the first step of every lakehouse pipeline — moving data from operational sources into Apache Iceberg Bronze tables. Choosing the right ingestion pattern (streaming CDC, batch ETL, federated query, or file landing) determines data freshness, pipeline complexity, and the overall cost of keeping the lakehouse current.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

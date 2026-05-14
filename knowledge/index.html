@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Lakehouse Knowledge Base — 98 Definitive Guides | DataLakehouse101.com</title>
+  <meta name="description" content="Browse 98 authoritative guides on data lakehouse technologies — Apache Iceberg, Dremio, table formats, catalogs, governance, streaming, ML, and AI-native architectures. The definitive reference for data engineers and architects.">
+  <meta name="keywords" content="data lakehouse, Apache Iceberg, Dremio, knowledge base, data engineering, table format, data catalog, data governance, medallion architecture">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Data Lakehouse Knowledge Base — 98 Definitive Guides">
+  <meta property="og:description" content="Browse 98 authoritative guides on data lakehouse technologies — Apache Iceberg, Dremio, catalogs, governance, streaming, and AI architectures.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Data Lakehouse Knowledge Base — 98 Definitive Guides">
+  <meta name="twitter:description" content="98 authoritative guides on data lakehouse tech: Apache Iceberg, Dremio, catalogs, governance, ML, and Agentic AI.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Data Lakehouse Knowledge Base",
+    "description": "100 definitive guides on data lakehouse technologies \u2014 Apache Iceberg, Dremio, Delta Lake, catalogs, governance, analytics, and AI-native architectures.",
+    "url": "https://datalakehouse101.com/knowledge/",
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      }
+    ]
+  }
+]
+  </script>
+
+  <style>
+    .kb-hero {
+      background: linear-gradient(135deg, #0a1428 0%, #0d2137 50%, #0a1f35 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 4rem 1.5rem 3rem;
+      text-align: center;
+    }
+    .kb-hero h1 {
+      font-family: 'Roboto', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, #7dd3fc 60%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 1rem;
+    }
+    .kb-hero p {
+      color: #94a3b8;
+      font-size: 1.15rem;
+      max-width: 680px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+    .kb-stat-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .kb-stat { text-align: center; }
+    .kb-stat-num {
+      display: block;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #38bdf8;
+      line-height: 1;
+    }
+    .kb-stat-label { font-size: 0.85rem; color: #64748b; margin-top: 0.25rem; }
+
+    /* Search */
+    .kb-search-wrap {
+      max-width: 560px;
+      margin: 2rem auto 0;
+      position: relative;
+    }
+    #kb-search {
+      width: 100%;
+      padding: 0.85rem 1.2rem 0.85rem 3rem;
+      border-radius: 9999px;
+      border: 1.5px solid rgba(56,189,248,0.35);
+      background: rgba(255,255,255,0.05);
+      color: #f1f5f9;
+      font-size: 1rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color .2s;
+    }
+    #kb-search:focus { border-color: #38bdf8; }
+    #kb-search::placeholder { color: #64748b; }
+    .kb-search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    /* Category pills */
+    .kb-nav {
+      background: rgba(10,20,40,0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0.75rem 1.5rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+    .kb-pill {
+      display: inline-block;
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(56,189,248,0.3);
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      margin-right: 0.5rem;
+      transition: background .2s, color .2s;
+    }
+    .kb-pill:hover { background: rgba(56,189,248,0.15); color: #38bdf8; }
+
+    /* Grid */
+    .kb-section { padding: 2.5rem 1.5rem 1rem; max-width: 1300px; margin: 0 auto; }
+    .kb-section-title {
+      font-size: 1.3rem; font-weight: 700;
+      color: #7dd3fc;
+      border-left: 3px solid #38bdf8;
+      padding-left: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .kb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .kb-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 1.1rem 1.25rem;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      text-decoration: none;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+    .kb-card:hover {
+      background: rgba(56,189,248,0.08);
+      border-color: rgba(56,189,248,0.3);
+      transform: translateY(-2px);
+    }
+    .kb-card-cat {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #38bdf8;
+    }
+    .kb-card-term {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      line-height: 1.3;
+    }
+    .kb-card-desc {
+      font-size: 0.82rem;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .kb-card.hidden { display: none; }
+
+    .kb-footer {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: #475569;
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin-top: 2rem;
+    }
+    .kb-footer a { color: #38bdf8; text-decoration: none; }
+  </style>
+</head>
+<body style="background:#0a1428; color:#f1f5f9; font-family:'Inter',sans-serif; margin:0;">
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="kb-hero">
+    <h1>Data Lakehouse Knowledge Base</h1>
+    <p>The definitive reference for modern data lakehouse architecture — 98 expert-written guides on Apache Iceberg, Dremio, open table formats, catalogs, governance, and Agentic AI.</p>
+    <div class="kb-stat-bar">
+      <div class="kb-stat"><span class="kb-stat-num">98</span><span class="kb-stat-label">Definitive Guides</span></div>
+      <div class="kb-stat"><span class="kb-stat-num">11</span><span class="kb-stat-label">Topic Categories</span></div>
+      <div class="kb-stat"><span class="kb-stat-num">4K+</span><span class="kb-stat-label">Words per Guide</span></div>
+      <div class="kb-stat"><span class="kb-stat-num">100%</span><span class="kb-stat-label">Open Access</span></div>
+    </div>
+    <div class="kb-search-wrap">
+      <svg class="kb-search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="kb-search" type="search" placeholder="Search all 98 guides…" autocomplete="off" aria-label="Search knowledge base">
+    </div>
+  </header>
+
+  <nav class="kb-nav" aria-label="Knowledge categories">
+    <a class="kb-pill" href="#cat-analytics--bi">Analytics & BI</a>
+<a class="kb-pill" href="#cat-architecture-patterns">Architecture Patterns</a>
+<a class="kb-pill" href="#cat-catalogs--metadata">Catalogs & Metadata</a>
+<a class="kb-pill" href="#cat-core-concepts">Core Concepts</a>
+<a class="kb-pill" href="#cat-file-formats--storage">File Formats & Storage</a>
+<a class="kb-pill" href="#cat-governance">Governance</a>
+<a class="kb-pill" href="#cat-governance--quality">Governance & Quality</a>
+<a class="kb-pill" href="#cat-ingestion">Ingestion</a>
+<a class="kb-pill" href="#cat-ingestion--streaming">Ingestion & Streaming</a>
+<a class="kb-pill" href="#cat-query-engines--platforms">Query Engines & Platforms</a>
+<a class="kb-pill" href="#cat-table-formats">Table Formats</a>
+
+  </nav>
+
+  <main id="kb-main">
+  <section class="kb-section" id="cat-analytics--bi">
+    <h2 class="kb-section-title">Analytics & BI</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="ai-semantic-layer.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">AI Semantic Layer (Dremio)</span>
+        <span class="kb-card-desc">Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents …</span>
+      </a>
+      <a class="kb-card" href="automated-table-optimization.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">Automated Table Optimization</span>
+        <span class="kb-card-desc">Learn what automated table optimization is, how Dremio and Apache Iceberg automate compaction, Z-ord…</span>
+      </a>
+      <a class="kb-card" href="data-skipping.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">Data Skipping</span>
+        <span class="kb-card-desc">Learn what data skipping is in Apache Iceberg, how file-level statistics enable skipping irrelevant …</span>
+      </a>
+      <a class="kb-card" href="lakehouse-federation.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">Lakehouse Federation</span>
+        <span class="kb-card-desc">Learn what lakehouse federation is, how engines like Dremio and Trino query across Iceberg tables an…</span>
+      </a>
+      <a class="kb-card" href="multi-engine-interoperability.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">Multi-Engine Interoperability</span>
+        <span class="kb-card-desc">Learn what multi-engine interoperability means in the data lakehouse, how Apache Iceberg and the RES…</span>
+      </a>
+      <a class="kb-card" href="query-optimization.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">Query Optimization</span>
+        <span class="kb-card-desc">Learn what query optimization is, the key optimization techniques used in Apache Iceberg and Dremio,…</span>
+      </a>
+      <a class="kb-card" href="self-service-analytics.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">Self-Service Analytics</span>
+        <span class="kb-card-desc">Learn what self-service analytics is, how the data lakehouse enables it at scale, and why the semant…</span>
+      </a>
+      <a class="kb-card" href="semantic-layer.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">Semantic Layer</span>
+        <span class="kb-card-desc">Learn what a semantic layer is, how it translates raw data into business-friendly metrics, and why i…</span>
+      </a>
+      <a class="kb-card" href="sql-analytics.html">
+        <span class="kb-card-cat">Analytics & BI</span>
+        <span class="kb-card-term">SQL Analytics</span>
+        <span class="kb-card-desc">Learn how SQL analytics powers the data lakehouse, the key SQL patterns for Iceberg queries, and how…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-architecture-patterns">
+    <h2 class="kb-section-title">Architecture Patterns</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="agentic-lakehouse.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Agentic Lakehouse</span>
+        <span class="kb-card-desc">Learn what the Agentic Lakehouse is, how AI agents autonomously discover and query Apache Iceberg da…</span>
+      </a>
+      <a class="kb-card" href="bronze-layer.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Bronze Layer</span>
+        <span class="kb-card-desc">Learn what the Bronze Layer is in the Medallion Architecture, how it stores raw ingested data in Apa…</span>
+      </a>
+      <a class="kb-card" href="data-engineering.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Data Engineering</span>
+        <span class="kb-card-desc">Learn what data engineering is, the key skills and tools data engineers use to build Apache Iceberg …</span>
+      </a>
+      <a class="kb-card" href="data-science-lakehouse.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Data Science on the Lakehouse</span>
+        <span class="kb-card-desc">Learn how data scientists use Apache Iceberg tables, PyIceberg, and Dremio's AI Semantic Layer for M…</span>
+      </a>
+      <a class="kb-card" href="etl.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">ETL (Extract, Transform, Load)</span>
+        <span class="kb-card-desc">Learn what ETL is, how it differs from ELT in the data lakehouse, and how Apache Spark and Flink imp…</span>
+      </a>
+      <a class="kb-card" href="feature-store.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Feature Store</span>
+        <span class="kb-card-desc">Learn what a feature store is, how Apache Iceberg tables serve as open feature stores, and how featu…</span>
+      </a>
+      <a class="kb-card" href="gold-layer.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Gold Layer</span>
+        <span class="kb-card-desc">Learn what the Gold Layer is in the Medallion Architecture, how it delivers pre-aggregated business …</span>
+      </a>
+      <a class="kb-card" href="lakehouse-architecture.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Lakehouse Architecture</span>
+        <span class="kb-card-desc">Learn what the data lakehouse architecture is, its key layers and components, and how Apache Iceberg…</span>
+      </a>
+      <a class="kb-card" href="medallion-architecture.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Medallion Architecture</span>
+        <span class="kb-card-desc">Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers organize data lakehous…</span>
+      </a>
+      <a class="kb-card" href="mlflow.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">MLflow</span>
+        <span class="kb-card-desc">Learn what MLflow is, how it tracks ML experiments on Apache Iceberg features, and why it is the sta…</span>
+      </a>
+      <a class="kb-card" href="model-context-protocol.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">MCP (Model Context Protocol)</span>
+        <span class="kb-card-desc">Learn what the Model Context Protocol (MCP) is, how Dremio's MCP server enables AI agents to autonom…</span>
+      </a>
+      <a class="kb-card" href="nessie-branching-tagging.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Nessie Branching and Tagging</span>
+        <span class="kb-card-desc">Learn how Project Nessie's Git-like branching and tagging enables isolated data experimentation, rep…</span>
+      </a>
+      <a class="kb-card" href="open-lakehouse.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Open Lakehouse</span>
+        <span class="kb-card-desc">Learn what the Open Lakehouse is, how open standards (Apache Iceberg, Parquet, Iceberg REST Catalog)…</span>
+      </a>
+      <a class="kb-card" href="silver-layer.html">
+        <span class="kb-card-cat">Architecture Patterns</span>
+        <span class="kb-card-term">Silver Layer</span>
+        <span class="kb-card-desc">Learn what the Silver Layer is in the Medallion Architecture, how it cleanses and conforms Bronze da…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-catalogs--metadata">
+    <h2 class="kb-section-title">Catalogs & Metadata</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="apache-gravitino.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Apache Gravitino</span>
+        <span class="kb-card-desc">Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalo…</span>
+      </a>
+      <a class="kb-card" href="apache-polaris.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Apache Polaris</span>
+        <span class="kb-card-desc">Learn what Apache Polaris is, how this ASF-governed Iceberg REST Catalog enables multi-engine intero…</span>
+      </a>
+      <a class="kb-card" href="aws-glue-catalog.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">AWS Glue Data Catalog</span>
+        <span class="kb-card-desc">Learn what AWS Glue Data Catalog is, how it supports Apache Iceberg as a serverless managed catalog …</span>
+      </a>
+      <a class="kb-card" href="catalog-interoperability.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Catalog Interoperability</span>
+        <span class="kb-card-desc">Learn what catalog interoperability means in the data lakehouse, how the Iceberg REST Catalog specif…</span>
+      </a>
+      <a class="kb-card" href="data-catalog.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Data Catalog</span>
+        <span class="kb-card-desc">Learn what a data catalog is, how it differs from a technical metadata store, and why business data …</span>
+      </a>
+      <a class="kb-card" href="hive-metastore.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Hive Metastore</span>
+        <span class="kb-card-desc">Learn what the Hive Metastore is, how it stores Hadoop table metadata, its limitations for Apache Ic…</span>
+      </a>
+      <a class="kb-card" href="metadata-management.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Metadata Management</span>
+        <span class="kb-card-desc">Learn what metadata management is, the types of metadata in the data lakehouse, and how managing tec…</span>
+      </a>
+      <a class="kb-card" href="project-nessie.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Project Nessie</span>
+        <span class="kb-card-desc">Learn what Project Nessie is, how its Git-like branching and tagging works for Apache Iceberg tables…</span>
+      </a>
+      <a class="kb-card" href="unity-catalog.html">
+        <span class="kb-card-cat">Catalogs & Metadata</span>
+        <span class="kb-card-term">Unity Catalog</span>
+        <span class="kb-card-desc">Learn what Databricks Unity Catalog is, how it provides unified governance for the Databricks Lakeho…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-core-concepts">
+    <h2 class="kb-section-title">Core Concepts</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="acid-transactions.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">ACID Transactions</span>
+        <span class="kb-card-desc">Learn what ACID transactions are, why they matter in the data lakehouse, and how Apache Iceberg impl…</span>
+      </a>
+      <a class="kb-card" href="data-lake.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">Data Lake</span>
+        <span class="kb-card-desc">Learn what a data lake is, how it works, its strengths and weaknesses, and how it evolved into the m…</span>
+      </a>
+      <a class="kb-card" href="data-lakehouse.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">Data Lakehouse</span>
+        <span class="kb-card-desc">Learn what a data lakehouse is, how it works, why it replaced the data warehouse for modern analytic…</span>
+      </a>
+      <a class="kb-card" href="data-mesh.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">Data Mesh</span>
+        <span class="kb-card-desc">Learn what Data Mesh is, its four core principles, how it differs from centralized data platforms, a…</span>
+      </a>
+      <a class="kb-card" href="data-warehouse.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">Data Warehouse</span>
+        <span class="kb-card-desc">Learn what a data warehouse is, how it works, its architecture patterns, key limitations, and how it…</span>
+      </a>
+      <a class="kb-card" href="decoupled-storage-compute.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">Decoupled Storage and Compute</span>
+        <span class="kb-card-desc">Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object s…</span>
+      </a>
+      <a class="kb-card" href="elt.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">ELT (Extract, Load, Transform)</span>
+        <span class="kb-card-desc">Learn what ELT is, how Extract Load Transform differs from ETL, why ELT is the dominant pattern in t…</span>
+      </a>
+      <a class="kb-card" href="open-table-format.html">
+        <span class="kb-card-cat">Core Concepts</span>
+        <span class="kb-card-term">Open Table Format</span>
+        <span class="kb-card-desc">Learn what an open table format is, how Apache Iceberg, Delta Lake, and Apache Hudi compare, and why…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-file-formats--storage">
+    <h2 class="kb-section-title">File Formats & Storage</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="amazon-s3.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Amazon S3</span>
+        <span class="kb-card-desc">Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3…</span>
+      </a>
+      <a class="kb-card" href="apache-arrow.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Apache Arrow</span>
+        <span class="kb-card-desc">Learn what Apache Arrow is, how its in-memory columnar format powers vectorized query engines, and w…</span>
+      </a>
+      <a class="kb-card" href="apache-avro.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Apache Avro</span>
+        <span class="kb-card-desc">Learn what Apache Avro is, how its schema-embedded row format is used for streaming and Iceberg meta…</span>
+      </a>
+      <a class="kb-card" href="apache-orc.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Apache ORC</span>
+        <span class="kb-card-desc">Learn what Apache ORC is, how its columnar format compares to Parquet, and its role in the Hive ecos…</span>
+      </a>
+      <a class="kb-card" href="apache-parquet.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Apache Parquet</span>
+        <span class="kb-card-desc">Learn what Apache Parquet is, how its columnar format enables efficient analytics, and why it is the…</span>
+      </a>
+      <a class="kb-card" href="azure-adls.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Azure Data Lake Storage (ADLS)</span>
+        <span class="kb-card-desc">Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure…</span>
+      </a>
+      <a class="kb-card" href="google-cloud-storage.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Google Cloud Storage (GCS)</span>
+        <span class="kb-card-desc">Learn how Google Cloud Storage serves as the object storage foundation for GCP-based Apache Iceberg …</span>
+      </a>
+      <a class="kb-card" href="hdfs.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Apache Hadoop HDFS</span>
+        <span class="kb-card-desc">Learn what Apache Hadoop HDFS is, its role as the original data lake storage layer, and why modern l…</span>
+      </a>
+      <a class="kb-card" href="minio.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">MinIO</span>
+        <span class="kb-card-desc">Learn what MinIO is, how its S3-compatible object storage enables on-premises and hybrid data lakeho…</span>
+      </a>
+      <a class="kb-card" href="object-storage.html">
+        <span class="kb-card-cat">File Formats & Storage</span>
+        <span class="kb-card-term">Object Storage</span>
+        <span class="kb-card-desc">Learn what object storage is, why S3-compatible object storage is the foundation of the data lakehou…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-governance">
+    <h2 class="kb-section-title">Governance</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="data-governance.html">
+        <span class="kb-card-cat">Governance</span>
+        <span class="kb-card-term">Data Governance</span>
+        <span class="kb-card-desc">Learn what data governance means in the data lakehouse, how access control, lineage, quality, and ca…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-governance--quality">
+    <h2 class="kb-section-title">Governance & Quality</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="apache-atlas.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Apache Atlas</span>
+        <span class="kb-card-desc">Learn what Apache Atlas is, how it provides metadata management and governance for the Hadoop and la…</span>
+      </a>
+      <a class="kb-card" href="apache-ranger.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Apache Ranger</span>
+        <span class="kb-card-desc">Learn what Apache Ranger is, how it provides centralized security policy management for the Hadoop a…</span>
+      </a>
+      <a class="kb-card" href="column-level-security.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Column-Level Security</span>
+        <span class="kb-card-desc">Learn what column-level security is, how data masking and column visibility controls protect sensiti…</span>
+      </a>
+      <a class="kb-card" href="data-fabric.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Data Fabric</span>
+        <span class="kb-card-desc">Learn what a data fabric is, how it provides a unified data management layer across distributed data…</span>
+      </a>
+      <a class="kb-card" href="data-lineage.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Data Lineage</span>
+        <span class="kb-card-desc">Learn what data lineage is, how it tracks data flow through lakehouse pipelines, and why lineage is …</span>
+      </a>
+      <a class="kb-card" href="data-observability.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Data Observability</span>
+        <span class="kb-card-desc">Learn what data observability is, how it monitors freshness, volume, schema, and distribution in Apa…</span>
+      </a>
+      <a class="kb-card" href="data-quality.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Data Quality</span>
+        <span class="kb-card-desc">Learn what data quality means in the data lakehouse, the key data quality dimensions, and how tools …</span>
+      </a>
+      <a class="kb-card" href="openmetadata.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">OpenMetadata</span>
+        <span class="kb-card-desc">Learn what OpenMetadata is, how it provides unified data discovery, lineage, and quality for Apache …</span>
+      </a>
+      <a class="kb-card" href="rbac.html">
+        <span class="kb-card-cat">Governance & Quality</span>
+        <span class="kb-card-term">Role-Based Access Control (RBAC)</span>
+        <span class="kb-card-desc">Learn what RBAC is in the data lakehouse, how it is implemented in Apache Polaris and Dremio, and wh…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-ingestion">
+    <h2 class="kb-section-title">Ingestion</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="apache-kafka.html">
+        <span class="kb-card-cat">Ingestion</span>
+        <span class="kb-card-term">Apache Kafka</span>
+        <span class="kb-card-desc">Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipeline…</span>
+      </a>
+      <a class="kb-card" href="change-data-capture.html">
+        <span class="kb-card-cat">Ingestion</span>
+        <span class="kb-card-term">Change Data Capture (CDC)</span>
+        <span class="kb-card-desc">Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Icebe…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-ingestion--streaming">
+    <h2 class="kb-section-title">Ingestion & Streaming</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="batch-processing.html">
+        <span class="kb-card-cat">Ingestion & Streaming</span>
+        <span class="kb-card-term">Batch Processing</span>
+        <span class="kb-card-desc">Learn what batch processing is, how Apache Spark handles large-scale batch ETL into Apache Iceberg, …</span>
+      </a>
+      <a class="kb-card" href="data-ingestion.html">
+        <span class="kb-card-cat">Ingestion & Streaming</span>
+        <span class="kb-card-term">Data Ingestion</span>
+        <span class="kb-card-desc">Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to c…</span>
+      </a>
+      <a class="kb-card" href="dbt.html">
+        <span class="kb-card-cat">Ingestion & Streaming</span>
+        <span class="kb-card-term">dbt (Data Build Tool)</span>
+        <span class="kb-card-desc">Learn what dbt is, how it implements SQL-based ELT transformations on Apache Iceberg tables, and why…</span>
+      </a>
+      <a class="kb-card" href="real-time-analytics.html">
+        <span class="kb-card-cat">Ingestion & Streaming</span>
+        <span class="kb-card-term">Real-Time Analytics</span>
+        <span class="kb-card-desc">Learn what real-time analytics means in the data lakehouse, how streaming ingestion and query engine…</span>
+      </a>
+      <a class="kb-card" href="stream-processing.html">
+        <span class="kb-card-cat">Ingestion & Streaming</span>
+        <span class="kb-card-term">Stream Processing</span>
+        <span class="kb-card-desc">Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Ic…</span>
+      </a>
+      <a class="kb-card" href="upsert.html">
+        <span class="kb-card-cat">Ingestion & Streaming</span>
+        <span class="kb-card-term">Upsert</span>
+        <span class="kb-card-desc">Learn what upsert is, how Apache Iceberg's MERGE INTO implements upsert semantics, and why upsert is…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-query-engines--platforms">
+    <h2 class="kb-section-title">Query Engines & Platforms</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="apache-flink.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Apache Flink</span>
+        <span class="kb-card-desc">Learn what Apache Flink is, how it enables real-time streaming ingestion into Apache Iceberg tables,…</span>
+      </a>
+      <a class="kb-card" href="apache-spark.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Apache Spark</span>
+        <span class="kb-card-desc">Learn what Apache Spark is, how it powers Iceberg ETL and ML workloads, and when to use Spark vs Dre…</span>
+      </a>
+      <a class="kb-card" href="autonomous-reflections.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Autonomous Reflections</span>
+        <span class="kb-card-desc">Learn how Dremio Autonomous Reflections automatically analyze query patterns and create, update, and…</span>
+      </a>
+      <a class="kb-card" href="column-pruning.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Column Pruning</span>
+        <span class="kb-card-desc">Learn what column pruning is, how it works with Apache Parquet's columnar storage, and why it dramat…</span>
+      </a>
+      <a class="kb-card" href="dremio-cloud.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Dremio Cloud</span>
+        <span class="kb-card-desc">Learn what Dremio Cloud is, how its serverless lakehouse platform works on AWS and Azure, and how it…</span>
+      </a>
+      <a class="kb-card" href="dremio-open-catalog.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Dremio Open Catalog</span>
+        <span class="kb-card-desc">Learn what Dremio Open Catalog is, how it implements the Iceberg REST Catalog spec with Git-like Nes…</span>
+      </a>
+      <a class="kb-card" href="dremio-query-engine.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Dremio Intelligent Query Engine</span>
+        <span class="kb-card-desc">Learn how Dremio's Intelligent Query Engine uses Apache Arrow vectorized execution, Reflection accel…</span>
+      </a>
+      <a class="kb-card" href="dremio-reflections.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Dremio Reflections</span>
+        <span class="kb-card-desc">Learn what Dremio Reflections are, how raw and aggregation Reflections work, and how they deliver su…</span>
+      </a>
+      <a class="kb-card" href="dremio.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Dremio</span>
+        <span class="kb-card-desc">Learn what Dremio is, how its intelligent query engine works, and why it is the leading data lakehou…</span>
+      </a>
+      <a class="kb-card" href="physical-datasets.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Physical Datasets (Dremio)</span>
+        <span class="kb-card-desc">Learn what Physical Datasets are in Dremio, how they register data sources including Apache Iceberg …</span>
+      </a>
+      <a class="kb-card" href="predicate-pushdown.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Predicate Pushdown</span>
+        <span class="kb-card-desc">Learn what predicate pushdown is, how it works in Apache Iceberg and Parquet, and why it is one of t…</span>
+      </a>
+      <a class="kb-card" href="presto.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Presto</span>
+        <span class="kb-card-desc">Learn what Presto is, how it compares to Trino, and its role in distributed SQL analytics across Apa…</span>
+      </a>
+      <a class="kb-card" href="trino.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Trino</span>
+        <span class="kb-card-desc">Learn what Trino is, how its federated SQL query engine works across Apache Iceberg and other data s…</span>
+      </a>
+      <a class="kb-card" href="vectorized-execution.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Vectorized Query Execution</span>
+        <span class="kb-card-desc">Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelera…</span>
+      </a>
+      <a class="kb-card" href="virtual-datasets.html">
+        <span class="kb-card-cat">Query Engines & Platforms</span>
+        <span class="kb-card-term">Virtual Datasets (Dremio)</span>
+        <span class="kb-card-desc">Learn what Dremio Virtual Datasets are, how they create a semantic layer above raw Iceberg data, and…</span>
+      </a>
+    </div>
+  </section>
+  <section class="kb-section" id="cat-table-formats">
+    <h2 class="kb-section-title">Table Formats</h2>
+    <div class="kb-grid">
+      <a class="kb-card" href="apache-hudi.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Apache Hudi</span>
+        <span class="kb-card-desc">Learn what Apache Hudi is, how its incremental processing model works, how it compares to Apache Ice…</span>
+      </a>
+      <a class="kb-card" href="apache-iceberg.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Apache Iceberg</span>
+        <span class="kb-card-desc">Learn what Apache Iceberg is, how its metadata architecture works, and why it is the industry-standa…</span>
+      </a>
+      <a class="kb-card" href="compaction.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Compaction</span>
+        <span class="kb-card-desc">Learn what compaction is in Apache Iceberg, why it is essential for lakehouse performance, how Copy-…</span>
+      </a>
+      <a class="kb-card" href="copy-on-write.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Copy-on-Write (CoW)</span>
+        <span class="kb-card-desc">Learn what Copy-on-Write means in Apache Iceberg, when to use CoW vs Merge-on-Read, and how CoW upda…</span>
+      </a>
+      <a class="kb-card" href="delta-lake.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Delta Lake</span>
+        <span class="kb-card-desc">Learn what Delta Lake is, how it works, how it compares to Apache Iceberg, and when to choose Delta …</span>
+      </a>
+      <a class="kb-card" href="hidden-partitioning.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Hidden Partitioning</span>
+        <span class="kb-card-desc">Learn how Apache Iceberg hidden partitioning works, why it eliminates the need to write partition-aw…</span>
+      </a>
+      <a class="kb-card" href="iceberg-manifest-files.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Iceberg Manifest Files</span>
+        <span class="kb-card-desc">Learn what Apache Iceberg manifest files are, how they store file-level statistics for data skipping…</span>
+      </a>
+      <a class="kb-card" href="iceberg-rest-catalog.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Iceberg REST Catalog</span>
+        <span class="kb-card-desc">Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog int…</span>
+      </a>
+      <a class="kb-card" href="iceberg-snapshots.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Iceberg Snapshots</span>
+        <span class="kb-card-desc">Learn what Apache Iceberg snapshots are, how they enable ACID transactions and time travel, and how …</span>
+      </a>
+      <a class="kb-card" href="merge-on-read.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Merge-on-Read (MoR)</span>
+        <span class="kb-card-desc">Learn what Merge-on-Read means in Apache Iceberg, how delete files work, when to use MoR vs Copy-on-…</span>
+      </a>
+      <a class="kb-card" href="partition-evolution.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Partition Evolution</span>
+        <span class="kb-card-desc">Learn how Apache Iceberg partition evolution works, why it solves the static partitioning problem, a…</span>
+      </a>
+      <a class="kb-card" href="row-level-deletes.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Row-Level Deletes</span>
+        <span class="kb-card-desc">Learn how row-level deletes work in Apache Iceberg V2, the difference between positional and equalit…</span>
+      </a>
+      <a class="kb-card" href="schema-evolution.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Schema Evolution</span>
+        <span class="kb-card-desc">Learn how Apache Iceberg schema evolution works, what changes are safe vs breaking, and how to evolv…</span>
+      </a>
+      <a class="kb-card" href="time-travel.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Time Travel</span>
+        <span class="kb-card-desc">Learn how Apache Iceberg time travel works, how to query historical snapshots by timestamp or snapsh…</span>
+      </a>
+      <a class="kb-card" href="z-ordering.html">
+        <span class="kb-card-cat">Table Formats</span>
+        <span class="kb-card-term">Z-Ordering (Data Sorting)</span>
+        <span class="kb-card-desc">Learn what Z-Ordering is in Apache Iceberg, how it clusters data to improve data skipping, and how t…</span>
+      </a>
+    </div>
+  </section>
+
+  </main>
+
+  <div class="kb-footer">
+    <p>&copy; 2026 <a href="../index.html">DataLakehouse101.com</a> &mdash; by <a href="https://alexmerced.com">Alex Merced</a> &middot; <a href="../llms.txt">llms.txt</a> &middot; <a href="../sitemap.xml">Sitemap</a></p>
+  </div>
+
+  <script>
+    const input = document.getElementById('kb-search');
+    const cards = document.querySelectorAll('.kb-card');
+    const sections = document.querySelectorAll('.kb-section');
+    input.addEventListener('input', () => {
+      const q = input.value.toLowerCase().trim();
+      sections.forEach(sec => {
+        let visCount = 0;
+        sec.querySelectorAll('.kb-card').forEach(c => {
+          const text = c.textContent.toLowerCase();
+          const show = !q || text.includes(q);
+          c.classList.toggle('hidden', !show);
+          if (show) visCount++;
+        });
+        sec.style.display = visCount === 0 ? 'none' : '';
+      });
+    });
+  </script>
+</body>
+</html>

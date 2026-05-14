@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medallion Architecture: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers organize data lakehouse pipelines, and best practices for implementing it with Apache Iceberg.">
+  <meta name="keywords" content="Medallion Architecture, data lakehouse, Apache Iceberg, ETL, Change Data Capture, Compaction, Z-Ordering, Dremio Reflections, Semantic Layer, Data Lakehouse">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/medallion-architecture.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Medallion Architecture: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers organize data lakehouse pipelines, and best practices for implementing it with Apache Iceberg.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/medallion-architecture.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Architecture Patterns">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Medallion Architecture: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers organize data lakehouse pipelines, and best practices for implementing it with Apache Iceberg.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Medallion Architecture: The Definitive Guide",
-      "description": "Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers organize data lakehouse pipelines, and best practices for implementing it with Apache Iceberg.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/medallion-architecture.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Medallion Architecture: The Definitive Guide",
+    "description": "Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers organize data lakehouse pipelines, and best practices for implementing it with Apache Iceberg.",
+    "keywords": "Medallion Architecture, data lakehouse, Apache Iceberg, ETL, Change Data Capture, Compaction, Z-Ordering, Dremio Reflections, Semantic Layer, Data Lakehouse",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Medallion Architecture", "item": "https://datalakehouse101.com/knowledge/medallion-architecture.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is the Medallion Architecture?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Medallion Architecture is a data lakehouse design pattern that organizes data into three quality tiers: Bronze (raw, unmodified data as ingested from source systems), Silver (cleaned, validated, conformed, and joined data), and Gold (business-ready aggregations, metrics, and domain-specific datasets optimized for analytics). Each layer serves as input to the next, progressively increasing data quality and analytical readiness."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "What are the Bronze, Silver, and Gold layers?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Bronze: Raw ingestion — exact copies of source data, immutable, typically append-only, may contain duplicates, errors, and schema variations. Silver: Cleansed — deduplicated, validated, null-handled, schema-conforming data with standard business rules applied. Gold: Business-ready — pre-aggregated metrics, dimensional models, domain datasets optimized for specific analytics use cases and business teams."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/medallion-architecture.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/medallion-architecture.html"
     },
-    {
-      "@type": "Question",
-      "name": "Does the Medallion Architecture require Apache Iceberg?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No, but Apache Iceberg is the ideal implementation technology. Iceberg's ACID commits, schema evolution, time travel, and partition evolution make each layer easier to manage — Bronze can handle schema changes without pipeline breaks, Silver can use MERGE INTO for CDC upserts, and Gold can be incrementally refreshed without full rebuilds."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Medallion Architecture",
+        "item": "https://datalakehouse101.com/knowledge/medallion-architecture.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Medallion Architecture?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Medallion Architecture is a data lakehouse design pattern that organizes data into three quality tiers: Bronze (raw, unmodified data as ingested from source systems), Silver (cleaned, validated, conformed, and joined data), and Gold (business-ready aggregations, metrics, and domain-specific datasets optimized for analytics). Each layer serves as input to the next, progressively increasing data quality and analytical readiness."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the Bronze, Silver, and Gold layers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bronze: Raw ingestion — exact copies of source data, immutable, typically append-only, may contain duplicates, errors, and schema variations. Silver: Cleansed — deduplicated, validated, null-handled, schema-conforming data with standard business rules applied. Gold: Business-ready — pre-aggregated metrics, dimensional models, domain datasets optimized for specific analytics use cases and business teams."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the Medallion Architecture require Apache Iceberg?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, but Apache Iceberg is the ideal implementation technology. Iceberg's ACID commits, schema evolution, time travel, and partition evolution make each layer easier to manage — Bronze can handle schema changes without pipeline breaks, Silver can use MERGE INTO for CDC upserts, and Gold can be incrementally refreshed without full rebuilds."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Medallion Architecture: The Definitive Guide</h1>
       <p class="hero-lede">The Medallion Architecture organizes data lakehouse pipelines into three quality tiers — Bronze (raw ingestion), Silver (cleansed and conformed), and Gold (business-ready aggregations). It is the most widely adopted framework for structuring data engineering workflows on Apache Iceberg and the lakehouse.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

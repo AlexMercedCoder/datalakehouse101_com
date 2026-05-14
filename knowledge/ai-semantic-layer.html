@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Semantic Layer in Dremio: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents via MCP, and why it is the bridge between enterprise data and agentic AI.">
+  <meta name="keywords" content="AI Semantic Layer (Dremio), data lakehouse, Apache Iceberg, Semantic Layer, Dremio, Virtual Datasets, Self-Service Analytics, Dremio Reflections, Metadata Management, Data Governance, Data Lakehouse">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/ai-semantic-layer.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="AI Semantic Layer in Dremio: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents via MCP, and why it is the bridge between enterprise data and agentic AI.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/ai-semantic-layer.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Analytics & BI">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Semantic Layer in Dremio: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents via MCP, and why it is the bridge between enterprise data and agentic AI.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "AI Semantic Layer in Dremio: The Definitive Guide",
-      "description": "Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents via MCP, and why it is the bridge between enterprise data and agentic AI.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/ai-semantic-layer.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "AI Semantic Layer in Dremio: The Definitive Guide",
+    "description": "Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents via MCP, and why it is the bridge between enterprise data and agentic AI.",
+    "keywords": "AI Semantic Layer (Dremio), data lakehouse, Apache Iceberg, Semantic Layer, Dremio, Virtual Datasets, Self-Service Analytics, Dremio Reflections, Metadata Management, Data Governance, Data Lakehouse",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "AI Semantic Layer (Dremio)", "item": "https://datalakehouse101.com/knowledge/ai-semantic-layer.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is Dremio's AI Semantic Layer?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Dremio's AI Semantic Layer is an extension of its Virtual Dataset-based semantic layer that adds AI-native capabilities: rich natural language descriptions of data assets, formal metric definitions with dimensional context, and an MCP (Model Context Protocol) server endpoint that enables AI language models to discover and query enterprise data autonomously."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "What is the Model Context Protocol (MCP) and how does it relate?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "MCP is an open standard for AI agent tool interfaces, allowing language models (like Claude or GPT) to call external services as tools. Dremio's MCP server exposes the AI Semantic Layer as MCP tools — agents can list available datasets, understand their business meaning, and execute SQL queries against Dremio's engine, all autonomously during an AI conversation."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/ai-semantic-layer.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/ai-semantic-layer.html"
     },
-    {
-      "@type": "Question",
-      "name": "How does the AI Semantic Layer differ from the standard semantic layer?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The standard semantic layer focuses on SQL-level abstraction for human analysts. The AI Semantic Layer adds: structured natural language descriptions designed for LLM consumption, metric definitions with explicit formula and dimension relationships, context that helps AI models understand data without human guidance, and MCP server endpoints for autonomous agent tool access."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "AI Semantic Layer (Dremio)",
+        "item": "https://datalakehouse101.com/knowledge/ai-semantic-layer.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Dremio's AI Semantic Layer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Dremio's AI Semantic Layer is an extension of its Virtual Dataset-based semantic layer that adds AI-native capabilities: rich natural language descriptions of data assets, formal metric definitions with dimensional context, and an MCP (Model Context Protocol) server endpoint that enables AI language models to discover and query enterprise data autonomously."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Model Context Protocol (MCP) and how does it relate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "MCP is an open standard for AI agent tool interfaces, allowing language models (like Claude or GPT) to call external services as tools. Dremio's MCP server exposes the AI Semantic Layer as MCP tools — agents can list available datasets, understand their business meaning, and execute SQL queries against Dremio's engine, all autonomously during an AI conversation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the AI Semantic Layer differ from the standard semantic layer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The standard semantic layer focuses on SQL-level abstraction for human analysts. The AI Semantic Layer adds: structured natural language descriptions designed for LLM consumption, metric definitions with explicit formula and dimension relationships, context that helps AI models understand data without human guidance, and MCP server endpoints for autonomous agent tool access."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>AI Semantic Layer in Dremio: The Definitive Guide</h1>
       <p class="hero-lede">Dremio's AI Semantic Layer extends the traditional semantic layer with AI-native capabilities — natural language metric definitions, context-rich descriptions, and an MCP server endpoint that enables AI agents to autonomously discover, understand, and query enterprise lakehouse data without human intervention.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

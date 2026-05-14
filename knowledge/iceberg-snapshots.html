@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iceberg Snapshots: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what Apache Iceberg snapshots are, how they enable ACID transactions and time travel, and how Dremio leverages the snapshot model for reliable lakehouse analytics.">
+  <meta name="keywords" content="Iceberg Snapshots, data lakehouse, Apache Iceberg, Iceberg Manifest Files, Time Travel, ACID Transactions, Compaction, Project Nessie, Dremio, Copy-on-Write">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/iceberg-snapshots.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Iceberg Snapshots: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what Apache Iceberg snapshots are, how they enable ACID transactions and time travel, and how Dremio leverages the snapshot model for reliable lakehouse analytics.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/iceberg-snapshots.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Table Formats">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Iceberg Snapshots: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what Apache Iceberg snapshots are, how they enable ACID transactions and time travel, and how Dremio leverages the snapshot model for reliable lakehouse analytics.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Iceberg Snapshots: The Definitive Guide",
-      "description": "Learn what Apache Iceberg snapshots are, how they enable ACID transactions and time travel, and how Dremio leverages the snapshot model for reliable lakehouse analytics.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/iceberg-snapshots.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Iceberg Snapshots: The Definitive Guide",
+    "description": "Learn what Apache Iceberg snapshots are, how they enable ACID transactions and time travel, and how Dremio leverages the snapshot model for reliable lakehouse analytics.",
+    "keywords": "Iceberg Snapshots, data lakehouse, Apache Iceberg, Iceberg Manifest Files, Time Travel, ACID Transactions, Compaction, Project Nessie, Dremio, Copy-on-Write",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Iceberg Snapshots", "item": "https://datalakehouse101.com/knowledge/iceberg-snapshots.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is an Iceberg snapshot?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "An Apache Iceberg snapshot is an immutable record of a table's state at a specific point in time. Each committed transaction creates a new snapshot identified by a unique snapshot ID and timestamp, containing a reference to the manifest list that identifies all data files in the table at that moment."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How do Iceberg snapshots enable time travel?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Because every transaction creates a new snapshot (rather than overwriting the previous state), the full history of the table is preserved in the snapshot log. Users can query any historical snapshot by ID or timestamp using the AT SNAPSHOT or AT TIMESTAMP syntax, seeing the table exactly as it existed at that moment."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/iceberg-snapshots.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/iceberg-snapshots.html"
     },
-    {
-      "@type": "Question",
-      "name": "How long are Iceberg snapshots retained?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "By default, Iceberg retains snapshots indefinitely until an explicit expiration is run. Most production deployments configure snapshot expiration to retain between 7 and 30 days of history, which supports time travel needs while preventing unbounded metadata growth. Dremio automates this cleanup."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Iceberg Snapshots",
+        "item": "https://datalakehouse101.com/knowledge/iceberg-snapshots.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is an Iceberg snapshot?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An Apache Iceberg snapshot is an immutable record of a table's state at a specific point in time. Each committed transaction creates a new snapshot identified by a unique snapshot ID and timestamp, containing a reference to the manifest list that identifies all data files in the table at that moment."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do Iceberg snapshots enable time travel?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Because every transaction creates a new snapshot (rather than overwriting the previous state), the full history of the table is preserved in the snapshot log. Users can query any historical snapshot by ID or timestamp using the AT SNAPSHOT or AT TIMESTAMP syntax, seeing the table exactly as it existed at that moment."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long are Iceberg snapshots retained?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "By default, Iceberg retains snapshots indefinitely until an explicit expiration is run. Most production deployments configure snapshot expiration to retain between 7 and 30 days of history, which supports time travel needs while preventing unbounded metadata growth. Dremio automates this cleanup."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Iceberg Snapshots: The Definitive Guide</h1>
       <p class="hero-lede">Snapshots are the atomic unit of change in Apache Iceberg. Every committed transaction creates a new snapshot — a complete, immutable description of the table's state — enabling ACID transactions, time travel, and snapshot isolation for concurrent readers and writers.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

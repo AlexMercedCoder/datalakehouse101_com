@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion | Data Lakehouse 101</title>
   <meta name="description" content="Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipelines, and how Kafka connects operational systems to Apache Iceberg tables.">
+  <meta name="keywords" content="Apache Kafka, data lakehouse, Apache Iceberg, Change Data Capture, Apache Flink, Apache Avro, Medallion Architecture, ETL, Apache Spark, Schema Evolution">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/apache-kafka.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion | Data Lakehouse 101">
   <meta property="og:description" content="Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipelines, and how Kafka connects operational systems to Apache Iceberg tables.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/apache-kafka.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Ingestion">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipelines, and how Kafka connects operational systems to Apache Iceberg tables.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion",
-      "description": "Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipelines, and how Kafka connects operational systems to Apache Iceberg tables.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/apache-kafka.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion",
+    "description": "Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipelines, and how Kafka connects operational systems to Apache Iceberg tables.",
+    "keywords": "Apache Kafka, data lakehouse, Apache Iceberg, Change Data Capture, Apache Flink, Apache Avro, Medallion Architecture, ETL, Apache Spark, Schema Evolution",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Apache Kafka", "item": "https://datalakehouse101.com/knowledge/apache-kafka.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is Apache Kafka?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Apache Kafka is an open-source distributed event streaming platform designed for high-throughput, fault-tolerant, real-time data pipelines. It stores messages as ordered, immutable logs partitioned across a cluster, allowing millions of events per second to be published and consumed by multiple independent consumers simultaneously."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How does Apache Kafka fit into a data lakehouse architecture?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Kafka serves as the real-time ingestion layer between operational systems and the lakehouse. Applications, databases (via Debezium CDC), IoT devices, and SaaS webhooks publish events to Kafka topics. Downstream consumers (Apache Flink, Spark Structured Streaming) read from Kafka and write to Bronze Apache Iceberg tables, creating a continuously updated real-time data pipeline."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/apache-kafka.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/apache-kafka.html"
     },
-    {
-      "@type": "Question",
-      "name": "What is Kafka Connect and how does it relate to lakehouse ingestion?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Kafka Connect is Kafka's connector framework for integrating external systems. Debezium runs as a Kafka Connect source connector, reading database WALs and publishing CDC events to Kafka. Kafka Connect sink connectors can write Kafka topics directly to Iceberg tables without requiring Flink or Spark — simplifying simple ingestion scenarios."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Apache Kafka",
+        "item": "https://datalakehouse101.com/knowledge/apache-kafka.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Apache Kafka?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Apache Kafka is an open-source distributed event streaming platform designed for high-throughput, fault-tolerant, real-time data pipelines. It stores messages as ordered, immutable logs partitioned across a cluster, allowing millions of events per second to be published and consumed by multiple independent consumers simultaneously."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Apache Kafka fit into a data lakehouse architecture?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kafka serves as the real-time ingestion layer between operational systems and the lakehouse. Applications, databases (via Debezium CDC), IoT devices, and SaaS webhooks publish events to Kafka topics. Downstream consumers (Apache Flink, Spark Structured Streaming) read from Kafka and write to Bronze Apache Iceberg tables, creating a continuously updated real-time data pipeline."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Kafka Connect and how does it relate to lakehouse ingestion?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kafka Connect is Kafka's connector framework for integrating external systems. Debezium runs as a Kafka Connect source connector, reading database WALs and publishing CDC events to Kafka. Kafka Connect sink connectors can write Kafka topics directly to Iceberg tables without requiring Flink or Spark — simplifying simple ingestion scenarios."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Apache Kafka: The Definitive Guide for Data Lakehouse Ingestion</h1>
       <p class="hero-lede">Apache Kafka is the distributed event streaming platform that connects operational systems to the data lakehouse. As the message bus for CDC events, application logs, clickstreams, and IoT data, Kafka enables the real-time data pipelines that feed Bronze Iceberg tables with seconds-fresh operational data.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

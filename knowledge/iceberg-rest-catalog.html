@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iceberg REST Catalog: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog interoperability, and which implementations power modern data lakehouses.">
+  <meta name="keywords" content="Iceberg REST Catalog, data lakehouse, Apache Iceberg, Apache Polaris, Project Nessie, Dremio, Data Lakehouse, Multi-Engine Interoperability, Role-Based Access Control, Decoupled Storage and Compute">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Iceberg REST Catalog: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog interoperability, and which implementations power modern data lakehouses.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Table Formats">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Iceberg REST Catalog: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog interoperability, and which implementations power modern data lakehouses.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Iceberg REST Catalog: The Definitive Guide",
-      "description": "Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog interoperability, and which implementations power modern data lakehouses.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Iceberg REST Catalog: The Definitive Guide",
+    "description": "Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog interoperability, and which implementations power modern data lakehouses.",
+    "keywords": "Iceberg REST Catalog, data lakehouse, Apache Iceberg, Apache Polaris, Project Nessie, Dremio, Data Lakehouse, Multi-Engine Interoperability, Role-Based Access Control, Decoupled Storage and Compute",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Iceberg REST Catalog", "item": "https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is the Iceberg REST Catalog?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Iceberg REST Catalog is an open HTTP API specification that defines standard endpoints for catalog operations: creating namespaces and tables, loading table metadata, committing transactions, and managing access tokens. Any query engine implementing the REST catalog client can connect to any catalog implementing the REST catalog server."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "Which catalogs implement the Iceberg REST Catalog spec?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Major implementations include Apache Polaris (donated by Snowflake, now ASF), Project Nessie (Dremio's Git-like catalog), AWS Glue (native REST API), Tabular (acquired by Databricks), and several cloud providers' managed catalog services."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html"
     },
-    {
-      "@type": "Question",
-      "name": "Why is the Iceberg REST Catalog important for the data lakehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The REST Catalog specification creates a true plug-and-play catalog ecosystem: organizations can switch catalog backends without changing query engine configuration, and query engines can connect to any compliant catalog without engine-specific plugins. This interoperability reduces vendor lock-in at the catalog layer."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Iceberg REST Catalog",
+        "item": "https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the Iceberg REST Catalog?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Iceberg REST Catalog is an open HTTP API specification that defines standard endpoints for catalog operations: creating namespaces and tables, loading table metadata, committing transactions, and managing access tokens. Any query engine implementing the REST catalog client can connect to any catalog implementing the REST catalog server."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which catalogs implement the Iceberg REST Catalog spec?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Major implementations include Apache Polaris (donated by Snowflake, now ASF), Project Nessie (Dremio's Git-like catalog), AWS Glue (native REST API), Tabular (acquired by Databricks), and several cloud providers' managed catalog services."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is the Iceberg REST Catalog important for the data lakehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The REST Catalog specification creates a true plug-and-play catalog ecosystem: organizations can switch catalog backends without changing query engine configuration, and query engines can connect to any compliant catalog without engine-specific plugins. This interoperability reduces vendor lock-in at the catalog layer."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Iceberg REST Catalog: The Definitive Guide</h1>
       <p class="hero-lede">The Iceberg REST Catalog specification defines a standard HTTP API for catalog operations — table discovery, metadata loading, and transaction commits. Any engine implementing the client and any catalog implementing the server can interoperate seamlessly, making it the foundation of the open lakehouse ecosystem.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

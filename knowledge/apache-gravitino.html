@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Apache Gravitino: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalogs, and its role in multi-catalog lakehouse governance.">
+  <meta name="keywords" content="Apache Gravitino, data lakehouse, Apache Iceberg, Apache Polaris, Hive Metastore, Catalog Interoperability, Trino, Metadata Management, Data Governance, Lakehouse Federation">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/apache-gravitino.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Apache Gravitino: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalogs, and its role in multi-catalog lakehouse governance.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/apache-gravitino.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Catalogs & Metadata">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Apache Gravitino: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalogs, and its role in multi-catalog lakehouse governance.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Apache Gravitino: The Definitive Guide",
-      "description": "Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalogs, and its role in multi-catalog lakehouse governance.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/apache-gravitino.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Apache Gravitino: The Definitive Guide",
+    "description": "Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalogs, and its role in multi-catalog lakehouse governance.",
+    "keywords": "Apache Gravitino, data lakehouse, Apache Iceberg, Apache Polaris, Hive Metastore, Catalog Interoperability, Trino, Metadata Management, Data Governance, Lakehouse Federation",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Apache Gravitino", "item": "https://datalakehouse101.com/knowledge/apache-gravitino.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is Apache Gravitino?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Apache Gravitino (formerly part of the Datastrato project) is an open-source federated metadata service that provides a unified metadata API across multiple catalog types — Iceberg, Hive Metastore, JDBC databases, Kafka, and others. It acts as a universal catalog federation layer, presenting a single namespace across disparate catalog backends."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How is Apache Gravitino different from Apache Polaris?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Polaris is an Iceberg-specific REST catalog. Gravitino is a federated metadata layer that connects to multiple catalog types — including Iceberg REST catalogs, Hive Metastores, JDBC databases, and message queues. Gravitino provides a unified namespace and governance model across all of them, while Polaris focuses on first-class Iceberg catalog capabilities."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/apache-gravitino.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/apache-gravitino.html"
     },
-    {
-      "@type": "Question",
-      "name": "What is Gravitino's relationship to the Apache Software Foundation?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Apache Gravitino entered the Apache Software Foundation Incubator in 2024, donated by Datastrato. It is in the process of graduating from incubation to a top-level Apache project."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Apache Gravitino",
+        "item": "https://datalakehouse101.com/knowledge/apache-gravitino.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Apache Gravitino?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Apache Gravitino (formerly part of the Datastrato project) is an open-source federated metadata service that provides a unified metadata API across multiple catalog types — Iceberg, Hive Metastore, JDBC databases, Kafka, and others. It acts as a universal catalog federation layer, presenting a single namespace across disparate catalog backends."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is Apache Gravitino different from Apache Polaris?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Polaris is an Iceberg-specific REST catalog. Gravitino is a federated metadata layer that connects to multiple catalog types — including Iceberg REST catalogs, Hive Metastores, JDBC databases, and message queues. Gravitino provides a unified namespace and governance model across all of them, while Polaris focuses on first-class Iceberg catalog capabilities."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Gravitino's relationship to the Apache Software Foundation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Apache Gravitino entered the Apache Software Foundation Incubator in 2024, donated by Datastrato. It is in the process of graduating from incubation to a top-level Apache project."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Apache Gravitino: The Definitive Guide</h1>
       <p class="hero-lede">Apache Gravitino is an open-source federated metadata layer that provides a unified API and governance model across multiple catalogs — Iceberg, Hive, JDBC databases, and others. It is the multi-catalog abstraction layer that lets engines discover and govern data across heterogeneous catalog systems.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

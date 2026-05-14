@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stream Processing: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
   <meta name="description" content="Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.">
+  <meta name="keywords" content="Stream Processing, data lakehouse, Apache Iceberg, Apache Flink, Apache Kafka, Batch Processing, Change Data Capture, Medallion Architecture, Real-Time Analytics, Data Lakehouse">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/stream-processing.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Stream Processing: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
   <meta property="og:description" content="Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/stream-processing.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Ingestion & Streaming">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Stream Processing: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Stream Processing: The Definitive Guide",
-      "description": "Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/stream-processing.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Stream Processing: The Definitive Guide",
+    "description": "Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.",
+    "keywords": "Stream Processing, data lakehouse, Apache Iceberg, Apache Flink, Apache Kafka, Batch Processing, Change Data Capture, Medallion Architecture, Real-Time Analytics, Data Lakehouse",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Stream Processing", "item": "https://datalakehouse101.com/knowledge/stream-processing.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is stream processing?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Stream processing is the continuous computation on data as it arrives — processing events in real time or near-real time rather than accumulating data in batches and processing periodically. Stream processing systems maintain state across events, apply time-based windowing, and write results continuously to outputs like Apache Iceberg tables, databases, or downstream Kafka topics."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How does Apache Flink enable stream processing into Iceberg?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Apache Flink reads data from Kafka topics using its Kafka source connector, processes events using Flink's stateful stream processing APIs (filtering, aggregating, joining across streams), and writes results to Apache Iceberg tables using the Flink Iceberg sink connector. The sink supports both append mode (Bronze tables) and upsert mode (CDC-driven Silver tables) with exactly-once delivery guarantees."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/stream-processing.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/stream-processing.html"
     },
-    {
-      "@type": "Question",
-      "name": "When should I use stream processing vs batch processing for lakehouse ingestion?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Use stream processing when data freshness matters — real-time dashboards, fraud detection, operational alerts. Use batch processing when throughput and transformation complexity matter more than freshness — large historical loads, complex multi-table joins, ML feature engineering. Most mature lakehouse architectures use both: streaming for Bronze CDC ingestion and operational analytics, batch for Silver and Gold transformations."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Stream Processing",
+        "item": "https://datalakehouse101.com/knowledge/stream-processing.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is stream processing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Stream processing is the continuous computation on data as it arrives — processing events in real time or near-real time rather than accumulating data in batches and processing periodically. Stream processing systems maintain state across events, apply time-based windowing, and write results continuously to outputs like Apache Iceberg tables, databases, or downstream Kafka topics."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Apache Flink enable stream processing into Iceberg?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Apache Flink reads data from Kafka topics using its Kafka source connector, processes events using Flink's stateful stream processing APIs (filtering, aggregating, joining across streams), and writes results to Apache Iceberg tables using the Flink Iceberg sink connector. The sink supports both append mode (Bronze tables) and upsert mode (CDC-driven Silver tables) with exactly-once delivery guarantees."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When should I use stream processing vs batch processing for lakehouse ingestion?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use stream processing when data freshness matters — real-time dashboards, fraud detection, operational alerts. Use batch processing when throughput and transformation complexity matter more than freshness — large historical loads, complex multi-table joins, ML feature engineering. Most mature lakehouse architectures use both: streaming for Bronze CDC ingestion and operational analytics, batch for Silver and Gold transformations."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Stream Processing: The Definitive Guide</h1>
       <p class="hero-lede">Stream processing continuously processes data as it arrives — event by event or in micro-batches — enabling real-time analytics, fraud detection, and live dashboards. Apache Flink is the dominant stream processing engine for lakehouse pipelines, writing real-time data to Apache Iceberg Bronze tables with exactly-once guarantees.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

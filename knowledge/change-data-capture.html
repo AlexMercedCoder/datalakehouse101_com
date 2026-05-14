@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Change Data Capture (CDC): The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
   <meta name="description" content="Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.">
+  <meta name="keywords" content="Change Data Capture (CDC), data lakehouse, Apache Iceberg, Apache Flink, Merge-on-Read, Compaction, Medallion Architecture, ETL, Apache Kafka, Data Lakehouse">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/change-data-capture.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Change Data Capture (CDC): The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
   <meta property="og:description" content="Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/change-data-capture.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Ingestion">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Change Data Capture (CDC): The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Change Data Capture (CDC): The Definitive Guide",
-      "description": "Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/change-data-capture.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Change Data Capture (CDC): The Definitive Guide",
+    "description": "Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how CDC enables near-real-time lakehouse data freshness.",
+    "keywords": "Change Data Capture (CDC), data lakehouse, Apache Iceberg, Apache Flink, Merge-on-Read, Compaction, Medallion Architecture, ETL, Apache Kafka, Data Lakehouse",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Change Data Capture (CDC)", "item": "https://datalakehouse101.com/knowledge/change-data-capture.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is Change Data Capture (CDC)?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Change Data Capture (CDC) is a data integration technique that monitors a source database's transaction log (WAL — Write-Ahead Log) and captures every row-level change (INSERT, UPDATE, DELETE) as a structured event. These events are then streamed to downstream systems (Kafka, Iceberg tables) to replicate the source database's changes in near-real-time."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How does CDC work with Apache Iceberg?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "CDC events (typically captured by Debezium and published to Kafka) are processed by Apache Flink using the Flink CDC connectors. Flink writes INSERTs as new rows, UPDATEs as updates (using Iceberg V2 equality delete files in MoR mode), and DELETEs as deletions to target Iceberg Silver tables. The result is a Silver Iceberg table that continuously mirrors the current state of the source operational database."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/change-data-capture.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/change-data-capture.html"
     },
-    {
-      "@type": "Question",
-      "name": "What is Debezium and why is it used for CDC?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Debezium is the leading open-source CDC platform. It connects to source databases (PostgreSQL, MySQL, Oracle, MongoDB, SQL Server) as a replication client, reads the WAL, and publishes change events to Apache Kafka in a structured JSON or Avro format. Debezium's Kafka Connect integration makes it the standard CDC source for Kafka-based streaming pipelines feeding Apache Iceberg lakehouses."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Change Data Capture (CDC)",
+        "item": "https://datalakehouse101.com/knowledge/change-data-capture.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Change Data Capture (CDC)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Change Data Capture (CDC) is a data integration technique that monitors a source database's transaction log (WAL — Write-Ahead Log) and captures every row-level change (INSERT, UPDATE, DELETE) as a structured event. These events are then streamed to downstream systems (Kafka, Iceberg tables) to replicate the source database's changes in near-real-time."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does CDC work with Apache Iceberg?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "CDC events (typically captured by Debezium and published to Kafka) are processed by Apache Flink using the Flink CDC connectors. Flink writes INSERTs as new rows, UPDATEs as updates (using Iceberg V2 equality delete files in MoR mode), and DELETEs as deletions to target Iceberg Silver tables. The result is a Silver Iceberg table that continuously mirrors the current state of the source operational database."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Debezium and why is it used for CDC?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Debezium is the leading open-source CDC platform. It connects to source databases (PostgreSQL, MySQL, Oracle, MongoDB, SQL Server) as a replication client, reads the WAL, and publishes change events to Apache Kafka in a structured JSON or Avro format. Debezium's Kafka Connect integration makes it the standard CDC source for Kafka-based streaming pipelines feeding Apache Iceberg lakehouses."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Change Data Capture (CDC): The Definitive Guide</h1>
       <p class="hero-lede">Change Data Capture (CDC) continuously captures row-level changes — inserts, updates, and deletes — from operational databases and streams them to the lakehouse. With Debezium + Apache Flink + Apache Iceberg, CDC enables near-real-time data freshness in the lakehouse without full table scans or expensive batch ETL windows.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

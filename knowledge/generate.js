@@ -2,7 +2,6 @@
 /**
  * Knowledge Base Page Generator
  * Usage: node generate.js <content-file.json>
- * Reads a JSON content file and writes the rendered HTML page.
  */
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +12,7 @@ if (!contentFile) { console.error('Usage: node generate.js <content.json>'); pro
 const page = JSON.parse(fs.readFileSync(contentFile, 'utf8'));
 const outPath = path.join(__dirname, `${page.slug}.html`);
 
-/* ── CTA Block ──────────────────────────────────────────────────────── */
+/* ── CTA Block ─────────────────────────────────────────────────────── */
 const ctaHTML = `
 <section class="cta-section">
   <div class="container">
@@ -54,14 +53,13 @@ const ctaHTML = `
   </div>
 </section>`;
 
-/* ── TOC Builder ────────────────────────────────────────────────────── */
+/* ── Helpers ────────────────────────────────────────────────────────── */
 function buildTOC(sections) {
   return sections.map((s, i) =>
     `<li><a href="#section-${i+1}">${s.heading}</a></li>`
   ).join('\n        ');
 }
 
-/* ── Section Builder ────────────────────────────────────────────────── */
 function buildSections(sections) {
   return sections.map((s, i) => {
     const diag = s.diagram
@@ -76,7 +74,6 @@ function buildSections(sections) {
   }).join('\n');
 }
 
-/* ── Related Cards ──────────────────────────────────────────────────── */
 function buildRelated(related) {
   return related.map(r =>
     `<a class="related-card" href="${r.slug}.html">
@@ -87,9 +84,49 @@ function buildRelated(related) {
   ).join('\n      ');
 }
 
-/* ── FAQ JSON-LD ────────────────────────────────────────────────────── */
-function buildFAQSchema(faqs) {
-  return JSON.stringify({
+function buildKeywords(p) {
+  const base = [p.term, 'data lakehouse', 'Apache Iceberg'];
+  const related = (p.related || []).map(r => r.term);
+  return [...new Set([...base, ...related])].slice(0, 12).join(', ');
+}
+
+/* ── LD+JSON Schemas ────────────────────────────────────────────────── */
+function articleSchema(p) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": p.h1,
+    "description": p.metaDescription,
+    "keywords": buildKeywords(p),
+    "author": { "@type": "Person", "name": "Alex Merced", "url": "https://alexmerced.com" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": { "@type": "ImageObject", "url": "https://datalakehouse101.com/assets/img/favicon.png" }
+    },
+    "datePublished": p.datePublished || "2026-05-14",
+    "dateModified": p.datePublished || "2026-05-14",
+    "url": `https://datalakehouse101.com/knowledge/${p.slug}.html`,
+    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://datalakehouse101.com/knowledge/${p.slug}.html` },
+    "image": { "@type": "ImageObject", "url": "https://datalakehouse101.com/assets/img/og-image.png", "width": 1200, "height": 630 }
+  };
+}
+
+function breadcrumbSchema(p) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+      { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+      { "@type": "ListItem", "position": 3, "name": p.term, "item": `https://datalakehouse101.com/knowledge/${p.slug}.html` }
+    ]
+  };
+}
+
+function faqSchema(faqs) {
+  return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": faqs.map(f => ({
@@ -97,52 +134,57 @@ function buildFAQSchema(faqs) {
       "name": f.q,
       "acceptedAnswer": { "@type": "Answer", "text": f.a }
     }))
-  }, null, 2);
+  };
 }
 
-/* ── Full Page Template ─────────────────────────────────────────────── */
+/* ── Render ─────────────────────────────────────────────────────────── */
+const ldJson = JSON.stringify([articleSchema(page), breadcrumbSchema(page), faqSchema(page.faqs)], null, 2);
+const keywords = buildKeywords(page);
+const pageUrl = `https://datalakehouse101.com/knowledge/${page.slug}.html`;
+const fullTitle = `${page.metaTitle} | Data Lakehouse 101`;
+const pubDate = page.datePublished || '2026-05-14';
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${page.metaTitle} | Data Lakehouse 101</title>
+  <title>${fullTitle}</title>
   <meta name="description" content="${page.metaDescription}">
-  <link rel="canonical" href="https://datalakehouse101.com/knowledge/${page.slug}.html">
+  <meta name="keywords" content="${keywords}">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="${pageUrl}">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
-  <meta property="og:title" content="${page.metaTitle} | Data Lakehouse 101">
+  <meta property="og:title" content="${fullTitle}">
   <meta property="og:description" content="${page.metaDescription}">
-  <meta property="og:url" content="https://datalakehouse101.com/knowledge/${page.slug}.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:url" content="${pageUrl}">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="${pubDate}">
+  <meta property="article:section" content="${page.category}">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${fullTitle}">
+  <meta name="twitter:description" content="${page.metaDescription}">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "${page.h1}",
-      "description": "${page.metaDescription}",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "${page.datePublished || '2026-05-14'}",
-      "url": "https://datalakehouse101.com/knowledge/${page.slug}.html"
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "${page.term}", "item": "https://datalakehouse101.com/knowledge/${page.slug}.html" }
-      ]
-    },
-    ${buildFAQSchema(page.faqs)}
-  ]
+${ldJson}
   </script>
 </head>
 <body>
@@ -174,9 +216,9 @@ const html = `<!DOCTYPE html>
       <h1>${page.h1}</h1>
       <p class="hero-lede">${page.lede}</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
-        <span id="reading-time">Loading…</span>
-        <span>Updated ${page.datePublished || '2026'}</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
+        <span id="reading-time">Loading\u2026</span>
+        <span>Updated ${pubDate}</span>
       </div>
     </div>
   </header>
@@ -214,4 +256,4 @@ const html = `<!DOCTYPE html>
 </html>`;
 
 fs.writeFileSync(outPath, html, 'utf8');
-console.log(`✅ Written: ${outPath}`);
+console.log(`\u2705 Written: ${outPath}`);

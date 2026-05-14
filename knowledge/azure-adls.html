@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Azure ADLS: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
   <meta name="description" content="Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure-based Apache Iceberg lakehouses, and its key features for enterprise data.">
+  <meta name="keywords" content="Azure Data Lake Storage (ADLS), data lakehouse, Apache Iceberg, Object Storage, Amazon S3, Dremio Cloud, Decoupled Storage and Compute, Google Cloud Storage, Apache Parquet, Data Governance">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/azure-adls.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Azure ADLS: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
   <meta property="og:description" content="Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure-based Apache Iceberg lakehouses, and its key features for enterprise data.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/azure-adls.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="File Formats & Storage">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Azure ADLS: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure-based Apache Iceberg lakehouses, and its key features for enterprise data.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Azure Data Lake Storage (ADLS): The Definitive Guide",
-      "description": "Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure-based Apache Iceberg lakehouses, and its key features for enterprise data.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/azure-adls.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Azure Data Lake Storage (ADLS): The Definitive Guide",
+    "description": "Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure-based Apache Iceberg lakehouses, and its key features for enterprise data.",
+    "keywords": "Azure Data Lake Storage (ADLS), data lakehouse, Apache Iceberg, Object Storage, Amazon S3, Dremio Cloud, Decoupled Storage and Compute, Google Cloud Storage, Apache Parquet, Data Governance",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Azure Data Lake Storage (ADLS)", "item": "https://datalakehouse101.com/knowledge/azure-adls.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is Azure ADLS Gen2?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Azure Data Lake Storage Gen2 is Microsoft's cloud object storage service optimized for big data analytics. It combines Azure Blob Storage's unlimited scale and low cost with a hierarchical namespace and POSIX-compatible ACLs for fine-grained access control. It is the recommended storage backend for Apache Iceberg lakehouses on Microsoft Azure."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How does ADLS Gen2 differ from Azure Blob Storage?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "ADLS Gen2 is built on Azure Blob Storage but adds a hierarchical namespace (true directory semantics with atomic rename), POSIX ACLs (file and directory level permissions), and optimized drivers for big data workloads (ABFS protocol). Standard Blob Storage uses a flat namespace and only container-level RBAC."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/azure-adls.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/azure-adls.html"
     },
-    {
-      "@type": "Question",
-      "name": "Does Apache Iceberg support ADLS Gen2?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. Apache Iceberg, Dremio, Spark, and Trino all support ADLS Gen2 as a storage backend via the Azure Blob File System (ABFS) driver. Iceberg stores data files and metadata in ADLS Gen2 containers using the abfss:// URI scheme."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Azure Data Lake Storage (ADLS)",
+        "item": "https://datalakehouse101.com/knowledge/azure-adls.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Azure ADLS Gen2?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Azure Data Lake Storage Gen2 is Microsoft's cloud object storage service optimized for big data analytics. It combines Azure Blob Storage's unlimited scale and low cost with a hierarchical namespace and POSIX-compatible ACLs for fine-grained access control. It is the recommended storage backend for Apache Iceberg lakehouses on Microsoft Azure."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does ADLS Gen2 differ from Azure Blob Storage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ADLS Gen2 is built on Azure Blob Storage but adds a hierarchical namespace (true directory semantics with atomic rename), POSIX ACLs (file and directory level permissions), and optimized drivers for big data workloads (ABFS protocol). Standard Blob Storage uses a flat namespace and only container-level RBAC."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Apache Iceberg support ADLS Gen2?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Apache Iceberg, Dremio, Spark, and Trino all support ADLS Gen2 as a storage backend via the Azure Blob File System (ABFS) driver. Iceberg stores data files and metadata in ADLS Gen2 containers using the abfss:// URI scheme."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Azure Data Lake Storage (ADLS): The Definitive Guide</h1>
       <p class="hero-lede">Azure Data Lake Storage Gen2 (ADLS Gen2) is Microsoft's enterprise-grade object storage for data lakehouses on Azure. Its hierarchical namespace, Azure AD integration, and ACL-based access control make it the natural storage layer for Apache Iceberg tables on Microsoft Azure.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

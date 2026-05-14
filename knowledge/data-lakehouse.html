@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Data Lakehouse: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what a data lakehouse is, how it works, why it replaced the data warehouse for modern analytics, and how to build one with Apache Iceberg and Dremio.">
+  <meta name="keywords" content="Data Lakehouse, data lakehouse, Apache Iceberg, Data Lake, Data Warehouse, Medallion Architecture, Dremio, Open Table Format, Apache Polaris, ACID Transactions, Agentic Lakehouse, Decoupled Storage & Compute">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-lakehouse.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Data Lakehouse: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what a data lakehouse is, how it works, why it replaced the data warehouse for modern analytics, and how to build one with Apache Iceberg and Dremio.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-lakehouse.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Core Concepts">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Data Lakehouse: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what a data lakehouse is, how it works, why it replaced the data warehouse for modern analytics, and how to build one with Apache Iceberg and Dremio.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Data Lakehouse: The Definitive Guide",
-      "description": "Learn what a data lakehouse is, how it works, why it replaced the data warehouse for modern analytics, and how to build one with Apache Iceberg and Dremio.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/data-lakehouse.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Data Lakehouse: The Definitive Guide",
+    "description": "Learn what a data lakehouse is, how it works, why it replaced the data warehouse for modern analytics, and how to build one with Apache Iceberg and Dremio.",
+    "keywords": "Data Lakehouse, data lakehouse, Apache Iceberg, Data Lake, Data Warehouse, Medallion Architecture, Dremio, Open Table Format, Apache Polaris, ACID Transactions, Agentic Lakehouse, Decoupled Storage & Compute",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Data Lakehouse", "item": "https://datalakehouse101.com/knowledge/data-lakehouse.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is a data lakehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "A data lakehouse is a data architecture that stores data in open file formats on cloud object storage and applies a structured table format layer — typically Apache Iceberg — to provide ACID transactions, schema enforcement, and high-performance SQL queries, combining the best of data lakes and data warehouses."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How is a data lakehouse different from a data warehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "A data warehouse stores data in a proprietary, closed system optimized for SQL analytics. A data lakehouse stores data in open formats on commodity cloud storage, supports multiple query engines, costs significantly less at scale, and supports both structured and semi-structured data natively."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/data-lakehouse.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/data-lakehouse.html"
     },
-    {
-      "@type": "Question",
-      "name": "What is the best open table format for a data lakehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Apache Iceberg has emerged as the industry-standard open table format for the data lakehouse, with native support from Dremio, Apache Spark, Trino, Flink, AWS, Azure, and Google Cloud."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Data Lakehouse",
+        "item": "https://datalakehouse101.com/knowledge/data-lakehouse.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a data lakehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A data lakehouse is a data architecture that stores data in open file formats on cloud object storage and applies a structured table format layer — typically Apache Iceberg — to provide ACID transactions, schema enforcement, and high-performance SQL queries, combining the best of data lakes and data warehouses."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is a data lakehouse different from a data warehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A data warehouse stores data in a proprietary, closed system optimized for SQL analytics. A data lakehouse stores data in open formats on commodity cloud storage, supports multiple query engines, costs significantly less at scale, and supports both structured and semi-structured data natively."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the best open table format for a data lakehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Apache Iceberg has emerged as the industry-standard open table format for the data lakehouse, with native support from Dremio, Apache Spark, Trino, Flink, AWS, Azure, and Google Cloud."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Data Lakehouse: The Definitive Guide</h1>
       <p class="hero-lede">The data lakehouse is the dominant architecture for modern enterprise analytics — combining the low-cost, flexible storage of a data lake with the ACID guarantees, governance, and performance of a data warehouse. This guide covers everything you need to know.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

@@ -1,0 +1,153 @@
+# DataLakehouse101.com
+
+> DataLakehouse101.com is the definitive knowledge hub for the modern data lakehouse — 100 authoritative, expert-written guides on Apache Iceberg, Dremio, open table formats, catalog technologies, governance, analytics, and AI-native data architectures. Written by Alex Merced, VP of Developer Relations at Dremio and author of multiple books on data lakehouse architecture.
+
+## About
+
+- [Home](https://datalakehouse101.com/): Introduction to the data lakehouse, key concepts, and navigation to all resources
+- [Knowledge Base](https://datalakehouse101.com/knowledge/): Index of all 100 definitive guides on data lakehouse terms
+
+## Knowledge Base — Core Concepts
+
+## Knowledge Base — Analytics & BI
+
+- [AI Semantic Layer (Dremio)](https://datalakehouse101.com/knowledge/ai-semantic-layer.html): Learn what Dremio's AI Semantic Layer is, how it enables natural language data access for AI agents via MCP, and why it 
+- [Automated Table Optimization](https://datalakehouse101.com/knowledge/automated-table-optimization.html): Learn what automated table optimization is, how Dremio and Apache Iceberg automate compaction, Z-ordering, and snapshot 
+- [Data Skipping](https://datalakehouse101.com/knowledge/data-skipping.html): Learn what data skipping is in Apache Iceberg, how file-level statistics enable skipping irrelevant data files, and why 
+- [Lakehouse Federation](https://datalakehouse101.com/knowledge/lakehouse-federation.html): Learn what lakehouse federation is, how engines like Dremio and Trino query across Iceberg tables and external databases
+- [Multi-Engine Interoperability](https://datalakehouse101.com/knowledge/multi-engine-interoperability.html): Learn what multi-engine interoperability means in the data lakehouse, how Apache Iceberg and the REST Catalog spec enabl
+- [Query Optimization](https://datalakehouse101.com/knowledge/query-optimization.html): Learn what query optimization is, the key optimization techniques used in Apache Iceberg and Dremio, and how to improve 
+- [Self-Service Analytics](https://datalakehouse101.com/knowledge/self-service-analytics.html): Learn what self-service analytics is, how the data lakehouse enables it at scale, and why the semantic layer, data catal
+- [Semantic Layer](https://datalakehouse101.com/knowledge/semantic-layer.html): Learn what a semantic layer is, how it translates raw data into business-friendly metrics, and why it is the critical br
+- [SQL Analytics](https://datalakehouse101.com/knowledge/sql-analytics.html): Learn how SQL analytics powers the data lakehouse, the key SQL patterns for Iceberg queries, and how engines like Dremio
+
+## Knowledge Base — Architecture Patterns
+
+- [Agentic Lakehouse](https://datalakehouse101.com/knowledge/agentic-lakehouse.html): Learn what the Agentic Lakehouse is, how AI agents autonomously discover and query Apache Iceberg data via Dremio's MCP 
+- [Bronze Layer](https://datalakehouse101.com/knowledge/bronze-layer.html): Learn what the Bronze Layer is in the Medallion Architecture, how it stores raw ingested data in Apache Iceberg, and bes
+- [Data Engineering](https://datalakehouse101.com/knowledge/data-engineering.html): Learn what data engineering is, the key skills and tools data engineers use to build Apache Iceberg lakehouse pipelines,
+- [Data Science on the Lakehouse](https://datalakehouse101.com/knowledge/data-science-lakehouse.html): Learn how data scientists use Apache Iceberg tables, PyIceberg, and Dremio's AI Semantic Layer for ML feature engineerin
+- [ETL (Extract, Transform, Load)](https://datalakehouse101.com/knowledge/etl.html): Learn what ETL is, how it differs from ELT in the data lakehouse, and how Apache Spark and Flink implement modern ETL pi
+- [Feature Store](https://datalakehouse101.com/knowledge/feature-store.html): Learn what a feature store is, how Apache Iceberg tables serve as open feature stores, and how feature stores bridge ML 
+- [Gold Layer](https://datalakehouse101.com/knowledge/gold-layer.html): Learn what the Gold Layer is in the Medallion Architecture, how it delivers pre-aggregated business metrics on Apache Ic
+- [Lakehouse Architecture](https://datalakehouse101.com/knowledge/lakehouse-architecture.html): Learn what the data lakehouse architecture is, its key layers and components, and how Apache Iceberg, object storage, an
+- [Medallion Architecture](https://datalakehouse101.com/knowledge/medallion-architecture.html): Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers organize data lakehouse pipelines, and bes
+- [MLflow](https://datalakehouse101.com/knowledge/mlflow.html): Learn what MLflow is, how it tracks ML experiments on Apache Iceberg features, and why it is the standard open-source ML
+- [MCP (Model Context Protocol)](https://datalakehouse101.com/knowledge/model-context-protocol.html): Learn what the Model Context Protocol (MCP) is, how Dremio's MCP server enables AI agents to autonomously query the lake
+- [Nessie Branching and Tagging](https://datalakehouse101.com/knowledge/nessie-branching-tagging.html): Learn how Project Nessie's Git-like branching and tagging enables isolated data experimentation, reproducible ML experim
+- [Open Lakehouse](https://datalakehouse101.com/knowledge/open-lakehouse.html): Learn what the Open Lakehouse is, how open standards (Apache Iceberg, Parquet, Iceberg REST Catalog) prevent vendor lock
+- [Silver Layer](https://datalakehouse101.com/knowledge/silver-layer.html): Learn what the Silver Layer is in the Medallion Architecture, how it cleanses and conforms Bronze data in Apache Iceberg
+
+## Knowledge Base — Catalogs & Metadata
+
+- [Apache Gravitino](https://datalakehouse101.com/knowledge/apache-gravitino.html): Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalogs, and its role in 
+- [Apache Polaris](https://datalakehouse101.com/knowledge/apache-polaris.html): Learn what Apache Polaris is, how this ASF-governed Iceberg REST Catalog enables multi-engine interoperability, and why 
+- [AWS Glue Data Catalog](https://datalakehouse101.com/knowledge/aws-glue-catalog.html): Learn what AWS Glue Data Catalog is, how it supports Apache Iceberg as a serverless managed catalog on AWS, and how it c
+- [Catalog Interoperability](https://datalakehouse101.com/knowledge/catalog-interoperability.html): Learn what catalog interoperability means in the data lakehouse, how the Iceberg REST Catalog specification enables it, 
+- [Data Catalog](https://datalakehouse101.com/knowledge/data-catalog.html): Learn what a data catalog is, how it differs from a technical metadata store, and why business data catalogs are essenti
+- [Hive Metastore](https://datalakehouse101.com/knowledge/hive-metastore.html): Learn what the Hive Metastore is, how it stores Hadoop table metadata, its limitations for Apache Iceberg, and why moder
+- [Metadata Management](https://datalakehouse101.com/knowledge/metadata-management.html): Learn what metadata management is, the types of metadata in the data lakehouse, and how managing technical, business, an
+- [Project Nessie](https://datalakehouse101.com/knowledge/project-nessie.html): Learn what Project Nessie is, how its Git-like branching and tagging works for Apache Iceberg tables, and why it powers 
+- [Unity Catalog](https://datalakehouse101.com/knowledge/unity-catalog.html): Learn what Databricks Unity Catalog is, how it provides unified governance for the Databricks Lakehouse, its open-source
+
+## Knowledge Base — Core Concepts
+
+- [ACID Transactions](https://datalakehouse101.com/knowledge/acid-transactions.html): Learn what ACID transactions are, why they matter in the data lakehouse, and how Apache Iceberg implements Atomicity, Co
+- [Data Lake](https://datalakehouse101.com/knowledge/data-lake.html): Learn what a data lake is, how it works, its strengths and weaknesses, and how it evolved into the modern data lakehouse
+- [Data Lakehouse](https://datalakehouse101.com/knowledge/data-lakehouse.html): Learn what a data lakehouse is, how it works, why it replaced the data warehouse for modern analytics, and how to build 
+- [Data Mesh](https://datalakehouse101.com/knowledge/data-mesh.html): Learn what Data Mesh is, its four core principles, how it differs from centralized data platforms, and how to implement 
+- [Data Warehouse](https://datalakehouse101.com/knowledge/data-warehouse.html): Learn what a data warehouse is, how it works, its architecture patterns, key limitations, and how it compares to the mod
+- [Decoupled Storage and Compute](https://datalakehouse101.com/knowledge/decoupled-storage-compute.html): Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, a
+- [ELT (Extract, Load, Transform)](https://datalakehouse101.com/knowledge/elt.html): Learn what ELT is, how Extract Load Transform differs from ETL, why ELT is the dominant pattern in the modern data lakeh
+- [Open Table Format](https://datalakehouse101.com/knowledge/open-table-format.html): Learn what an open table format is, how Apache Iceberg, Delta Lake, and Apache Hudi compare, and why open table formats 
+
+## Knowledge Base — File Formats & Storage
+
+- [Amazon S3](https://datalakehouse101.com/knowledge/amazon-s3.html): Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3 storage classes, st
+- [Apache Arrow](https://datalakehouse101.com/knowledge/apache-arrow.html): Learn what Apache Arrow is, how its in-memory columnar format powers vectorized query engines, and why Arrow Flight SQL 
+- [Apache Avro](https://datalakehouse101.com/knowledge/apache-avro.html): Learn what Apache Avro is, how its schema-embedded row format is used for streaming and Iceberg metadata, and how it dif
+- [Apache ORC](https://datalakehouse101.com/knowledge/apache-orc.html): Learn what Apache ORC is, how its columnar format compares to Parquet, and its role in the Hive ecosystem and modern Apa
+- [Apache Parquet](https://datalakehouse101.com/knowledge/apache-parquet.html): Learn what Apache Parquet is, how its columnar format enables efficient analytics, and why it is the default file format
+- [Azure Data Lake Storage (ADLS)](https://datalakehouse101.com/knowledge/azure-adls.html): Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure-based Apache Iceber
+- [Google Cloud Storage (GCS)](https://datalakehouse101.com/knowledge/google-cloud-storage.html): Learn how Google Cloud Storage serves as the object storage foundation for GCP-based Apache Iceberg data lakehouses and 
+- [Apache Hadoop HDFS](https://datalakehouse101.com/knowledge/hdfs.html): Learn what Apache Hadoop HDFS is, its role as the original data lake storage layer, and why modern lakehouses are migrat
+- [MinIO](https://datalakehouse101.com/knowledge/minio.html): Learn what MinIO is, how its S3-compatible object storage enables on-premises and hybrid data lakehouses, and how to use
+- [Object Storage](https://datalakehouse101.com/knowledge/object-storage.html): Learn what object storage is, why S3-compatible object storage is the foundation of the data lakehouse, and how it enabl
+
+## Knowledge Base — Governance
+
+- [Data Governance](https://datalakehouse101.com/knowledge/data-governance.html): Learn what data governance means in the data lakehouse, how access control, lineage, quality, and catalog management imp
+
+## Knowledge Base — Governance & Quality
+
+- [Apache Atlas](https://datalakehouse101.com/knowledge/apache-atlas.html): Learn what Apache Atlas is, how it provides metadata management and governance for the Hadoop and lakehouse ecosystem, a
+- [Apache Ranger](https://datalakehouse101.com/knowledge/apache-ranger.html): Learn what Apache Ranger is, how it provides centralized security policy management for the Hadoop and lakehouse ecosyst
+- [Column-Level Security](https://datalakehouse101.com/knowledge/column-level-security.html): Learn what column-level security is, how data masking and column visibility controls protect sensitive data in Apache Ic
+- [Data Fabric](https://datalakehouse101.com/knowledge/data-fabric.html): Learn what a data fabric is, how it provides a unified data management layer across distributed data sources, and how it
+- [Data Lineage](https://datalakehouse101.com/knowledge/data-lineage.html): Learn what data lineage is, how it tracks data flow through lakehouse pipelines, and why lineage is essential for govern
+- [Data Observability](https://datalakehouse101.com/knowledge/data-observability.html): Learn what data observability is, how it monitors freshness, volume, schema, and distribution in Apache Iceberg pipeline
+- [Data Quality](https://datalakehouse101.com/knowledge/data-quality.html): Learn what data quality means in the data lakehouse, the key data quality dimensions, and how tools like Great Expectati
+- [OpenMetadata](https://datalakehouse101.com/knowledge/openmetadata.html): Learn what OpenMetadata is, how it provides unified data discovery, lineage, and quality for Apache Iceberg lakehouses, 
+- [Role-Based Access Control (RBAC)](https://datalakehouse101.com/knowledge/rbac.html): Learn what RBAC is in the data lakehouse, how it is implemented in Apache Polaris and Dremio, and why role-based access 
+
+## Knowledge Base — Ingestion
+
+- [Apache Kafka](https://datalakehouse101.com/knowledge/apache-kafka.html): Learn how Apache Kafka enables streaming data ingestion into the lakehouse, its role in CDC pipelines, and how Kafka con
+- [Change Data Capture (CDC)](https://datalakehouse101.com/knowledge/change-data-capture.html): Learn what Change Data Capture is, how Debezium and Apache Flink stream CDC events into Apache Iceberg tables, and how C
+
+## Knowledge Base — Ingestion & Streaming
+
+- [Batch Processing](https://datalakehouse101.com/knowledge/batch-processing.html): Learn what batch processing is, how Apache Spark handles large-scale batch ETL into Apache Iceberg, and when to choose b
+- [Data Ingestion](https://datalakehouse101.com/knowledge/data-ingestion.html): Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to choose between stream
+- [dbt (Data Build Tool)](https://datalakehouse101.com/knowledge/dbt.html): Learn what dbt is, how it implements SQL-based ELT transformations on Apache Iceberg tables, and why dbt-dremio and dbt-
+- [Real-Time Analytics](https://datalakehouse101.com/knowledge/real-time-analytics.html): Learn what real-time analytics means in the data lakehouse, how streaming ingestion and query engines like Dremio enable
+- [Stream Processing](https://datalakehouse101.com/knowledge/stream-processing.html): Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and th
+- [Upsert](https://datalakehouse101.com/knowledge/upsert.html): Learn what upsert is, how Apache Iceberg's MERGE INTO implements upsert semantics, and why upsert is essential for CDC p
+
+## Knowledge Base — Query Engines & Platforms
+
+- [Apache Flink](https://datalakehouse101.com/knowledge/apache-flink.html): Learn what Apache Flink is, how it enables real-time streaming ingestion into Apache Iceberg tables, and why Flink is th
+- [Apache Spark](https://datalakehouse101.com/knowledge/apache-spark.html): Learn what Apache Spark is, how it powers Iceberg ETL and ML workloads, and when to use Spark vs Dremio, Trino, or Flink
+- [Autonomous Reflections](https://datalakehouse101.com/knowledge/autonomous-reflections.html): Learn how Dremio Autonomous Reflections automatically analyze query patterns and create, update, and drop Reflections to
+- [Column Pruning](https://datalakehouse101.com/knowledge/column-pruning.html): Learn what column pruning is, how it works with Apache Parquet's columnar storage, and why it dramatically reduces I/O f
+- [Dremio Cloud](https://datalakehouse101.com/knowledge/dremio-cloud.html): Learn what Dremio Cloud is, how its serverless lakehouse platform works on AWS and Azure, and how it compares to Snowfla
+- [Dremio Open Catalog](https://datalakehouse101.com/knowledge/dremio-open-catalog.html): Learn what Dremio Open Catalog is, how it implements the Iceberg REST Catalog spec with Git-like Nessie branching, and w
+- [Dremio Intelligent Query Engine](https://datalakehouse101.com/knowledge/dremio-query-engine.html): Learn how Dremio's Intelligent Query Engine uses Apache Arrow vectorized execution, Reflection acceleration, and adaptiv
+- [Dremio Reflections](https://datalakehouse101.com/knowledge/dremio-reflections.html): Learn what Dremio Reflections are, how raw and aggregation Reflections work, and how they deliver sub-second BI performa
+- [Dremio](https://datalakehouse101.com/knowledge/dremio.html): Learn what Dremio is, how its intelligent query engine works, and why it is the leading data lakehouse platform for Apac
+- [Physical Datasets (Dremio)](https://datalakehouse101.com/knowledge/physical-datasets.html): Learn what Physical Datasets are in Dremio, how they register data sources including Apache Iceberg tables and federated
+- [Predicate Pushdown](https://datalakehouse101.com/knowledge/predicate-pushdown.html): Learn what predicate pushdown is, how it works in Apache Iceberg and Parquet, and why it is one of the most important qu
+- [Presto](https://datalakehouse101.com/knowledge/presto.html): Learn what Presto is, how it compares to Trino, and its role in distributed SQL analytics across Apache Iceberg and hete
+- [Trino](https://datalakehouse101.com/knowledge/trino.html): Learn what Trino is, how its federated SQL query engine works across Apache Iceberg and other data sources, and when to 
+- [Vectorized Query Execution](https://datalakehouse101.com/knowledge/vectorized-execution.html): Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelerate analytical querie
+- [Virtual Datasets (Dremio)](https://datalakehouse101.com/knowledge/virtual-datasets.html): Learn what Dremio Virtual Datasets are, how they create a semantic layer above raw Iceberg data, and how they enable sel
+
+## Knowledge Base — Table Formats
+
+- [Apache Hudi](https://datalakehouse101.com/knowledge/apache-hudi.html): Learn what Apache Hudi is, how its incremental processing model works, how it compares to Apache Iceberg and Delta Lake,
+- [Apache Iceberg](https://datalakehouse101.com/knowledge/apache-iceberg.html): Learn what Apache Iceberg is, how its metadata architecture works, and why it is the industry-standard open table format
+- [Compaction](https://datalakehouse101.com/knowledge/compaction.html): Learn what compaction is in Apache Iceberg, why it is essential for lakehouse performance, how Copy-on-Write and Merge-o
+- [Copy-on-Write (CoW)](https://datalakehouse101.com/knowledge/copy-on-write.html): Learn what Copy-on-Write means in Apache Iceberg, when to use CoW vs Merge-on-Read, and how CoW updates and deletes work
+- [Delta Lake](https://datalakehouse101.com/knowledge/delta-lake.html): Learn what Delta Lake is, how it works, how it compares to Apache Iceberg, and when to choose Delta Lake for your data l
+- [Hidden Partitioning](https://datalakehouse101.com/knowledge/hidden-partitioning.html): Learn how Apache Iceberg hidden partitioning works, why it eliminates the need to write partition-aware queries, and how
+- [Iceberg Manifest Files](https://datalakehouse101.com/knowledge/iceberg-manifest-files.html): Learn what Apache Iceberg manifest files are, how they store file-level statistics for data skipping, and how the manife
+- [Iceberg REST Catalog](https://datalakehouse101.com/knowledge/iceberg-rest-catalog.html): Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog interoperability, and w
+- [Iceberg Snapshots](https://datalakehouse101.com/knowledge/iceberg-snapshots.html): Learn what Apache Iceberg snapshots are, how they enable ACID transactions and time travel, and how Dremio leverages the
+- [Merge-on-Read (MoR)](https://datalakehouse101.com/knowledge/merge-on-read.html): Learn what Merge-on-Read means in Apache Iceberg, how delete files work, when to use MoR vs Copy-on-Write, and how MoR e
+- [Partition Evolution](https://datalakehouse101.com/knowledge/partition-evolution.html): Learn how Apache Iceberg partition evolution works, why it solves the static partitioning problem, and how to change par
+- [Row-Level Deletes](https://datalakehouse101.com/knowledge/row-level-deletes.html): Learn how row-level deletes work in Apache Iceberg V2, the difference between positional and equality delete files, and 
+- [Schema Evolution](https://datalakehouse101.com/knowledge/schema-evolution.html): Learn how Apache Iceberg schema evolution works, what changes are safe vs breaking, and how to evolve table schemas with
+- [Time Travel](https://datalakehouse101.com/knowledge/time-travel.html): Learn how Apache Iceberg time travel works, how to query historical snapshots by timestamp or snapshot ID, and practical
+- [Z-Ordering (Data Sorting)](https://datalakehouse101.com/knowledge/z-ordering.html): Learn what Z-Ordering is in Apache Iceberg, how it clusters data to improve data skipping, and how to use OPTIMIZE with 
+
+## Author
+
+- [Alex Merced](https://alexmerced.com): VP Developer Relations at Dremio, author of multiple books on data lakehouse, Apache Iceberg, and Agentic AI
+- [Substack Newsletter](https://amdatalakehouse.substack.com): Weekly updates on open lakehouse OSS and Agentic AI
+
+## Books by Alex Merced
+
+- [Architecting an Apache Iceberg Lakehouse](https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/): Manning Publications — the definitive book on building enterprise lakehouses with Apache Iceberg
+- [The Open Source Lakehouse](https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/): Comprehensive guide to open lakehouse architecture
+- [The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI](https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/): Current-year handbook on lakehouses and AI
+- [Apache Iceberg and Agentic AI](https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/): Connecting structured data to AI agents via Iceberg

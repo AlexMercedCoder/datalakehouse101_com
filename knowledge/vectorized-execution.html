@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vectorized Query Execution: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelerate analytical queries, and why it is the performance foundation of modern lakehouse engines.">
+  <meta name="keywords" content="Vectorized Query Execution, data lakehouse, Apache Iceberg, Apache Arrow, Dremio, Apache Parquet, Predicate Pushdown, Column Pruning, Query Optimization, Data Skipping, Data Lakehouse">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/vectorized-execution.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Vectorized Query Execution: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelerate analytical queries, and why it is the performance foundation of modern lakehouse engines.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/vectorized-execution.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Query Engines & Platforms">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vectorized Query Execution: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelerate analytical queries, and why it is the performance foundation of modern lakehouse engines.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Vectorized Query Execution: The Definitive Guide",
-      "description": "Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelerate analytical queries, and why it is the performance foundation of modern lakehouse engines.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/vectorized-execution.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Vectorized Query Execution: The Definitive Guide",
+    "description": "Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelerate analytical queries, and why it is the performance foundation of modern lakehouse engines.",
+    "keywords": "Vectorized Query Execution, data lakehouse, Apache Iceberg, Apache Arrow, Dremio, Apache Parquet, Predicate Pushdown, Column Pruning, Query Optimization, Data Skipping, Data Lakehouse",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Vectorized Query Execution", "item": "https://datalakehouse101.com/knowledge/vectorized-execution.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is vectorized query execution?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Vectorized query execution is a query engine design where data is processed in batches of column values (vectors) rather than one row at a time. Processing an entire column's values together enables SIMD (Single Instruction Multiple Data) CPU instructions that apply one operation to 8, 16, or 32 values simultaneously, delivering dramatic throughput improvements for analytical queries."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "What is Apache Arrow's role in vectorized execution?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Apache Arrow provides the in-memory columnar format standard that vectorized engines use to represent data vectors. When a query engine uses Apache Arrow format internally, data can be passed between execution stages (and between engines) without serialization/deserialization overhead, and SIMD operations can be applied directly to Arrow memory buffers."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/vectorized-execution.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/vectorized-execution.html"
     },
-    {
-      "@type": "Question",
-      "name": "Which query engines use vectorized execution?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Dremio (built on Apache Arrow), DuckDB, Apache Spark (Tungsten project, Velox), Trino (Project Hummingbird), Snowflake, and BigQuery all use vectorized execution. It is now the standard architecture for analytical query engines competing on performance."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Vectorized Query Execution",
+        "item": "https://datalakehouse101.com/knowledge/vectorized-execution.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is vectorized query execution?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Vectorized query execution is a query engine design where data is processed in batches of column values (vectors) rather than one row at a time. Processing an entire column's values together enables SIMD (Single Instruction Multiple Data) CPU instructions that apply one operation to 8, 16, or 32 values simultaneously, delivering dramatic throughput improvements for analytical queries."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Apache Arrow's role in vectorized execution?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Apache Arrow provides the in-memory columnar format standard that vectorized engines use to represent data vectors. When a query engine uses Apache Arrow format internally, data can be passed between execution stages (and between engines) without serialization/deserialization overhead, and SIMD operations can be applied directly to Arrow memory buffers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which query engines use vectorized execution?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Dremio (built on Apache Arrow), DuckDB, Apache Spark (Tungsten project, Velox), Trino (Project Hummingbird), Snowflake, and BigQuery all use vectorized execution. It is now the standard architecture for analytical query engines competing on performance."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Vectorized Query Execution: The Definitive Guide</h1>
       <p class="hero-lede">Vectorized query execution processes data in column-oriented batches (vectors) rather than row-by-row, enabling SIMD CPU instructions and cache-efficient memory access patterns that deliver 10–100x analytical query performance over traditional row-at-a-time execution models.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

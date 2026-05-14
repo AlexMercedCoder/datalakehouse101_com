@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Amazon S3 for Data Lakehouse: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3 storage classes, strong consistency, and integration with Apache Iceberg.">
+  <meta name="keywords" content="Amazon S3, data lakehouse, Apache Iceberg, Object Storage, Azure ADLS, Google Cloud Storage, Decoupled Storage and Compute, AWS Glue Data Catalog, Dremio Cloud, Apache Parquet">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/amazon-s3.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Amazon S3 for Data Lakehouse: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3 storage classes, strong consistency, and integration with Apache Iceberg.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/amazon-s3.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="File Formats & Storage">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Amazon S3 for Data Lakehouse: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3 storage classes, strong consistency, and integration with Apache Iceberg.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Amazon S3 for Data Lakehouse: The Definitive Guide",
-      "description": "Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3 storage classes, strong consistency, and integration with Apache Iceberg.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/amazon-s3.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Amazon S3 for Data Lakehouse: The Definitive Guide",
+    "description": "Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3 storage classes, strong consistency, and integration with Apache Iceberg.",
+    "keywords": "Amazon S3, data lakehouse, Apache Iceberg, Object Storage, Azure ADLS, Google Cloud Storage, Decoupled Storage and Compute, AWS Glue Data Catalog, Dremio Cloud, Apache Parquet",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Amazon S3", "item": "https://datalakehouse101.com/knowledge/amazon-s3.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is Amazon S3?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Amazon S3 (Simple Storage Service) is AWS's object storage service, providing unlimited storage capacity with 99.999999999% (11 nines) durability, multiple storage tiers, strong read-after-write consistency, and a universal HTTP API. It is the primary storage backend for Apache Iceberg data files and metadata in AWS-based data lakehouse architectures."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "Why is Amazon S3 ideal for Apache Iceberg lakehouses?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "S3's combination of 11-nine durability, unlimited scale, low cost, strong consistency (since December 2020), and universal API makes it ideal for Iceberg. Iceberg's atomic commit model works correctly with S3's consistency guarantees. S3's storage classes (Intelligent-Tiering, Infrequent Access) enable cost optimization for historical data."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/amazon-s3.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/amazon-s3.html"
     },
-    {
-      "@type": "Question",
-      "name": "How does S3 storage pricing work for a lakehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "S3 charges per GB stored per month (varies by storage class and region), per API request (PUT, GET, LIST operations), and for data transfer out of AWS. For lakehouses, storage costs dominate. S3 Standard is ~$0.023/GB/month in US East; S3 Intelligent-Tiering automatically moves infrequently accessed data to lower-cost tiers, reducing costs for cold historical data by 40–68%."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Amazon S3",
+        "item": "https://datalakehouse101.com/knowledge/amazon-s3.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Amazon S3?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Amazon S3 (Simple Storage Service) is AWS's object storage service, providing unlimited storage capacity with 99.999999999% (11 nines) durability, multiple storage tiers, strong read-after-write consistency, and a universal HTTP API. It is the primary storage backend for Apache Iceberg data files and metadata in AWS-based data lakehouse architectures."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is Amazon S3 ideal for Apache Iceberg lakehouses?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "S3's combination of 11-nine durability, unlimited scale, low cost, strong consistency (since December 2020), and universal API makes it ideal for Iceberg. Iceberg's atomic commit model works correctly with S3's consistency guarantees. S3's storage classes (Intelligent-Tiering, Infrequent Access) enable cost optimization for historical data."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does S3 storage pricing work for a lakehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "S3 charges per GB stored per month (varies by storage class and region), per API request (PUT, GET, LIST operations), and for data transfer out of AWS. For lakehouses, storage costs dominate. S3 Standard is ~$0.023/GB/month in US East; S3 Intelligent-Tiering automatically moves infrequently accessed data to lower-cost tiers, reducing costs for cold historical data by 40–68%."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Amazon S3 for Data Lakehouse: The Definitive Guide</h1>
       <p class="hero-lede">Amazon S3 (Simple Storage Service) is the world's most widely used object storage service and the dominant storage layer for AWS-based data lakehouses. Its 11 nines durability, strong consistency, multiple storage classes, and universal API make it the natural home for Apache Iceberg data files at any scale.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>

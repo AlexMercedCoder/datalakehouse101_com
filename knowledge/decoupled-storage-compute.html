@@ -5,70 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Decoupled Storage and Compute: The Definitive Guide | Data Lakehouse 101</title>
   <meta name="description" content="Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.">
+  <meta name="keywords" content="Decoupled Storage and Compute, data lakehouse, Apache Iceberg, Object Storage, Dremio, Amazon S3, Multi-Engine Interoperability, Dremio Cloud, Data Lakehouse, Apache Spark">
+  <meta name="author" content="Alex Merced">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://datalakehouse101.com/knowledge/decoupled-storage-compute.html">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Decoupled Storage and Compute: The Definitive Guide | Data Lakehouse 101">
   <meta property="og:description" content="Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.">
   <meta property="og:url" content="https://datalakehouse101.com/knowledge/decoupled-storage-compute.html">
-  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="DataLakehouse101.com">
+  <meta property="article:author" content="Alex Merced">
+  <meta property="article:published_time" content="2026-05-14">
+  <meta property="article:section" content="Core Concepts">
+
+  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Decoupled Storage and Compute: The Definitive Guide | Data Lakehouse 101">
+  <meta name="twitter:description" content="Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.">
+  <meta name="twitter:image" content="https://datalakehouse101.com/assets/img/og-image.png">
+  <meta name="twitter:creator" content="@alexmercedcoder">
+  <meta name="twitter:site" content="@alexmercedcoder">
+
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="knowledge.css">
+
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "Decoupled Storage and Compute: The Definitive Guide",
-      "description": "Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.",
-      "author": { "@type": "Person", "name": "Alex Merced" },
-      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
-      "datePublished": "2026-05-14",
-      "url": "https://datalakehouse101.com/knowledge/decoupled-storage-compute.html"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Decoupled Storage and Compute: The Definitive Guide",
+    "description": "Learn what decoupled storage and compute means in the data lakehouse, how Apache Iceberg on object storage enables it, and why it is the key economic advantage over data warehouses.",
+    "keywords": "Decoupled Storage and Compute, data lakehouse, Apache Iceberg, Object Storage, Dremio, Amazon S3, Multi-Engine Interoperability, Dremio Cloud, Data Lakehouse, Apache Spark",
+    "author": {
+      "@type": "Person",
+      "name": "Alex Merced",
+      "url": "https://alexmerced.com"
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
-        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
-        { "@type": "ListItem", "position": 3, "name": "Decoupled Storage and Compute", "item": "https://datalakehouse101.com/knowledge/decoupled-storage-compute.html" }
-      ]
-    },
-    {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What does decoupled storage and compute mean?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Decoupled storage and compute means that data storage (files in S3, ADLS, GCS) is completely separate from query processing infrastructure (Dremio executors, Spark clusters, Trino workers). Storage scales independently of compute. Compute scales independently of storage. Storage is always-on; compute can be turned off when not in use. They are billed separately."
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataLakehouse101.com",
+      "url": "https://datalakehouse101.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://datalakehouse101.com/assets/img/favicon.png"
       }
     },
-    {
-      "@type": "Question",
-      "name": "How is decoupled architecture different from a traditional data warehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "In a traditional data warehouse (Redshift, Snowflake in early versions, Teradata), storage and compute are tightly coupled — you provision a cluster that determines both storage capacity and compute power together. More data requires more nodes which adds both storage and compute. In the lakehouse, adding data requires only more object storage; scaling queries requires only more compute nodes."
-      }
+    "datePublished": "2026-05-14",
+    "dateModified": "2026-05-14",
+    "url": "https://datalakehouse101.com/knowledge/decoupled-storage-compute.html",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://datalakehouse101.com/knowledge/decoupled-storage-compute.html"
     },
-    {
-      "@type": "Question",
-      "name": "What technologies enable decoupled storage and compute in the lakehouse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Three technologies work together: object storage (S3, ADLS, GCS) provides the decoupled storage layer; Apache Iceberg provides the shared data format and metadata model that multiple compute engines can read simultaneously; and elastic compute services (Dremio Cloud, EMR, Databricks) provide on-demand query processing that can scale to zero when idle."
-      }
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://datalakehouse101.com/assets/img/og-image.png",
+      "width": 1200,
+      "height": 630
     }
-  ]
-}
-  ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://datalakehouse101.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Knowledge Base",
+        "item": "https://datalakehouse101.com/knowledge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Decoupled Storage and Compute",
+        "item": "https://datalakehouse101.com/knowledge/decoupled-storage-compute.html"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does decoupled storage and compute mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Decoupled storage and compute means that data storage (files in S3, ADLS, GCS) is completely separate from query processing infrastructure (Dremio executors, Spark clusters, Trino workers). Storage scales independently of compute. Compute scales independently of storage. Storage is always-on; compute can be turned off when not in use. They are billed separately."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is decoupled architecture different from a traditional data warehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In a traditional data warehouse (Redshift, Snowflake in early versions, Teradata), storage and compute are tightly coupled — you provision a cluster that determines both storage capacity and compute power together. More data requires more nodes which adds both storage and compute. In the lakehouse, adding data requires only more object storage; scaling queries requires only more compute nodes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What technologies enable decoupled storage and compute in the lakehouse?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Three technologies work together: object storage (S3, ADLS, GCS) provides the decoupled storage layer; Apache Iceberg provides the shared data format and metadata model that multiple compute engines can read simultaneously; and elastic compute services (Dremio Cloud, EMR, Databricks) provide on-demand query processing that can scale to zero when idle."
+        }
+      }
+    ]
+  }
+]
   </script>
 </head>
 <body>
@@ -100,7 +159,7 @@
       <h1>Decoupled Storage and Compute: The Definitive Guide</h1>
       <p class="hero-lede">Decoupled storage and compute is the defining architectural principle of the data lakehouse — separating data storage (cheap, infinite object storage) from query processing (elastic, pay-per-use compute). It enables organizations to store unlimited data at minimal cost and scale query engines independently based on workload demand.</p>
       <div class="hero-meta">
-        <span>By Alex Merced</span>
+        <span>By <a href="https://alexmerced.com" rel="author" style="color:inherit">Alex Merced</a></span>
         <span id="reading-time">Loading…</span>
         <span>Updated 2026-05-14</span>
       </div>
