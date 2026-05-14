@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medallion Architecture: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers work in a data lakehouse, and best practices for implementing it with Apache Iceberg and Dremio.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/medallion-architecture.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Medallion Architecture: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers work in a data lakehouse, and best practices for implementing it with Apache Iceberg and Dremio.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/medallion-architecture.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Medallion Architecture: The Definitive Guide",
+      "description": "Learn what the Medallion Architecture is, how Bronze, Silver, and Gold layers work in a data lakehouse, and best practices for implementing it with Apache Iceberg and Dremio.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/medallion-architecture.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Medallion Architecture", "item": "https://datalakehouse101.com/knowledge/medallion-architecture.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the Medallion Architecture?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Medallion Architecture is a data design pattern that organizes lakehouse data into three quality tiers: Bronze (raw, as-ingested data), Silver (cleaned, conformed data), and Gold (business-ready, aggregated data for analytics and BI)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who invented the Medallion Architecture?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Medallion Architecture was popularized by Databricks as a best practice for organizing data in the Apache Spark and Delta Lake ecosystem. It draws on earlier concepts from data warehouse staging patterns but formalizes them for the lakehouse context."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need all three layers in a Medallion Architecture?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not necessarily. Many organizations use all three tiers for production data products, but smaller projects or streaming pipelines sometimes collapse Bronze and Silver into a single landing and cleansing stage. The key principle is progressive data quality — each layer should be more reliable and business-ready than the previous."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Medallion Architecture</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Core Concepts</span>
+      <h1>Medallion Architecture: The Definitive Guide</h1>
+      <p class="hero-lede">The Medallion Architecture — Bronze, Silver, Gold — is the foundational data organization pattern for the modern data lakehouse. It separates raw ingestion from governed analytics through progressively refined data quality tiers.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is the Medallion Architecture?</a></li>
+        <li><a href="#section-2">The Bronze Layer: Raw Ingestion</a></li>
+        <li><a href="#section-3">The Silver Layer: Cleansed and Conformed Data</a></li>
+        <li><a href="#section-4">The Gold Layer: Business-Ready Analytics</a></li>
+        <li><a href="#section-5">Pipeline Design: Bronze to Silver to Gold</a></li>
+        <li><a href="#section-6">Medallion Architecture and Apache Iceberg</a></li>
+        <li><a href="#section-7">Medallion Architecture with Dremio</a></li>
+        <li><a href="#section-8">Streaming Medallion Architecture</a></li>
+        <li><a href="#section-9">Common Mistakes in Medallion Architecture Implementation</a></li>
+        <li><a href="#section-10">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is the Medallion Architecture?</h2>
+        <p>The <strong>Medallion Architecture</strong> (also called multi-hop architecture or layered lakehouse architecture) is a data organization pattern that structures a <a href="data-lakehouse.html">data lakehouse</a> into three progressively refined data quality tiers: <strong>Bronze</strong>, <strong>Silver</strong>, and <strong>Gold</strong>. Each tier serves a distinct purpose in the data lifecycle, from raw ingestion to business-ready analytics.</p><p>The Bronze layer is the raw landing zone — data arrives here exactly as it was produced by source systems, with no transformation or quality enforcement. The Silver layer applies cleaning, validation, and conforming transformations, producing a reliable, integrated dataset that represents a single version of truth for each business entity. The Gold layer builds business-specific aggregations, dimensional models, and feature sets that are directly consumed by BI tools, dashboards, data scientists, and increasingly, AI agents.</p><p>The name "Medallion" is a metaphor: raw ore (Bronze) is refined into a more valuable material (Silver), which is then further refined into the highest-quality, most valuable output (Gold). Each step adds value through quality improvement, and each layer serves different consumers with different needs.</p><p>The Medallion Architecture was popularized by Databricks as a Delta Lake best practice but has since become the de facto standard for organizing data across all lakehouse platforms, regardless of table format. It is equally applicable to <a href="apache-iceberg.html">Apache Iceberg</a>-based lakehouses (where it is the most common organizational pattern), Delta Lake, and <a href="apache-hudi.html">Apache Hudi</a>.</p><p>Understanding the Medallion Architecture is foundational to understanding how production lakehouses are designed, built, and operated. It is the pattern that separates a mature, well-engineered lakehouse from an ad-hoc collection of files.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>The Bronze Layer: Raw Ingestion</h2>
+        <p>The <a href="bronze-layer.html">Bronze layer</a> is the first landing point for all incoming data. Its defining characteristic is <strong>fidelity to the source</strong>: data is stored exactly as it was received, without transformation, filtering, or quality enforcement.</p><h3>What Goes in Bronze</h3><p>Bronze tables contain the raw output of ingestion pipelines. For relational database sources, this means complete row-level records — including all columns, even those not needed downstream. For event streams, Bronze holds every event exactly as produced, including duplicates and out-of-order records. For files (CSV, JSON, XML), Bronze stores the parsed content, often with an additional metadata column recording the source file path and ingestion timestamp.</p><h3>Bronze Table Design</h3><p>Bronze tables are typically <strong>append-only</strong> — new records are inserted, never updated in place. This append-only design makes ingestion simple and fast, and it preserves the complete historical record of every record ever received. If a source system sends a corrected version of a record, both the original and the correction land in Bronze; the correction logic is applied in the Silver transformation.</p><p>Common additional columns in Bronze tables include: <code>_ingested_at</code> (the timestamp when the record arrived), <code>_source_system</code> (the name of the source), and <code>_source_file</code> (for file-based sources). These audit columns enable data lineage tracing and debugging of downstream quality issues.</p><h3>Bronze Partitioning</h3><p>Bronze tables are almost always partitioned by ingestion date — <code>ingested_date</code> or <code>year</code>/<code>month</code>/<code>day</code>. This partition strategy makes it efficient to process only recently arrived data in incremental Silver refresh jobs.</p><h3>Bronze Access Control</h3><p>Bronze data is typically restricted to data engineers and automated pipeline processes. Business analysts and data scientists generally do not have direct access to Bronze tables — the raw data may contain sensitive PII, duplicate records, or invalid values that would produce incorrect analysis if queried directly.</p>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/data-lakehouse-diagram-1.png" alt="Medallion Architecture Bronze Silver Gold Layers diagram" loading="lazy"><figcaption>Figure 1: The three-layer lakehouse architecture — each layer refining data for different consumers.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>The Silver Layer: Cleansed and Conformed Data</h2>
+        <p>The <a href="silver-layer.html">Silver layer</a> is where the real data engineering work happens. Silver tables transform raw Bronze data into a clean, reliable, integrated dataset that represents a single, consistent version of truth for each business entity or domain.</p><h3>Silver Transformations</h3><p>The Bronze-to-Silver transformation pipeline typically performs:</p><ul><li><strong>Deduplication:</strong> Identifying and removing or collapsing duplicate records from the same or multiple source systems</li><li><strong>Null handling:</strong> Replacing nulls with appropriate defaults, flagging records with critical null values, or filtering invalid records</li><li><strong>Type coercion:</strong> Converting string-encoded dates, numbers, and booleans to their proper types</li><li><strong>Entity resolution:</strong> Matching customer records from CRM and ERP systems to a single canonical customer identity</li><li><strong>Schema conforming:</strong> Standardizing column names, date formats, and categorical values across sources (e.g., mapping 'M'/'F'/'Male'/'Female' to a standardized gender taxonomy)</li><li><strong>Business rule application:</strong> Calculating derived fields, applying product classification rules, and enriching records with reference data lookups</li></ul><h3>Silver Table Design</h3><p>Unlike Bronze, Silver tables support <strong>upserts and deletes</strong>. When a source system sends a corrected record, the Silver pipeline uses <a href="apache-iceberg.html">Apache Iceberg's</a> MERGE INTO capability to upsert the correction into the Silver table without rewriting the entire partition. This is where Iceberg's <a href="merge-on-read.html">Merge-on-Read</a> or <a href="copy-on-write.html">Copy-on-Write</a> strategies are configured based on the read/write frequency trade-off.</p><p>Silver tables are often organized by business domain — <code>silver.customers</code>, <code>silver.orders</code>, <code>silver.products</code> — with each table representing a clean, integrated view of a single entity type across all sources.</p><h3>Silver Access</h3><p>Silver tables are accessible to data engineers, senior data analysts, and data scientists who need access to clean, integrated data without the constraints of pre-defined aggregations. Most machine learning feature engineering happens at the Silver layer.</p>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>The Gold Layer: Business-Ready Analytics</h2>
+        <p>The <a href="gold-layer.html">Gold layer</a> contains the finished data products — the aggregations, dimensional models, and domain-specific datasets that are directly consumed by business users, BI tools, dashboards, and executive reporting.</p><h3>Gold Table Design Patterns</h3><p>Gold tables are often designed following dimensional modeling conventions — fact tables and dimension tables in a star or snowflake schema. Common Gold table types include:</p><ul><li><strong>Aggregate tables:</strong> Pre-aggregated metrics by date, region, product, and other common dimensions — e.g., daily sales by product category and store</li><li><strong>Slowly Changing Dimension (SCD) tables:</strong> Dimension tables that track how attribute values change over time — e.g., customer address history, product price history</li><li><strong>Wide, denormalized tables:</strong> Denormalized tables that pre-join the fact and all relevant dimensions into a single wide table, eliminating join overhead at query time</li><li><strong>Feature tables:</strong> Computed ML features for model training and inference — e.g., customer 30-day purchase frequency, product demand signals</li></ul><h3>Gold Performance Optimization</h3><p>Gold tables receive the most intensive performance optimization of any layer:</p><ul><li><strong><a href="compaction.html">Compaction:</a></strong> Merging small files into optimally sized Parquet files for efficient sequential reads</li><li><strong><a href="z-ordering.html">Z-Ordering:</a></strong> Co-locating frequently filtered columns within data files to maximize data skipping</li><li><strong><a href="dremio-reflections.html">Dremio Reflections:</a></strong> Transparent materialized views that make sub-second query response possible for complex aggregations on large Gold tables</li></ul><h3>Gold Access</h3><p>Gold tables are the primary interface for business analysts and BI tools. They are connected to Tableau, Power BI, Looker, and other visualization tools via <a href="dremio.html">Dremio's</a> ODBC, JDBC, or Arrow Flight connectors. Access control at the Gold layer is typically the strictest — only specific roles can see specific tables or columns.</p>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/data-lakehouse-diagram-2.png" alt="Medallion Architecture Gold Layer Analytics diagram" loading="lazy"><figcaption>Figure 2: Gold layer data powers BI tools, dashboards, and AI agents.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Pipeline Design: Bronze to Silver to Gold</h2>
+        <p>The pipelines that move data between Medallion layers follow a consistent pattern: incremental processing, idempotent execution, and observable quality metrics.</p><h3>Incremental Processing</h3><p>Production Medallion pipelines process only new or changed data in each run, not the entire dataset. In Apache Iceberg, this is achieved using <a href="iceberg-snapshots.html">incremental snapshot reads</a> — the pipeline tracks the last processed snapshot ID and reads only the records added since that snapshot. This makes pipelines fast and economical regardless of how large the total dataset grows.</p><h3>Idempotent Execution</h3><p>Pipeline runs must be <strong>idempotent</strong> — running the same pipeline twice on the same input must produce the same output. This property is essential for recovery from failures: if a pipeline run fails partway through, it can be safely restarted from the beginning without producing duplicate records. Iceberg's ACID semantics make idempotent writes straightforward — a failed transaction leaves no partial state behind.</p><h3>Data Quality Gates</h3><p>Between each layer, data quality checks serve as gates. Before Silver tables are marked as ready for consumption, the pipeline validates: null rates below threshold, record counts within expected range, no new unexpected categorical values, referential integrity between related tables. Failed quality checks halt the pipeline and trigger alerts.</p><h3>Orchestration</h3><p>Medallion pipelines are orchestrated by tools like Apache Airflow, Prefect, or Dagster. Each layer's pipeline is a DAG (Directed Acyclic Graph) of tasks, with dependencies between layers enforced — Silver jobs cannot run until Bronze is confirmed fresh, Gold jobs cannot run until Silver is confirmed clean.</p>
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Medallion Architecture and Apache Iceberg</h2>
+        <p>The Medallion Architecture and <a href="apache-iceberg.html">Apache Iceberg</a> are designed for each other. Iceberg's features map directly to the needs of each layer:</p><h3>Bronze + Iceberg</h3><p>Iceberg's efficient append operations and <a href="partition-evolution.html">partition evolution</a> make Bronze ingestion fast and flexible. As data volume grows, partitioning strategies can be updated without rewriting historical data. <a href="time-travel.html">Time travel</a> allows engineers to investigate what data existed in Bronze at any point in the past — essential for debugging quality issues.</p><h3>Silver + Iceberg</h3><p>Iceberg's MERGE INTO support and row-level delete capabilities make Silver upsert pipelines efficient. <a href="schema-evolution.html">Schema evolution</a> allows new source fields to be added to Silver tables without breaking downstream queries. Iceberg's <a href="iceberg-snapshots.html">snapshot isolation</a> ensures that Silver readers always see a consistent state, even while pipelines are updating Silver tables.</p><h3>Gold + Iceberg</h3><p><a href="compaction.html">Compaction</a> and <a href="z-ordering.html">Z-ordering</a> at the Gold layer are native Iceberg operations, ensuring optimal file layout for BI query patterns. Dremio's <a href="automated-table-optimization.html">Automated Table Optimization</a> can manage these operations automatically, keeping Gold tables performing at peak efficiency without manual DBA intervention.</p>
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Medallion Architecture with Dremio</h2>
+        <p><a href="dremio.html">Dremio</a> is particularly well-suited to the Medallion Architecture because it provides value at every layer:</p><h3>Bronze Data Exploration</h3><p>Data engineers can use Dremio to interactively explore Bronze tables — running SQL queries to inspect raw records, check null rates, and identify quality issues — without writing Spark jobs. Dremio's ability to query Iceberg tables without pre-warming or configuration makes it an excellent exploratory tool for raw data.</p><h3>Silver Data Curation</h3><p>Through <a href="virtual-datasets.html">Virtual Datasets</a>, Dremio allows data engineers to define Silver-layer views on top of Bronze data — joins, filters, type casts — as SQL views without physically writing transformed data. This is ideal for exploratory curation work before committing to a full pipeline implementation.</p><h3>Gold Data Serving</h3><p>Dremio's primary role in the Medallion Architecture is serving Gold data to BI tools and analysts. <a href="dremio-reflections.html">Reflections</a> — Dremio's materialized acceleration layer — can be configured on Gold Iceberg tables to provide sub-second query response times for complex aggregations, enabling interactive dashboard performance on petabyte-scale data.</p><h3>Automated Optimization</h3><p>Dremio's <a href="automated-table-optimization.html">Automated Table Optimization</a> automatically compacts, clusters, and vacuums Gold Iceberg tables without requiring manual scheduling or Spark jobs. This dramatically reduces the operational overhead of maintaining Gold table performance.</p>
+        
+      </section>
+
+      <section id="section-8">
+        <h2>Streaming Medallion Architecture</h2>
+        <p>The traditional Medallion Architecture uses batch processing between layers. A streaming variant — increasingly common in modern lakehouses — applies the same Bronze/Silver/Gold quality tiers but moves data between them via continuous streaming pipelines rather than scheduled batch jobs.</p><h3>Streaming Bronze Ingestion</h3><p>In a streaming Medallion, events from <a href="apache-kafka.html">Apache Kafka</a> or other message brokers are continuously appended to Bronze Iceberg tables using a streaming writer — Apache Flink, Spark Structured Streaming, or a managed connector. Events arrive in Bronze within seconds of being produced by source systems.</p><h3>Streaming Silver Processing</h3><p>A continuous <a href="apache-flink.html">Apache Flink</a> job reads Bronze events, applies deduplication and transformation logic, and writes cleaned records to Silver Iceberg tables. Flink's exactly-once semantics ensure that each event is processed exactly once, even in the presence of failures.</p><h3>Latency Trade-offs</h3><p>Streaming Medallion architectures achieve near-real-time data freshness — data can be available in Gold within minutes of being produced in a source system. The trade-off is operational complexity: streaming jobs require more careful monitoring, failure handling, and resource management than batch jobs. For use cases where data freshness is critical — fraud detection, real-time dashboards, operational analytics — the complexity is justified. For most reporting workloads, nightly or hourly batch processing is sufficient.</p>
+        
+      </section>
+
+      <section id="section-9">
+        <h2>Common Mistakes in Medallion Architecture Implementation</h2>
+        <p>The Medallion Architecture is conceptually simple, but production implementations frequently encounter the following pitfalls:</p><h3>Over-engineering Bronze</h3><p>A common mistake is applying complex transformations in the Bronze layer — schema conforming, business rule application, enrichment. Bronze should be maximally simple: land the raw data, nothing more. Complexity in Bronze makes debugging difficult and loses the benefits of having a pristine historical record.</p><h3>Too Many Layers</h3><p>Some teams add additional layers — Platinum, Diamond, or domain-specific staging layers — creating a pipeline so deep that data latency becomes unacceptable and debugging requires tracing through five or six transformation stages. Unless your organization has genuinely complex multi-stage requirements, stick to three tiers.</p><h3>Inconsistent Upsert Patterns</h3><p>Teams that use different upsert strategies (full refresh, append-only, MERGE INTO) inconsistently across Silver tables create fragile, unpredictable data products. Standardize on a single upsert pattern per entity type and document it clearly.</p><h3>Neglecting Compaction at Gold</h3><p>Gold tables accumulate small files from incremental loads. Without regular <a href="compaction.html">compaction</a>, query performance degrades as engines must open thousands of small files. Dremio's automated optimization or scheduled Spark compaction jobs are essential for Gold layer health.</p><h3>Skipping Data Quality Gates</h3><p>The temptation to skip data quality checks between layers to simplify pipelines is strong — but it means that bad data silently propagates through all three layers and surfaces only when a business stakeholder reports an incorrect dashboard. Quality gates at each layer transition are non-negotiable in production systems.</p>
+        
+      </section>
+
+      <section id="section-10">
+        <h2>Summary</h2>
+        <p>The Medallion Architecture is the organizational backbone of every well-engineered <a href="data-lakehouse.html">data lakehouse</a>. By separating raw ingestion (Bronze), data cleansing (Silver), and business analytics (Gold) into distinct, progressively refined layers, it creates a system that is observable, debuggable, and resilient to the inevitable messiness of real-world data.</p><p><a href="apache-iceberg.html">Apache Iceberg</a> provides the transactional foundation — MERGE INTO for upserts, snapshot isolation for concurrent access, time travel for debugging — that makes the Medallion Architecture practical at scale. <a href="dremio.html">Dremio</a> provides the query and serving layer that makes Gold data instantly available to business users with sub-second performance.</p><p>Teams adopting the lakehouse for the first time should implement the Medallion Architecture from the start — it is far easier to establish the right organizational patterns early than to retrofit them onto an existing collection of unorganized files and tables. The discipline it imposes pays dividends in data quality, operational reliability, and team productivity throughout the life of the data platform.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture the Medallion pattern organizes.</span>
+    </a>
+      <a class="related-card" href="bronze-layer.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Bronze Layer</span>
+      <span class="related-desc">The raw ingestion tier of the Medallion Architecture.</span>
+    </a>
+      <a class="related-card" href="silver-layer.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Silver Layer</span>
+      <span class="related-desc">The cleansed and conformed tier.</span>
+    </a>
+      <a class="related-card" href="gold-layer.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Gold Layer</span>
+      <span class="related-desc">The business-ready analytics tier.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format enabling upserts and transactions across all layers.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Essential maintenance for Gold layer performance.</span>
+    </a>
+      <a class="related-card" href="dremio-reflections.html">
+      <span class="related-label">Dremio</span>
+      <span class="related-term">Dremio Reflections</span>
+      <span class="related-desc">Acceleration technology for Gold layer query performance.</span>
+    </a>
+      <a class="related-card" href="etl.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">The pipeline pattern feeding the Medallion layers.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>
