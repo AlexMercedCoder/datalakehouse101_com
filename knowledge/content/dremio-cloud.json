@@ -1,0 +1,102 @@
+{
+  "slug": "dremio-cloud",
+  "term": "Dremio Cloud",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Dremio Cloud: The Definitive Guide",
+  "metaDescription": "Learn what Dremio Cloud is, how its serverless lakehouse platform works on AWS and Azure, and how it compares to Snowflake and Databricks for open lakehouse analytics.",
+  "h1": "Dremio Cloud: The Definitive Guide",
+  "lede": "Dremio Cloud is the fully managed, serverless lakehouse platform on AWS and Azure. It delivers sub-second BI, Iceberg table management, and AI-ready data access on your own cloud storage \u2014 with no infrastructure to manage, auto-scaling compute, and consumption-based pricing.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Dremio Cloud?",
+      "a": "Dremio Cloud is the fully managed, SaaS version of the Dremio data lakehouse platform. It runs on AWS and Azure, connects to your own S3 or ADLS storage, and provides a managed Dremio query engine, Open Catalog, Reflections, and semantic layer \u2014 all without infrastructure management on your part."
+    },
+    {
+      "q": "Does Dremio Cloud require moving data into Dremio's storage?",
+      "a": "No. Dremio Cloud connects to your own cloud storage (S3 or ADLS Gen2). Your data stays in your account in open Apache Iceberg format. Dremio Cloud reads and writes to your storage, but does not copy or import data into proprietary Dremio storage."
+    },
+    {
+      "q": "How does Dremio Cloud pricing work?",
+      "a": "Dremio Cloud uses consumption-based pricing \u2014 you pay for the compute resources used while queries are executing. Compute engines auto-scale up when queries arrive and wind down during idle periods, so you only pay for what you use. Storage costs are charged directly by your cloud provider (S3/ADLS), not by Dremio."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Dremio Cloud?",
+      "content": "<p><strong>Dremio Cloud</strong> is the fully managed SaaS version of <a href=\"dremio.html\">Dremio's</a> data lakehouse platform, available on AWS and Microsoft Azure. It provides all of Dremio's capabilities \u2014 SQL query engine, <a href=\"dremio-reflections.html\">Reflections</a>, <a href=\"dremio-open-catalog.html\">Open Catalog</a>, semantic layer, and BI tool connectivity \u2014 as a managed service with no infrastructure deployment, patching, or scaling to manage.</p><p>The key architectural principle of Dremio Cloud is <strong>BYOS (Bring Your Own Storage)</strong>: Dremio Cloud connects to your existing cloud storage bucket (S3 on AWS, ADLS Gen2 on Azure), reads and writes data in open <a href=\"apache-iceberg.html\">Apache Iceberg</a> format, and leaves all data in your account under your control. Unlike Snowflake or Databricks (which store data in their own managed storage by default), Dremio Cloud does not create a proprietary copy of your data."
+    },
+    {
+      "heading": "Dremio Cloud Architecture",
+      "content": "<p>Dremio Cloud's multi-tenant architecture separates the control plane (managed by Dremio) from the data plane (running in your cloud account):</p><h3>Control Plane (Dremio-Managed)</h3><p>The catalog, metadata service, query coordinator, and UI are managed by Dremio as a shared SaaS service. These components are multi-tenant but isolated per organization.</p><h3>Data Plane (Customer Cloud Account)</h3><p>Query execution engines run in the customer's own AWS or Azure account, in a Dremio-managed VPC. This ensures that raw data bytes never leave the customer's cloud account \u2014 the execution happens close to the data. Dremio manages the compute scaling, health monitoring, and software updates for the data plane engines.</p><h3>Auto-Scaling Engines</h3><p>Dremio Cloud provides named virtual engines (e.g., \"BI-Engine\", \"ETL-Engine\") that auto-scale based on query load. Each engine is a cluster of Arrow-based query executors. Engines can be independently sized and configured for different workload types.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Dremio Cloud Architecture BYOS",
+      "diagramCaption": "Figure 1: Dremio Cloud \u2014 managed control plane, customer-account data plane, your own cloud storage."
+    },
+    {
+      "heading": "Dremio Cloud vs. Snowflake vs. Databricks",
+      "content": "<table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>Dremio Cloud</th><th>Snowflake</th><th>Databricks</th></tr></thead><tbody><tr><td>Data storage</td><td>Your S3/ADLS (open Iceberg)</td><td>Snowflake proprietary</td><td>Your storage (Delta/Iceberg)</td></tr><tr><td>Table format</td><td>Apache Iceberg (open)</td><td>Proprietary (FDN)</td><td>Delta Lake / Iceberg</td></tr><tr><td>Multi-engine access</td><td>Yes \u2014 Iceberg REST Catalog</td><td>Limited (Snowflake Iceberg tables)</td><td>Yes \u2014 Unity Catalog</td></tr><tr><td>BI acceleration</td><td>Reflections (transparent)</td><td>Result cache</td><td>No native equivalent</td></tr><tr><td>Pricing model</td><td>Consumption (credits)</td><td>Consumption (credits)</td><td>DBU consumption</td></tr><tr><td>Semantic layer</td><td>Built-in AI Semantic Layer</td><td>None built-in</td><td>None built-in</td></tr></tbody></table>"
+    },
+    {
+      "heading": "Getting Started with Dremio Cloud",
+      "content": "<p>Starting with Dremio Cloud requires:</p><ol><li>Sign up at <code>dremio.com/get-started</code> (free trial available)</li><li>Connect your AWS S3 bucket or Azure ADLS Gen2 as a storage source</li><li>Create or register Apache Iceberg tables via Dremio's SQL editor or catalog UI</li><li>Connect BI tools (Tableau, Power BI) via Dremio's ODBC/JDBC drivers</li><li>Configure <a href=\"dremio-reflections.html\">Reflections</a> for your most-queried tables</li></ol><p>The entire setup takes less than 30 minutes for a basic deployment. Dremio's free trial includes sufficient compute credits to evaluate the platform with production-scale data.",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Dremio Cloud Getting Started",
+      "diagramCaption": "Figure 2: Dremio Cloud connects BI tools, AI agents, and SQL clients to your own Iceberg data in minutes."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Dremio Cloud makes the open <a href=\"data-lakehouse.html\">data lakehouse</a> accessible without infrastructure expertise. By managing all platform components while leaving your data in open <a href=\"apache-iceberg.html\">Apache Iceberg</a> format on your own cloud storage, Dremio Cloud delivers enterprise-grade analytics performance with the openness and portability that proprietary cloud warehouses cannot match. For organizations wanting to move beyond Snowflake or Databricks lock-in, Dremio Cloud is the most complete managed open lakehouse alternative.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The underlying platform behind Dremio Cloud."
+    },
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "BI acceleration available in Dremio Cloud."
+    },
+    {
+      "slug": "dremio-open-catalog",
+      "term": "Dremio Open Catalog",
+      "category": "Query Engines & Platforms",
+      "desc": "Managed Iceberg catalog in Dremio Cloud."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The open format your data stays in."
+    },
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "S3 and ADLS \u2014 Dremio Cloud's storage layer."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "The architecture Dremio Cloud embodies."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The pattern Dremio Cloud delivers as a managed service."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "Dremio Cloud's built-in AI Semantic Layer."
+    }
+  ]
+}

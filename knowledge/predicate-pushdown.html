@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predicate Pushdown: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what predicate pushdown is, how it works in Apache Iceberg and Parquet, and why it is one of the most important query optimization techniques in the data lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/predicate-pushdown.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Predicate Pushdown: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what predicate pushdown is, how it works in Apache Iceberg and Parquet, and why it is one of the most important query optimization techniques in the data lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/predicate-pushdown.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Predicate Pushdown: The Definitive Guide",
+      "description": "Learn what predicate pushdown is, how it works in Apache Iceberg and Parquet, and why it is one of the most important query optimization techniques in the data lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/predicate-pushdown.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Predicate Pushdown", "item": "https://datalakehouse101.com/knowledge/predicate-pushdown.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is predicate pushdown?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Predicate pushdown is a query optimization technique where filter conditions (predicates) from a SQL WHERE clause are applied at the earliest possible point in the data access chain — into the metadata layer, file format readers, and storage systems — rather than filtering after data has been read into memory. It eliminates the reading of irrelevant data entirely."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does predicate pushdown work with Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In Apache Iceberg, predicate pushdown operates at three levels: manifest list pruning (eliminating entire manifest files whose partition summaries don't satisfy the predicate), manifest file pruning (eliminating data files whose min/max statistics don't satisfy the predicate), and Parquet row group pruning (eliminating row groups within data files using embedded column statistics)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is partition pruning vs. predicate pushdown?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Partition pruning is a specific type of predicate pushdown that eliminates entire data files or directories based on partition values. General predicate pushdown also includes file-level statistics pruning (min/max), row group pruning within files, and predicate evaluation in the storage reader before rows are returned to the engine. Partition pruning is the coarsest-grained form; row group pruning is the finest."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Predicate Pushdown</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Predicate Pushdown: The Definitive Guide</h1>
+      <p class="hero-lede">Predicate pushdown is the query optimization technique that moves filter conditions as close to the data source as possible — into metadata, into file footers, and into storage readers — eliminating irrelevant data before it is ever read into memory. It is the single most impactful optimization for large-scale lakehouse queries.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Predicate Pushdown?</a></li>
+        <li><a href="#section-2">Predicate Pushdown in Apache Iceberg</a></li>
+        <li><a href="#section-3">Partition Pruning as Predicate Pushdown</a></li>
+        <li><a href="#section-4">Predicate Pushdown to Federated Sources</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Predicate Pushdown?</h2>
+        <p><strong>Predicate pushdown</strong> is the query optimization technique of moving SQL filter conditions (predicates) as far down the data access chain as possible — ideally into the metadata layer or the storage reader itself — so that irrelevant data is never read into engine memory at all. It is the foundational optimization that makes analytical queries on large-scale <a href="data-lakehouse.html">data lakehouses</a> practical.</p><p>Without predicate pushdown, a query like <code>SELECT * FROM orders WHERE order_date = '2026-01-01'</code> would read all 10TB of historical order data into memory and filter it there — an obviously wasteful approach. With predicate pushdown, the storage reader identifies which files contain January 1st data (using partition metadata and file statistics) and reads only those files — perhaps 27GB instead of 10TB.</p><p>The term 'pushdown' refers to the direction of optimization: filter conditions are 'pushed down' from the query plan (which operates at a high, logical level) through multiple layers toward the storage system (which operates at a low, physical level). The further down the filter is pushed, the less data must be read.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Predicate Pushdown in Apache Iceberg</h2>
+        <p><a href="apache-iceberg.html">Apache Iceberg's</a> three-level metadata architecture creates three distinct opportunities for predicate pushdown:</p><h3>Level 1: Manifest List Pruning</h3><p>The manifest list contains partition-level summary statistics for each manifest file. The query engine applies predicates to these summaries, eliminating entire manifest files that cannot contain relevant rows. A table with 1000 manifest files may have 990 eliminated at this level — reducing subsequent metadata reads by 99%.</p><h3>Level 2: Manifest File Pruning (Data Skipping)</h3><p>Each manifest file contains per-data-file column statistics (min/max values, null counts). The engine applies predicates to these per-file statistics, eliminating data files that cannot contain rows satisfying the filter. A partition's 100 data files may be reduced to 3 relevant files at this level.</p><h3>Level 3: Parquet Row Group Pruning</h3><p>Within each data file, <a href="apache-parquet.html">Parquet</a> stores per-row-group column statistics. The engine applies predicates within the file, eliminating row groups (typically 128MB each) that cannot contain relevant rows. A 500MB file with 4 row groups may result in only 1 row group being read.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Predicate Pushdown Three Levels Iceberg diagram" loading="lazy"><figcaption>Figure 1: Predicate pushdown at three levels in Iceberg — manifest list, manifest files, Parquet row groups.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Partition Pruning as Predicate Pushdown</h2>
+        <p>Partition pruning is the most commonly discussed form of predicate pushdown. In <a href="apache-iceberg.html">Apache Iceberg</a> with <a href="hidden-partitioning.html">hidden partitioning</a>, partition pruning works transparently: a query with <code>WHERE event_date = '2026-01-15'</code> triggers Iceberg's partition transform evaluation (<code>days(event_time)</code> for the 2026-01-15 day value) and eliminates all manifest files and data files in other day partitions. No data from other days is read.</p><p>The power of Iceberg's partition pruning relative to Hive-style partitioning is that it works automatically from predicates on the original data columns — users do not need to know or filter on a synthetic partition column. The engine applies the partition transform to convert the data column predicate into a partition value predicate transparently.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Predicate Pushdown to Federated Sources</h2>
+        <p>In federated query scenarios — where <a href="dremio.html">Dremio</a> or <a href="trino.html">Trino</a> queries a PostgreSQL table alongside Iceberg tables — predicate pushdown extends to the source database. The engine pushes filter predicates from the SQL WHERE clause into the SQL query sent to PostgreSQL, ensuring that the database applies the filter before transmitting results over the network.</p><p>Without predicate pushdown to PostgreSQL, the engine would request all rows from the database table and filter them locally — unnecessarily transferring potentially millions of rows over the network. With pushdown, only matching rows are returned from PostgreSQL, minimizing network transfer and database load.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Predicate Pushdown Federated Sources diagram" loading="lazy"><figcaption>Figure 2: Predicate pushdown to federated sources — filters applied at the source, not after network transfer.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Predicate pushdown is the single most impactful query optimization technique in the data lakehouse. By pushing filter conditions into <a href="apache-iceberg.html">Iceberg's</a> metadata hierarchy and <a href="apache-parquet.html">Parquet's</a> file statistics, it eliminates the vast majority of data from consideration before any bytes are read from storage — transforming what would be full-table scans into targeted reads of a tiny fraction of the data. Every major lakehouse query engine implements predicate pushdown, and every data engineering decision that affects data layout (partitioning, sorting, Z-ordering) is ultimately about making predicate pushdown more effective.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Three-level metadata enabling multi-tier predicate pushdown.</span>
+    </a>
+      <a class="related-card" href="iceberg-manifest-files.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg Manifest Files</span>
+      <span class="related-desc">File statistics used for manifest-level predicate pushdown.</span>
+    </a>
+      <a class="related-card" href="apache-parquet.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Parquet</span>
+      <span class="related-desc">Row group statistics for within-file predicate pushdown.</span>
+    </a>
+      <a class="related-card" href="hidden-partitioning.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Hidden Partitioning</span>
+      <span class="related-desc">Partition pruning via hidden partition transforms.</span>
+    </a>
+      <a class="related-card" href="data-skipping.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Data Skipping</span>
+      <span class="related-desc">File-level skipping enabled by predicate pushdown.</span>
+    </a>
+      <a class="related-card" href="column-pruning.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Column Pruning</span>
+      <span class="related-desc">Companion optimization — eliminate columns, predicate eliminates rows.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Applies multi-level predicate pushdown aggressively.</span>
+    </a>
+      <a class="related-card" href="query-optimization.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Query Optimization</span>
+      <span class="related-desc">Predicate pushdown as a core query optimization.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

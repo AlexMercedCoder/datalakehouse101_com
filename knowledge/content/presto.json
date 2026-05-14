@@ -1,0 +1,102 @@
+{
+  "slug": "presto",
+  "term": "Presto",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Presto: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Presto is, how it compares to Trino, and its role in distributed SQL analytics across Apache Iceberg and heterogeneous data sources in the modern lakehouse.",
+  "h1": "Presto: The Definitive Guide for Data Lakehouse",
+  "lede": "Presto is the original Facebook-born distributed SQL engine that pioneered federated analytics at petabyte scale. Now governed by the Presto Foundation and used at Meta, Twitter, and Uber, it remains a major player in large-scale, multi-source SQL analytics alongside its fork, Trino.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Presto?",
+      "a": "Presto is an open-source, distributed SQL query engine originally developed at Facebook (Meta) for interactive analytics across heterogeneous data sources at petabyte scale. It is now governed by the Presto Foundation (a Linux Foundation project) and is distinct from Trino, which forked from Presto's open-source community in 2020."
+    },
+    {
+      "q": "What is the difference between Presto and Trino?",
+      "a": "Presto and Trino share a common codebase origin but diverged after the 2020 fork. Presto (Presto Foundation) is maintained primarily by Meta engineers and is optimized for Meta's scale. Trino has a larger open-source community, more frequent releases, and stronger Iceberg REST catalog support. Both support Apache Iceberg."
+    },
+    {
+      "q": "Who uses Presto in production?",
+      "a": "Presto is used at massive scale by Meta (Facebook/Instagram/WhatsApp analytics), Uber (trip and driver analytics), Twitter/X, Airbnb, and other large internet companies. These organizations run Presto clusters with thousands of nodes querying petabytes of data."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Presto?",
+      "content": "<p><strong>Presto</strong> is an open-source, distributed SQL query engine originally developed at Facebook (now Meta) in 2012 and open-sourced in 2013. It was designed to enable interactive SQL analytics across Meta's massive data infrastructure \u2014 petabytes of data in HDFS, Hive tables, MySQL databases, and proprietary stores \u2014 with sub-minute query latency at any scale.</p><p>Presto's architectural innovation was the MPP (massively parallel processing) SQL execution model applied to federated data sources: a single Presto cluster with a Coordinator and hundreds of Workers can query simultaneously across HDFS, S3, relational databases, and other sources using standard SQL, without requiring data to be centralized first.</p><p>In 2020, the Presto open-source community forked into two projects: <strong>Presto</strong> (maintained by the Presto Foundation, primarily Meta engineers) and <strong><a href=\"trino.html\">Trino</a></strong> (the renamed PrestoSQL, maintained by an independent community). Both projects share the original Presto architecture but have diverged in implementation details and ecosystem direction."
+    },
+    {
+      "heading": "Presto Architecture",
+      "content": "<p>Presto's architecture is the MPP model that influenced all subsequent distributed SQL engines:</p><ul><li><strong>Coordinator:</strong> Receives SQL queries, parses and plans them using the Presto planner and Raptor optimizer, then distributes execution stages to Workers</li><li><strong>Workers:</strong> Execute plan fragments in parallel, reading from data sources via Connectors and exchanging data between Workers via the Shuffle layer</li><li><strong>Connectors:</strong> Plugin interfaces that translate SQL operations into source-specific reads \u2014 Iceberg, Hive, JDBC, Kafka, etc.</li><li><strong>Memory management:</strong> Presto uses spill-to-disk for memory-intensive operations (large aggregations, sorts), enabling queries that exceed available cluster memory</li></ul>",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Presto Architecture MPP",
+      "diagramCaption": "Figure 1: Presto's MPP architecture \u2014 Coordinator distributes SQL execution across Worker nodes."
+    },
+    {
+      "heading": "Presto and Apache Iceberg",
+      "content": "<p>Presto supports <a href=\"apache-iceberg.html\">Apache Iceberg</a> through the Iceberg connector. Presto's Iceberg support covers: reading Iceberg V1 and V2 tables, partition pruning via hidden partitioning, time travel queries, and basic write operations. Presto's Iceberg catalog support includes Hive Metastore and REST catalogs.</p><p>Compared to <a href=\"trino.html\">Trino</a>, Presto's Iceberg connector is somewhat less feature-complete for writing (particularly for complex V2 operations), though both engines provide production-grade Iceberg reads. For organizations primarily using Presto as a read engine against Iceberg tables (written by Spark or Flink), the difference is minimal."
+    },
+    {
+      "heading": "Presto vs. Trino: Which to Choose?",
+      "content": "<p>For organizations starting fresh in 2025, the guidance is:</p><ul><li><strong>Choose Trino</strong> if: you want the most active open-source community, the fastest release cadence, the strongest Iceberg REST catalog support, or you are using Starburst Galaxy as a managed service</li><li><strong>Choose Presto</strong> if: your organization already runs Presto at scale and the migration cost outweighs the benefits, or if you are at Meta-scale and need Presto's spill-to-disk and native Meta optimizations</li><li><strong>Consider AWS Athena</strong> if: you are on AWS and want serverless Trino/Presto-compatible SQL without any cluster management</li></ul>",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Presto Trino Decision Guide",
+      "diagramCaption": "Figure 2: Presto vs Trino selection criteria for modern lakehouse deployments."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Presto pioneered distributed federated SQL analytics and remains a production-grade engine at some of the world's largest scale deployments. For most new data lakehouse projects in 2025, <a href=\"trino.html\">Trino</a> is the preferred choice given its more active community and stronger <a href=\"apache-iceberg.html\">Iceberg</a> ecosystem. For organizations already running Presto or operating at Meta-equivalent scale, Presto's battle-tested architecture and performance remain compelling. Both engines are part of a healthy lakehouse ecosystem alongside <a href=\"dremio.html\">Dremio</a> (BI analytics) and <a href=\"apache-spark.html\">Spark</a> (batch ETL).</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "trino",
+      "term": "Trino",
+      "category": "Query Engines & Platforms",
+      "desc": "The open-source fork of Presto with a broader community."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "The ETL engine complementing Presto in the lakehouse."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "BI-optimized alternative with Reflections and semantic layer."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Primary open table format for Presto queries."
+    },
+    {
+      "slug": "lakehouse-federation",
+      "term": "Lakehouse Federation",
+      "category": "Analytics & BI",
+      "desc": "Federated SQL across sources \u2014 Presto's core capability."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture Presto operates within."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Presto pushes predicates to connectors for efficiency."
+    },
+    {
+      "slug": "vectorized-execution",
+      "term": "Vectorized Query Execution",
+      "category": "Query Engines & Platforms",
+      "desc": "Presto uses columnar vectorized execution internally."
+    }
+  ]
+}

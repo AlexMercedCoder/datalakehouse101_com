@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apache Flink: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Apache Flink is, how it enables real-time streaming ingestion into Apache Iceberg tables, and why Flink is the engine of choice for CDC and event-driven lakehouse pipelines.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/apache-flink.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Apache Flink: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Apache Flink is, how it enables real-time streaming ingestion into Apache Iceberg tables, and why Flink is the engine of choice for CDC and event-driven lakehouse pipelines.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/apache-flink.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Apache Flink: The Definitive Guide for Data Lakehouse",
+      "description": "Learn what Apache Flink is, how it enables real-time streaming ingestion into Apache Iceberg tables, and why Flink is the engine of choice for CDC and event-driven lakehouse pipelines.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/apache-flink.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Apache Flink", "item": "https://datalakehouse101.com/knowledge/apache-flink.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Apache Flink?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Flink is an open-source, distributed stream processing framework that processes data events in real time with low latency, exactly-once semantics, and stateful computation. It provides both DataStream API (for complex event processing) and Table/SQL API (for SQL-based stream processing)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Apache Flink's role in the data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In the data lakehouse, Flink is primarily used for: continuous streaming ingestion of Kafka topics or CDC streams into Apache Iceberg tables (replacing hourly or daily batch loads with minute-level or second-level data freshness), real-time event aggregations, and complex event processing pipelines."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Apache Flink write to Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Flink has native Apache Iceberg sink support through the flink-iceberg connector. Flink can write streaming data to Iceberg tables with exactly-once semantics, using either append (for Bronze ingestion) or UPSERT mode (for Silver CDC pipelines). The Flink Iceberg sink handles checkpoint-based commits that align with Iceberg snapshots."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Apache Flink</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Apache Flink: The Definitive Guide for Data Lakehouse</h1>
+      <p class="hero-lede">Apache Flink is the leading open-source stream processing engine for real-time data pipelines. In the data lakehouse, Flink is the engine that continuously ingests CDC streams, event data, and Kafka topics into Apache Iceberg tables — enabling near-real-time data freshness without batch latency.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Apache Flink?</a></li>
+        <li><a href="#section-2">Flink and Apache Iceberg</a></li>
+        <li><a href="#section-3">Flink CDC: Debezium to Iceberg</a></li>
+        <li><a href="#section-4">Flink vs. Spark Structured Streaming</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Apache Flink?</h2>
+        <p><strong>Apache Flink</strong> is an open-source, distributed stream processing framework designed for high-throughput, low-latency processing of continuous data streams with exactly-once semantics and stateful computation. Originally developed at the Technical University of Berlin in 2010 and donated to the Apache Software Foundation in 2014, Flink has grown into the leading open-source stream processing engine, widely used at Alibaba, Netflix, Uber, LinkedIn, and many other large-scale data organizations.</p><p>Flink's core innovation over earlier streaming frameworks (like Apache Storm) is its unified stream-batch model: Flink processes all data as streams, with bounded (finite) streams representing batch workloads and unbounded (infinite) streams representing real-time workloads. This unification means the same Flink program and the same execution semantics apply to both batch and streaming data.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a> ecosystem, Flink's primary role is <strong>streaming ingestion</strong> — continuously reading from message queues (Apache Kafka, AWS Kinesis, Apache Pulsar) and <a href="change-data-capture.html">CDC</a> sources, applying real-time transformations, and writing to <a href="apache-iceberg.html">Apache Iceberg</a> tables with exactly-once delivery guarantees. This enables lakehouse data freshness measured in seconds or minutes rather than hours.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Flink and Apache Iceberg</h2>
+        <p>The Flink-Iceberg integration is one of the most production-proven streaming Iceberg write patterns. The key components:</p><h3>Flink Iceberg Sink</h3><p>The <code>FlinkSink</code> class writes DataStream or Table API results to Iceberg tables. It buffers incoming rows, commits batches to Iceberg as new snapshots aligned with Flink checkpoints, and provides exactly-once semantics through Flink's checkpoint mechanism — ensuring that even if the Flink job restarts, each row appears exactly once in the Iceberg table.</p><h3>Append Mode</h3><p>New rows are added to the Iceberg table as new data files on each checkpoint commit. Ideal for Bronze ingestion of event streams (logs, clickstreams, IoT telemetry) where each event is immutable and unique.</p><h3>UPSERT Mode</h3><p>Updates and deletes from CDC sources are applied to the Iceberg table using Iceberg V2 equality delete files. This enables real-time CDC ingestion directly into Silver Iceberg tables without a separate MERGE INTO batch step.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Apache Flink Iceberg Streaming Ingestion Architecture diagram" loading="lazy"><figcaption>Figure 1: Flink streaming ingestion — Kafka → Flink → Iceberg with exactly-once semantics.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Flink CDC: Debezium to Iceberg</h2>
+        <p>One of the most common production Flink patterns is the Debezium CDC to Iceberg pipeline:</p><ol><li><strong>Debezium connector</strong> reads the MySQL/PostgreSQL WAL (write-ahead log) and publishes change events (INSERT, UPDATE, DELETE) to Kafka topics in Debezium JSON format</li><li><strong>Flink job</strong> reads the Kafka Debezium topics using the <code>flink-cdc-connectors</code> library, which parses Debezium events into Flink RowData with change type metadata</li><li><strong>Transformation:</strong> Optional business logic applied in Flink (joining, enrichment, deduplication)</li><li><strong>Iceberg sink:</strong> Flink writes to the target Iceberg table in UPSERT mode — inserts become new data files, updates/deletes become equality delete files</li></ol><p>This pattern delivers data from the source operational database into the Iceberg Silver table within 30–120 seconds of the source change — enabling near-real-time analytics without the complexity of maintaining a custom streaming ETL pipeline.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Flink vs. Spark Structured Streaming</h2>
+        <p>Both Flink and Spark Structured Streaming can ingest data into Iceberg, but they have different strengths:</p><table class="comparison-table"><thead><tr><th>Dimension</th><th>Apache Flink</th><th>Spark Structured Streaming</th></tr></thead><tbody><tr><td>Latency</td><td>Sub-second (true streaming)</td><td>Seconds to minutes (micro-batch)</td></tr><tr><td>Exactly-once</td><td>Native, checkpoint-based</td><td>Available but more complex</td></tr><tr><td>CDC support</td><td>Native Debezium connector</td><td>Via Spark + Kafka + custom logic</td></tr><tr><td>State management</td><td>Built-in, production-grade</td><td>Limited for complex stateful ops</td></tr><tr><td>Python API</td><td>PyFlink (less mature)</td><td>PySpark (very mature)</td></tr><tr><td>Iceberg UPSERT</td><td>Native sink support</td><td>Less mature UPSERT support</td></tr></tbody></table>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Flink vs Spark Streaming Comparison diagram" loading="lazy"><figcaption>Figure 2: Flink vs Spark Structured Streaming for Iceberg ingestion — latency and CDC support comparison.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Apache Flink is the streaming ingestion engine of the modern data lakehouse. Its native <a href="apache-iceberg.html">Apache Iceberg</a> sink, exactly-once semantics, and deep <a href="change-data-capture.html">CDC</a> integration capabilities make it the optimal choice for organizations that need data freshness measured in seconds rather than hours. In the lakehouse engine stack, Flink ingests real-time data, <a href="apache-spark.html">Spark</a> processes large batch transformations, and <a href="dremio.html">Dremio</a> serves the resulting Iceberg tables to analysts — each engine optimized for its specific workload.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Batch alternative to Flink for Iceberg writes.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format Flink writes to via the Iceberg sink.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">Flink's primary CDC-to-Iceberg ingestion pattern.</span>
+    </a>
+      <a class="related-card" href="apache-kafka.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Apache Kafka</span>
+      <span class="related-desc">The message queue Flink most commonly reads from.</span>
+    </a>
+      <a class="related-card" href="merge-on-read.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Merge-on-Read</span>
+      <span class="related-desc">Flink UPSERT mode uses MoR equality delete files.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">The analytics engine serving Iceberg tables Flink writes.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture Flink enables real-time ingestion for.</span>
+    </a>
+      <a class="related-card" href="bronze-layer.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Bronze Layer</span>
+      <span class="related-desc">Primary target of Flink append-mode streaming writes.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dremio Intelligent Query Engine: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn how Dremio's Intelligent Query Engine uses Apache Arrow vectorized execution, Reflection acceleration, and adaptive optimization to deliver sub-second queries on Apache Iceberg data.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/dremio-query-engine.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Dremio Intelligent Query Engine: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn how Dremio's Intelligent Query Engine uses Apache Arrow vectorized execution, Reflection acceleration, and adaptive optimization to deliver sub-second queries on Apache Iceberg data.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/dremio-query-engine.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Dremio Intelligent Query Engine: The Definitive Guide",
+      "description": "Learn how Dremio's Intelligent Query Engine uses Apache Arrow vectorized execution, Reflection acceleration, and adaptive optimization to deliver sub-second queries on Apache Iceberg data.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/dremio-query-engine.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Dremio Intelligent Query Engine", "item": "https://datalakehouse101.com/knowledge/dremio-query-engine.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the Dremio Intelligent Query Engine?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Dremio Intelligent Query Engine is Dremio's core SQL execution layer built on Apache Arrow vectorized processing. It includes a cost-based query optimizer, automatic Reflection matching, multi-level predicate pushdown into Iceberg metadata, and adaptive query execution that adjusts plans at runtime based on actual data statistics."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What makes Dremio's query engine 'intelligent'?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The intelligence comes from three layers: Reflection matching (automatically routing queries to pre-computed materializations), adaptive optimization (adjusting query plans based on runtime statistics), and semantic layer integration (understanding business metric definitions to produce correct results, not just syntactically valid ones)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Dremio's engine handle Apache Iceberg metadata?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio's engine reads Iceberg manifest lists and manifest files during query planning to apply multi-level predicate pushdown — eliminating manifest files, data files, and Parquet row groups that cannot contain relevant rows. It also uses Iceberg's file-level column statistics to estimate cardinalities for join ordering and aggregation optimization."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Dremio Intelligent Query Engine</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Dremio Intelligent Query Engine: The Definitive Guide</h1>
+      <p class="hero-lede">Dremio's Intelligent Query Engine is the analytical core of the Dremio platform — a vectorized, Arrow-native SQL engine that automatically selects Reflections, pushes predicates into Iceberg metadata, and adapts its execution plan to deliver the fastest possible query response on any lakehouse query.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is the Dremio Intelligent Query Engine?</a></li>
+        <li><a href="#section-2">Query Planning in Dremio</a></li>
+        <li><a href="#section-3">Vectorized Arrow Execution</a></li>
+        <li><a href="#section-4">Adaptive Query Execution</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is the Dremio Intelligent Query Engine?</h2>
+        <p><a href="dremio.html">Dremio's</a> <strong>Intelligent Query Engine</strong> is the SQL execution core of the Dremio platform — the component responsible for receiving SQL queries, planning optimal execution strategies, and producing results as fast as possible from Apache Iceberg data and federated sources. It is built on <a href="apache-arrow.html">Apache Arrow</a> for vectorized in-memory processing and integrates <a href="dremio-reflections.html">Reflection</a> matching, multi-level predicate pushdown, and adaptive query execution into a unified planning and execution pipeline.</p><p>The 'intelligent' qualifier reflects three capabilities that distinguish Dremio's engine from a simple SQL executor: it automatically identifies and uses the best available <a href="dremio-reflections.html">Reflection</a> for each query (transparent materialized query routing), it adapts its execution plan at runtime based on actual data characteristics rather than static statistics (adaptive execution), and it understands the semantic meaning of queries within the context of <a href="virtual-datasets.html">Virtual Dataset</a> definitions (semantic-aware optimization).</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Query Planning in Dremio</h2>
+        <p>Every SQL query submitted to Dremio flows through a multi-phase planning pipeline:</p><ol><li><strong>Parsing:</strong> SQL text is parsed into an abstract syntax tree (AST)</li><li><strong>Validation:</strong> Column references and function names are validated against the catalog's schema</li><li><strong>Logical planning:</strong> The AST is converted to a logical query plan — a tree of relational algebra operators (Scan, Filter, Project, Aggregate, Join)</li><li><strong>Reflection matching:</strong> The optimizer checks whether any Reflection can serve as a substitute for part or all of the query plan — replacing a raw Iceberg scan with a pre-computed Reflection scan</li><li><strong>Physical planning:</strong> The logical plan is converted to a physical execution plan — specific operators (HashAggregate, HashJoin, VectorizedScan) with partitioning and distribution strategies</li><li><strong>Pushdown application:</strong> Predicates are pushed into Iceberg metadata readers and Parquet column readers</li><li><strong>Distribution planning:</strong> The plan is split across executor nodes for parallel execution</li></ol>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Dremio Intelligent Query Engine Planning Pipeline diagram" loading="lazy"><figcaption>Figure 1: Dremio's query planning pipeline — from SQL text to distributed vectorized execution.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Vectorized Arrow Execution</h2>
+        <p>Dremio's execution engine processes data in Apache Arrow RecordBatches — columnar memory buffers of fixed size (typically 4096 rows). Every operator in the execution pipeline — scan, filter, project, aggregate, join, sort — operates on Arrow batches, applying <a href="vectorized-execution.html">vectorized SIMD</a> operations that process 8–32 values per CPU instruction.</p><p>Data flows through the pipeline without serialization: each operator receives Arrow RecordBatches from the previous operator and produces Arrow RecordBatches for the next. Memory is managed with a shared Arrow memory pool that minimizes allocation overhead. Results returned to clients via Arrow Flight SQL are delivered in Arrow format directly — zero-copy for Python/PyArrow clients.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Dremio Arrow Vectorized Execution Pipeline diagram" loading="lazy"><figcaption>Figure 2: Arrow-native vectorized execution — data flows as column batches through each operator.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Adaptive Query Execution</h2>
+        <p>Dremio's Intelligent Query Engine implements adaptive query execution — the ability to adjust the query execution plan at runtime based on actual data characteristics observed during execution, rather than relying entirely on pre-execution statistics estimates.</p><p>Adaptive execution addresses a fundamental challenge in query optimization: the optimizer must make decisions (join order, aggregation strategy, partition count) before it has seen the actual data. When statistics are stale or missing, the optimizer's estimates may be wrong, leading to poor execution plans. Adaptive execution detects these situations mid-query and adjusts — for example, switching from a hash join to a broadcast join when an input turns out to be much smaller than estimated, or repartitioning an aggregation when cardinality estimates were wrong.
+        
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Dremio's Intelligent Query Engine is the technical core that makes the open <a href="data-lakehouse.html">data lakehouse</a> competitive with proprietary cloud warehouses for BI performance. Its combination of Arrow vectorized execution, automatic Reflection routing, multi-level Iceberg predicate pushdown, and adaptive execution creates a query engine that is simultaneously open (reads open Iceberg format), fast (sub-second for accelerated queries), and intelligent (self-optimizing based on actual workload and data characteristics). For organizations building on <a href="apache-iceberg.html">Apache Iceberg</a>, Dremio's query engine is the component that transforms open data into analytical performance.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">The platform containing the Intelligent Query Engine.</span>
+    </a>
+      <a class="related-card" href="dremio-reflections.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Reflections</span>
+      <span class="related-desc">Acceleration matched by the query optimizer.</span>
+    </a>
+      <a class="related-card" href="vectorized-execution.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Vectorized Query Execution</span>
+      <span class="related-desc">The execution model of Dremio's engine.</span>
+    </a>
+      <a class="related-card" href="apache-arrow.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Arrow</span>
+      <span class="related-desc">In-memory format for Dremio's vectorized pipeline.</span>
+    </a>
+      <a class="related-card" href="predicate-pushdown.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Predicate Pushdown</span>
+      <span class="related-desc">Multi-level pushdown into Iceberg metadata.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Primary data source for the Intelligent Query Engine.</span>
+    </a>
+      <a class="related-card" href="query-optimization.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Query Optimization</span>
+      <span class="related-desc">Adaptive and cost-based optimization in Dremio's engine.</span>
+    </a>
+      <a class="related-card" href="virtual-datasets.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Virtual Datasets</span>
+      <span class="related-desc">Semantic context integrated into the engine's optimizer.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

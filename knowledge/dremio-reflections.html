@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dremio Reflections: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Dremio Reflections are, how raw and aggregation Reflections work, and how they deliver sub-second BI performance on Apache Iceberg data without query rewrites.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/dremio-reflections.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Dremio Reflections: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Dremio Reflections are, how raw and aggregation Reflections work, and how they deliver sub-second BI performance on Apache Iceberg data without query rewrites.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/dremio-reflections.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Dremio Reflections: The Definitive Guide",
+      "description": "Learn what Dremio Reflections are, how raw and aggregation Reflections work, and how they deliver sub-second BI performance on Apache Iceberg data without query rewrites.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/dremio-reflections.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Dremio Reflections", "item": "https://datalakehouse101.com/knowledge/dremio-reflections.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are Dremio Reflections?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio Reflections are pre-computed, materialized representations of Iceberg data stored as optimized Iceberg tables. The Dremio query optimizer automatically selects the most beneficial Reflection for each incoming query, routing the query to the pre-computed result rather than scanning raw data files — delivering sub-second response times."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do users need to change their queries to benefit from Reflections?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Reflections are completely transparent to query writers and BI tools. Users write the same SQL against the same table or Virtual Dataset; Dremio's optimizer decides at planning time whether to use a Reflection or scan raw data. No query rewrites or tool configuration changes are needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What types of Reflections does Dremio support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio supports two types: Raw Reflections (pre-scanned, compacted, and optionally sorted/partitioned copies of the source data for fast full-scan queries) and Aggregation Reflections (pre-aggregated rollups storing GROUP BY results for instant OLAP-style queries)."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Dremio Reflections</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Dremio Reflections: The Definitive Guide</h1>
+      <p class="hero-lede">Dremio Reflections are intelligent, pre-computed materializations that transparently accelerate queries on Apache Iceberg data. No query rewrites, no BI tool changes — Dremio's optimizer automatically routes queries to the best available Reflection, delivering sub-second analytics on petabyte-scale lakehouses.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Are Dremio Reflections?</a></li>
+        <li><a href="#section-2">Raw Reflections</a></li>
+        <li><a href="#section-3">Aggregation Reflections</a></li>
+        <li><a href="#section-4">Reflection Transparency and Autonomy</a></li>
+        <li><a href="#section-5">Reflection Refresh and Staleness</a></li>
+        <li><a href="#section-6">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Are Dremio Reflections?</h2>
+        <p><strong>Dremio Reflections</strong> are the materialized query acceleration technology at the heart of <a href="dremio.html">Dremio's</a> sub-second BI performance. A Reflection is a pre-computed, optimized representation of all or part of an <a href="apache-iceberg.html">Apache Iceberg</a> table or <a href="virtual-datasets.html">Virtual Dataset</a>, stored as an Iceberg table in Dremio-managed storage. When a query arrives, Dremio's query optimizer considers all available Reflections and automatically routes the query to the most beneficial one — transparently, without any modification to the query or BI tool.</p><p>Reflections solve the fundamental tension in analytics between data freshness and query performance. Raw Iceberg data on object storage is always current, but scanning it for complex aggregations across billions of rows takes seconds to minutes. Pre-aggregated data answers those queries in milliseconds, but maintaining a separate summary table requires pipeline engineering. Reflections bridge this gap: Dremio automatically maintains the pre-computed materializations, automatically refreshes them when source data changes, and automatically routes queries to them.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Raw Reflections</h2>
+        <p><strong>Raw Reflections</strong> are pre-scanned, compacted, and optionally sorted copies of source Iceberg tables. They are beneficial for queries that scan large amounts of raw data — full-table reads, large range scans, and queries joining multiple large tables.</p><p>A Raw Reflection pre-reads source Parquet files, applies column projection (retaining only the columns included in the Reflection), applies optional sorting and partitioning for optimized access patterns, and stores the result as a compact Iceberg table in Dremio's Reflection store. When a query against the source table can be answered by the columns in the Raw Reflection, Dremio routes it to the Reflection — which may be 5–50x smaller than the original table due to column projection and compaction.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Dremio Reflections Acceleration Architecture diagram" loading="lazy"><figcaption>Figure 1: Dremio Reflections sit between the query and raw data — the optimizer routes queries to the best Reflection.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Aggregation Reflections</h2>
+        <p><strong>Aggregation Reflections</strong> pre-compute GROUP BY aggregations — sums, counts, averages, min/max — across specified dimension and measure columns. They are specifically designed for OLAP-style analytical queries: revenue by region by month, order counts by product category by day, customer activity metrics by segment.</p><p>An Aggregation Reflection stores the pre-computed grouped result as a compact Iceberg table. When a query arrives that requests aggregations matching (or derivable from) a Reflection's pre-computed groupings, Dremio routes it to the Reflection. A query for "revenue by region" can be answered by a Reflection that pre-computed "revenue by region by product" — Dremio re-aggregates the Reflection's product-level data to produce region-level totals, which is far faster than scanning the original row-level table.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Reflection Transparency and Autonomy</h2>
+        <p>Two properties make Reflections uniquely powerful compared to traditional materialized views:</p><h3>Query Transparency</h3><p>Reflections are completely transparent to query writers. A BI analyst writing <code>SELECT region, SUM(revenue) FROM sales GROUP BY region</code> does not know or care whether Dremio routes this to a raw Iceberg scan or an Aggregation Reflection. The result is identical — only the latency differs (seconds vs. milliseconds). No query changes, no BI tool reconfiguration, no analyst training required.</p><h3>Autonomous Reflections</h3><p><a href="autonomous-reflections.html">Autonomous Reflections</a> extend the concept further: Dremio analyzes historical query patterns and automatically creates, modifies, and drops Reflections to optimize for the actual query workload. Instead of requiring a data engineer to manually design and maintain Reflections, Autonomous Reflections continuously optimize the acceleration layer based on observed usage.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Dremio Reflections Transparency diagram" loading="lazy"><figcaption>Figure 2: Reflection routing is transparent — BI tools, analysts, and AI agents all benefit automatically.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Reflection Refresh and Staleness</h2>
+        <p>Reflections must be kept synchronized with their source Iceberg tables to remain useful. Dremio supports three refresh strategies:</p><ul><li><strong>Full refresh:</strong> Recompute the entire Reflection from the current source snapshot. Accurate but expensive for large tables.</li><li><strong>Incremental refresh:</strong> Read only the new Iceberg snapshots since the last refresh and append or update the Reflection incrementally. Much more efficient for large tables with regular appends.</li><li><strong>Never refresh (manual):</strong> Used for static reference data that changes infrequently.</li></ul><p>When a Reflection becomes stale (the source has been updated but the Reflection has not yet refreshed), Dremio can either serve queries from the stale Reflection (acceptable for BI dashboards with moderate staleness tolerance) or fall back to scanning raw source data (guaranteeing freshness at the cost of performance). This behavior is configurable per Reflection.
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Summary</h2>
+        <p>Dremio Reflections are the technology that makes the <a href="data-lakehouse.html">data lakehouse</a> competitive with a proprietary cloud data warehouse for BI performance. By pre-computing optimized materializations of Iceberg data and transparently routing queries to them, Reflections deliver sub-second response times on petabyte-scale lakehouses without any sacrifice of data openness, engine flexibility, or query compatibility. For any organization running <a href="dremio.html">Dremio</a> as their lakehouse query engine, Reflections are the first optimization lever to pull for improving dashboard performance.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">The platform providing Reflections acceleration.</span>
+    </a>
+      <a class="related-card" href="autonomous-reflections.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Autonomous Reflections</span>
+      <span class="related-desc">AI-driven automatic Reflection management.</span>
+    </a>
+      <a class="related-card" href="virtual-datasets.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Virtual Datasets</span>
+      <span class="related-desc">Semantic layer views that Reflections can accelerate.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Reflections are stored as and built on Iceberg tables.</span>
+    </a>
+      <a class="related-card" href="semantic-layer.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Semantic Layer</span>
+      <span class="related-desc">Reflections accelerate the semantic layer query path.</span>
+    </a>
+      <a class="related-card" href="query-optimization.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Query Optimization</span>
+      <span class="related-desc">Reflection matching is part of Dremio's query optimization.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Reflections use compacted Iceberg files for fast reads.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Reflections make the lakehouse competitive for BI.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

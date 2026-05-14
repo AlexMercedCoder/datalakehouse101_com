@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dremio Open Catalog: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Dremio Open Catalog is, how it implements the Iceberg REST Catalog spec with Git-like Nessie branching, and why it enables true multi-engine lakehouse interoperability.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/dremio-open-catalog.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Dremio Open Catalog: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Dremio Open Catalog is, how it implements the Iceberg REST Catalog spec with Git-like Nessie branching, and why it enables true multi-engine lakehouse interoperability.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/dremio-open-catalog.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Dremio Open Catalog: The Definitive Guide",
+      "description": "Learn what Dremio Open Catalog is, how it implements the Iceberg REST Catalog spec with Git-like Nessie branching, and why it enables true multi-engine lakehouse interoperability.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/dremio-open-catalog.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Dremio Open Catalog", "item": "https://datalakehouse101.com/knowledge/dremio-open-catalog.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Dremio Open Catalog?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio Open Catalog is Dremio's Apache Iceberg catalog service that implements the Iceberg REST Catalog API specification, powered by Project Nessie for Git-like table branching and tagging. It allows any Iceberg-compatible engine (Spark, Trino, Flink, Dremio) to create, read, and update Iceberg tables through a shared, interoperable catalog."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Dremio Open Catalog differ from AWS Glue or Hive Metastore?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio Open Catalog implements the Iceberg REST Catalog spec natively, supports Git-like branching (via Nessie) for isolated data experimentation, and includes credential vending for secure storage access. AWS Glue is AWS-specific; Hive Metastore is pre-REST-Catalog era and lacks Iceberg-native semantics."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can Spark and Trino use Dremio Open Catalog?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Any engine implementing the Iceberg REST catalog client — Spark, Trino, Flink, PyIceberg — can connect to Dremio Open Catalog using standard REST catalog configuration. Tables created by Spark are immediately visible to Dremio and Trino, and vice versa."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Dremio Open Catalog</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Dremio Open Catalog: The Definitive Guide</h1>
+      <p class="hero-lede">Dremio Open Catalog is an Apache Iceberg-native catalog that implements the Iceberg REST Catalog specification with Git-like branching and tagging via Project Nessie. Any engine — Spark, Trino, Flink — can connect to it, making Dremio the open catalog for the multi-engine lakehouse.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Dremio Open Catalog?</a></li>
+        <li><a href="#section-2">Key Open Catalog Features</a></li>
+        <li><a href="#section-3">Connecting to Dremio Open Catalog</a></li>
+        <li><a href="#section-4">Open Catalog and Data Governance</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Dremio Open Catalog?</h2>
+        <p><strong>Dremio Open Catalog</strong> is <a href="dremio.html">Dremio's</a> Apache Iceberg catalog service — the metadata store that registers Iceberg tables, manages namespaces, and coordinates access across multiple query engines. It implements the <a href="iceberg-rest-catalog.html">Iceberg REST Catalog specification</a>, meaning any engine with an Iceberg REST catalog client can connect to it as a drop-in catalog backend.</p><p>Under the hood, Dremio Open Catalog is powered by <a href="project-nessie.html">Project Nessie</a> — the Git-like transactional catalog developed by Dremio. Nessie adds branching and tagging semantics on top of the Iceberg snapshot model: data engineers can create isolated branches for experiments, merge changes atomically when validated, and tag specific table states for reproducible ML training datasets.</p><p>Dremio Open Catalog is available both as part of <a href="dremio-cloud.html">Dremio Cloud</a> (managed, serverless) and as a standalone service that can be deployed independently for organizations that want a managed open catalog without using Dremio as their primary query engine.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Key Open Catalog Features</h2>
+        <p>Dremio Open Catalog provides capabilities beyond basic catalog registration:</p><h3>Iceberg REST API Compliance</h3><p>Full implementation of the Iceberg REST Catalog specification — namespaces, table CRUD, metadata load, transaction commit, token-based auth. Any conformant Iceberg client connects without modification.</p><h3>Git-Like Branching (Nessie)</h3><p>Create branches for isolated data experimentation. Commit changes atomically. Merge branches when validated. Tag specific commits for reproducible ML datasets. All the power of Git workflows applied to lakehouse tables.</p><h3>Credential Vending</h3><p>The catalog returns short-lived, scoped cloud storage credentials alongside table metadata. Engines get exactly the permissions needed to read or write the specific table requested — no broad long-lived credentials required.</p><h3>Multi-Engine Interoperability</h3><p>Tables registered in Dremio Open Catalog are accessible simultaneously by Dremio, Apache Spark, Trino, Apache Flink, and any other Iceberg REST catalog client. Schema changes from one engine are immediately visible to all others.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Dremio Open Catalog Architecture diagram" loading="lazy"><figcaption>Figure 1: Dremio Open Catalog as the shared Iceberg catalog for a multi-engine lakehouse.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Connecting to Dremio Open Catalog</h2>
+        <p>Connecting any Iceberg-compatible engine to Dremio Open Catalog uses the standard Iceberg REST catalog configuration:</p><p><strong>Apache Spark:</strong></p><pre><code>spark.sql.catalog.dremio=org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.dremio.type=rest
+spark.sql.catalog.dremio.uri=https://your-catalog.dremio.cloud
+spark.sql.catalog.dremio.credential=&lt;token&gt;</code></pre><p><strong>Trino:</strong></p><pre><code>connector.name=iceberg
+iceberg.catalog.type=rest
+iceberg.rest-catalog.uri=https://your-catalog.dremio.cloud
+iceberg.rest-catalog.security=OAUTH2</code></pre><p>Once connected, tables created or modified by any engine appear in all other engines immediately — through the shared catalog's consistent metadata view.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Open Catalog and Data Governance</h2>
+        <p>Dremio Open Catalog enforces access control at the catalog API layer — not in the query engine. This means security policies are consistent regardless of which engine is querying. A principal without access to a namespace cannot load that namespace's table metadata, regardless of whether they're using Dremio, Spark, or Trino.</p><p>Access control in Dremio Open Catalog is managed through role-based policies on namespaces and tables: read access, write access, manage (create/drop) access, and admin. Combined with credential vending, this creates a security model where neither the query engine nor the storage credentials need to carry the full security policy — the catalog is the enforcement point.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Open Catalog Multi-Engine Governance diagram" loading="lazy"><figcaption>Figure 2: Open Catalog enforces governance consistently across all connected engines.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Dremio Open Catalog is the practical implementation of the open lakehouse vision: a vendor-neutral, Iceberg REST Catalog compliant metadata store that any engine can use, governed consistently regardless of client, and extended with Git-like branching for advanced data engineering workflows. For organizations building multi-engine lakehouses on <a href="apache-iceberg.html">Apache Iceberg</a>, Dremio Open Catalog provides the catalog foundation that makes true engine interoperability a reality.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">The platform providing Open Catalog.</span>
+    </a>
+      <a class="related-card" href="project-nessie.html">
+      <span class="related-label">Catalogs</span>
+      <span class="related-term">Project Nessie</span>
+      <span class="related-desc">Git-like catalog engine powering Open Catalog.</span>
+    </a>
+      <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">The API spec implemented by Open Catalog.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format Open Catalog manages.</span>
+    </a>
+      <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">Alternative open REST Catalog implementation.</span>
+    </a>
+      <a class="related-card" href="multi-engine-interoperability.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Multi-Engine Interoperability</span>
+      <span class="related-desc">What Open Catalog enables across engines.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Access control enforced at the catalog layer.</span>
+    </a>
+      <a class="related-card" href="dremio-cloud.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Cloud</span>
+      <span class="related-desc">Managed hosting of Dremio Open Catalog.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+{
+  "slug": "predicate-pushdown",
+  "term": "Predicate Pushdown",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Predicate Pushdown: The Definitive Guide",
+  "metaDescription": "Learn what predicate pushdown is, how it works in Apache Iceberg and Parquet, and why it is one of the most important query optimization techniques in the data lakehouse.",
+  "h1": "Predicate Pushdown: The Definitive Guide",
+  "lede": "Predicate pushdown is the query optimization technique that moves filter conditions as close to the data source as possible \u2014 into metadata, into file footers, and into storage readers \u2014 eliminating irrelevant data before it is ever read into memory. It is the single most impactful optimization for large-scale lakehouse queries.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is predicate pushdown?",
+      "a": "Predicate pushdown is a query optimization technique where filter conditions (predicates) from a SQL WHERE clause are applied at the earliest possible point in the data access chain \u2014 into the metadata layer, file format readers, and storage systems \u2014 rather than filtering after data has been read into memory. It eliminates the reading of irrelevant data entirely."
+    },
+    {
+      "q": "How does predicate pushdown work with Apache Iceberg?",
+      "a": "In Apache Iceberg, predicate pushdown operates at three levels: manifest list pruning (eliminating entire manifest files whose partition summaries don't satisfy the predicate), manifest file pruning (eliminating data files whose min/max statistics don't satisfy the predicate), and Parquet row group pruning (eliminating row groups within data files using embedded column statistics)."
+    },
+    {
+      "q": "What is partition pruning vs. predicate pushdown?",
+      "a": "Partition pruning is a specific type of predicate pushdown that eliminates entire data files or directories based on partition values. General predicate pushdown also includes file-level statistics pruning (min/max), row group pruning within files, and predicate evaluation in the storage reader before rows are returned to the engine. Partition pruning is the coarsest-grained form; row group pruning is the finest."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Predicate Pushdown?",
+      "content": "<p><strong>Predicate pushdown</strong> is the query optimization technique of moving SQL filter conditions (predicates) as far down the data access chain as possible \u2014 ideally into the metadata layer or the storage reader itself \u2014 so that irrelevant data is never read into engine memory at all. It is the foundational optimization that makes analytical queries on large-scale <a href=\"data-lakehouse.html\">data lakehouses</a> practical.</p><p>Without predicate pushdown, a query like <code>SELECT * FROM orders WHERE order_date = '2026-01-01'</code> would read all 10TB of historical order data into memory and filter it there \u2014 an obviously wasteful approach. With predicate pushdown, the storage reader identifies which files contain January 1st data (using partition metadata and file statistics) and reads only those files \u2014 perhaps 27GB instead of 10TB.</p><p>The term 'pushdown' refers to the direction of optimization: filter conditions are 'pushed down' from the query plan (which operates at a high, logical level) through multiple layers toward the storage system (which operates at a low, physical level). The further down the filter is pushed, the less data must be read."
+    },
+    {
+      "heading": "Predicate Pushdown in Apache Iceberg",
+      "content": "<p><a href=\"apache-iceberg.html\">Apache Iceberg's</a> three-level metadata architecture creates three distinct opportunities for predicate pushdown:</p><h3>Level 1: Manifest List Pruning</h3><p>The manifest list contains partition-level summary statistics for each manifest file. The query engine applies predicates to these summaries, eliminating entire manifest files that cannot contain relevant rows. A table with 1000 manifest files may have 990 eliminated at this level \u2014 reducing subsequent metadata reads by 99%.</p><h3>Level 2: Manifest File Pruning (Data Skipping)</h3><p>Each manifest file contains per-data-file column statistics (min/max values, null counts). The engine applies predicates to these per-file statistics, eliminating data files that cannot contain rows satisfying the filter. A partition's 100 data files may be reduced to 3 relevant files at this level.</p><h3>Level 3: Parquet Row Group Pruning</h3><p>Within each data file, <a href=\"apache-parquet.html\">Parquet</a> stores per-row-group column statistics. The engine applies predicates within the file, eliminating row groups (typically 128MB each) that cannot contain relevant rows. A 500MB file with 4 row groups may result in only 1 row group being read.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Predicate Pushdown Three Levels Iceberg",
+      "diagramCaption": "Figure 1: Predicate pushdown at three levels in Iceberg \u2014 manifest list, manifest files, Parquet row groups."
+    },
+    {
+      "heading": "Partition Pruning as Predicate Pushdown",
+      "content": "<p>Partition pruning is the most commonly discussed form of predicate pushdown. In <a href=\"apache-iceberg.html\">Apache Iceberg</a> with <a href=\"hidden-partitioning.html\">hidden partitioning</a>, partition pruning works transparently: a query with <code>WHERE event_date = '2026-01-15'</code> triggers Iceberg's partition transform evaluation (<code>days(event_time)</code> for the 2026-01-15 day value) and eliminates all manifest files and data files in other day partitions. No data from other days is read.</p><p>The power of Iceberg's partition pruning relative to Hive-style partitioning is that it works automatically from predicates on the original data columns \u2014 users do not need to know or filter on a synthetic partition column. The engine applies the partition transform to convert the data column predicate into a partition value predicate transparently."
+    },
+    {
+      "heading": "Predicate Pushdown to Federated Sources",
+      "content": "<p>In federated query scenarios \u2014 where <a href=\"dremio.html\">Dremio</a> or <a href=\"trino.html\">Trino</a> queries a PostgreSQL table alongside Iceberg tables \u2014 predicate pushdown extends to the source database. The engine pushes filter predicates from the SQL WHERE clause into the SQL query sent to PostgreSQL, ensuring that the database applies the filter before transmitting results over the network.</p><p>Without predicate pushdown to PostgreSQL, the engine would request all rows from the database table and filter them locally \u2014 unnecessarily transferring potentially millions of rows over the network. With pushdown, only matching rows are returned from PostgreSQL, minimizing network transfer and database load.",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Predicate Pushdown Federated Sources",
+      "diagramCaption": "Figure 2: Predicate pushdown to federated sources \u2014 filters applied at the source, not after network transfer."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Predicate pushdown is the single most impactful query optimization technique in the data lakehouse. By pushing filter conditions into <a href=\"apache-iceberg.html\">Iceberg's</a> metadata hierarchy and <a href=\"apache-parquet.html\">Parquet's</a> file statistics, it eliminates the vast majority of data from consideration before any bytes are read from storage \u2014 transforming what would be full-table scans into targeted reads of a tiny fraction of the data. Every major lakehouse query engine implements predicate pushdown, and every data engineering decision that affects data layout (partitioning, sorting, Z-ordering) is ultimately about making predicate pushdown more effective.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Three-level metadata enabling multi-tier predicate pushdown."
+    },
+    {
+      "slug": "iceberg-manifest-files",
+      "term": "Iceberg Manifest Files",
+      "category": "Table Formats",
+      "desc": "File statistics used for manifest-level predicate pushdown."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "Row group statistics for within-file predicate pushdown."
+    },
+    {
+      "slug": "hidden-partitioning",
+      "term": "Hidden Partitioning",
+      "category": "Table Formats",
+      "desc": "Partition pruning via hidden partition transforms."
+    },
+    {
+      "slug": "data-skipping",
+      "term": "Data Skipping",
+      "category": "Analytics & BI",
+      "desc": "File-level skipping enabled by predicate pushdown."
+    },
+    {
+      "slug": "column-pruning",
+      "term": "Column Pruning",
+      "category": "Query Engines & Platforms",
+      "desc": "Companion optimization \u2014 eliminate columns, predicate eliminates rows."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Applies multi-level predicate pushdown aggressively."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "Predicate pushdown as a core query optimization."
+    }
+  ]
+}

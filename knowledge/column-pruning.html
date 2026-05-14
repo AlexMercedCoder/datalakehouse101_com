@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Column Pruning: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what column pruning is, how it works with Apache Parquet's columnar storage, and why it dramatically reduces I/O for analytical queries in the data lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/column-pruning.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Column Pruning: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what column pruning is, how it works with Apache Parquet's columnar storage, and why it dramatically reduces I/O for analytical queries in the data lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/column-pruning.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Column Pruning: The Definitive Guide",
+      "description": "Learn what column pruning is, how it works with Apache Parquet's columnar storage, and why it dramatically reduces I/O for analytical queries in the data lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/column-pruning.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Column Pruning", "item": "https://datalakehouse101.com/knowledge/column-pruning.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is column pruning in query optimization?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Column pruning is the query optimization technique of reading only the columns referenced by a SQL query from the underlying data files, rather than reading the entire row. Also called column projection pushdown, it is most effective with columnar file formats like Apache Parquet, where individual columns are stored contiguously and can be read independently."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does column pruning work with Apache Parquet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Parquet stores each column's data in separate column chunks within each row group. A query engine implementing column pruning reads only the column chunks for columns referenced in the SQL query's SELECT, WHERE, JOIN, and GROUP BY clauses — skipping all other column chunks entirely. Parquet's file footer contains byte offsets for each column chunk, enabling direct seeks to relevant columns."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does column pruning require any special configuration?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Column pruning is implemented automatically by all major lakehouse query engines (Dremio, Spark, Trino, Flink) when reading Parquet or ORC files. The query planner identifies which columns are needed, pushes the column projection to the storage reader, and the reader selects only those columns from the file format."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Column Pruning</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Column Pruning: The Definitive Guide</h1>
+      <p class="hero-lede">Column pruning eliminates unneeded columns from the data read path — reading only the columns referenced in a SQL query from Parquet files rather than every column in the table. In wide tables with 100+ columns, column pruning can reduce I/O by 90% or more for typical analytical queries.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Column Pruning?</a></li>
+        <li><a href="#section-2">How Column Pruning Works with Apache Parquet</a></li>
+        <li><a href="#section-3">Column Pruning and the Medallion Architecture</a></li>
+        <li><a href="#section-4">Column Pruning in Dremio</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Column Pruning?</h2>
+        <p><strong>Column pruning</strong> (also called <strong>column projection pushdown</strong>) is the query optimization technique of reading only the columns that a SQL query actually needs from the underlying data files, rather than reading all columns for every row. It is the columnar storage equivalent of <a href="predicate-pushdown.html">predicate pushdown</a>: where predicate pushdown eliminates rows, column pruning eliminates columns.</p><p>Column pruning is particularly powerful in wide table scenarios common in the lakehouse: a table with 200 columns storing all customer attributes, behavioral signals, and computed features. A dashboard query that needs only 5 of those columns — name, email, segment, LTV, last_purchase_date — can read roughly 2.5% of the total data by reading only those 5 column chunks. The other 195 column chunks are never fetched from object storage.</p><p>This optimization is only possible because of the columnar storage format of <a href="apache-parquet.html">Apache Parquet</a> and Apache ORC: each column's data is stored contiguously and independently, with byte offsets in the file footer that allow direct seeks. In a row-oriented format (like CSV or traditional OLTP storage), column pruning is impossible without reading and discarding the unwanted column values for each row.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>How Column Pruning Works with Apache Parquet</h2>
+        <p><a href="apache-parquet.html">Apache Parquet's</a> physical layout enables column pruning at the byte level:</p><ol><li>The query engine reads the Parquet file footer, which contains the column schema and the byte offset and size of each column chunk within each row group</li><li>The query planner identifies which columns are needed (from SELECT, WHERE, GROUP BY, JOIN ON clauses)</li><li>The storage reader seeks directly to the byte offsets of only the needed column chunks, reading only those bytes from S3 or ADLS</li><li>For columns that are not needed, zero bytes are read from storage — not just filtered in memory, but never fetched at all</li></ol><p>The combination of column pruning (read fewer columns) and <a href="predicate-pushdown.html">predicate pushdown</a> (read fewer rows) is what makes analytical queries on wide, large Parquet tables practical at sub-second latency.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Column Pruning Parquet Column Chunks diagram" loading="lazy"><figcaption>Figure 1: Column pruning reads only needed column chunks from Parquet files — skipping unreferenced columns entirely.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Column Pruning and the Medallion Architecture</h2>
+        <p>Column pruning is especially impactful at the Gold layer of the <a href="medallion-architecture.html">Medallion Architecture</a>, where wide tables often store dozens or hundreds of pre-computed attributes. Common Gold table patterns:</p><ul><li><strong>Customer 360 table:</strong> 150+ columns covering demographics, behavior, segments, scores. Most queries need 5–10 columns. Column pruning reads 3–7% of the data.</li><li><strong>Product attributes table:</strong> 200 columns covering all product metadata. A price analysis query reads only 3 columns. Column pruning reads 1.5% of the data.</li><li><strong>Event fact table:</strong> 50 columns capturing all event attributes. An engagement funnel query reads 8 columns. Column pruning reads 16% of the data.</li></ul><p>In each case, column pruning transforms what would be a full-width table scan into a narrow column read — the difference between seconds and milliseconds for interactive BI queries.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Column Pruning in Dremio</h2>
+        <p><a href="dremio.html">Dremio</a> implements column pruning at multiple levels of its query pipeline:</p><ul><li><strong>Logical planning:</strong> The Dremio planner analyzes the query's column references across all SQL clauses (SELECT, WHERE, JOIN, GROUP BY, HAVING, ORDER BY) and produces a minimal column set</li><li><strong>Physical planning:</strong> Column projections are pushed into the Iceberg scan operator, which passes them to the Parquet reader</li><li><strong>Parquet reader:</strong> Only the specified column chunks are fetched from S3/ADLS, with byte-level precision using Parquet footer offsets</li><li><strong>Arrow execution:</strong> Data enters Dremio's vectorized pipeline as Arrow RecordBatches containing only the needed columns — subsequent operators never see or allocate memory for pruned columns</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Column Pruning Dremio Pipeline diagram" loading="lazy"><figcaption>Figure 2: Column pruning flows through Dremio's entire pipeline — from SQL planner to Parquet byte reads.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Column pruning is a foundational query optimization that works automatically in every modern <a href="data-lakehouse.html">data lakehouse</a> engine. By reading only the columns a SQL query needs from <a href="apache-parquet.html">Apache Parquet</a> files, it eliminates the vast majority of storage I/O for wide-table queries — the common pattern in Gold layer analytics. Together with <a href="predicate-pushdown.html">predicate pushdown</a> (eliminating rows), column pruning and predicate pushdown are the two most impactful query optimizations for large-scale analytical workloads, and choosing columnar file formats like Parquet is what makes both optimizations possible.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="predicate-pushdown.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Predicate Pushdown</span>
+      <span class="related-desc">Row elimination — the companion to column pruning.</span>
+    </a>
+      <a class="related-card" href="apache-parquet.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Parquet</span>
+      <span class="related-desc">Columnar format enabling independent column reads.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Column pruning applied to Iceberg's Parquet data files.</span>
+    </a>
+      <a class="related-card" href="data-skipping.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Data Skipping</span>
+      <span class="related-desc">File-level skipping complementing column-level pruning.</span>
+    </a>
+      <a class="related-card" href="vectorized-execution.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Vectorized Query Execution</span>
+      <span class="related-desc">Columnar execution that processes only pruned columns.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Applies column pruning through entire query pipeline.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Wide Gold tables benefit enormously from column pruning.</span>
+    </a>
+      <a class="related-card" href="query-optimization.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Query Optimization</span>
+      <span class="related-desc">Column pruning as a core optimization strategy.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

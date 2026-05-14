@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dremio Cloud: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Dremio Cloud is, how its serverless lakehouse platform works on AWS and Azure, and how it compares to Snowflake and Databricks for open lakehouse analytics.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/dremio-cloud.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Dremio Cloud: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Dremio Cloud is, how its serverless lakehouse platform works on AWS and Azure, and how it compares to Snowflake and Databricks for open lakehouse analytics.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/dremio-cloud.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Dremio Cloud: The Definitive Guide",
+      "description": "Learn what Dremio Cloud is, how its serverless lakehouse platform works on AWS and Azure, and how it compares to Snowflake and Databricks for open lakehouse analytics.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/dremio-cloud.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Dremio Cloud", "item": "https://datalakehouse101.com/knowledge/dremio-cloud.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Dremio Cloud?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio Cloud is the fully managed, SaaS version of the Dremio data lakehouse platform. It runs on AWS and Azure, connects to your own S3 or ADLS storage, and provides a managed Dremio query engine, Open Catalog, Reflections, and semantic layer — all without infrastructure management on your part."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Dremio Cloud require moving data into Dremio's storage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Dremio Cloud connects to your own cloud storage (S3 or ADLS Gen2). Your data stays in your account in open Apache Iceberg format. Dremio Cloud reads and writes to your storage, but does not copy or import data into proprietary Dremio storage."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Dremio Cloud pricing work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio Cloud uses consumption-based pricing — you pay for the compute resources used while queries are executing. Compute engines auto-scale up when queries arrive and wind down during idle periods, so you only pay for what you use. Storage costs are charged directly by your cloud provider (S3/ADLS), not by Dremio."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Dremio Cloud</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Dremio Cloud: The Definitive Guide</h1>
+      <p class="hero-lede">Dremio Cloud is the fully managed, serverless lakehouse platform on AWS and Azure. It delivers sub-second BI, Iceberg table management, and AI-ready data access on your own cloud storage — with no infrastructure to manage, auto-scaling compute, and consumption-based pricing.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Dremio Cloud?</a></li>
+        <li><a href="#section-2">Dremio Cloud Architecture</a></li>
+        <li><a href="#section-3">Dremio Cloud vs. Snowflake vs. Databricks</a></li>
+        <li><a href="#section-4">Getting Started with Dremio Cloud</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Dremio Cloud?</h2>
+        <p><strong>Dremio Cloud</strong> is the fully managed SaaS version of <a href="dremio.html">Dremio's</a> data lakehouse platform, available on AWS and Microsoft Azure. It provides all of Dremio's capabilities — SQL query engine, <a href="dremio-reflections.html">Reflections</a>, <a href="dremio-open-catalog.html">Open Catalog</a>, semantic layer, and BI tool connectivity — as a managed service with no infrastructure deployment, patching, or scaling to manage.</p><p>The key architectural principle of Dremio Cloud is <strong>BYOS (Bring Your Own Storage)</strong>: Dremio Cloud connects to your existing cloud storage bucket (S3 on AWS, ADLS Gen2 on Azure), reads and writes data in open <a href="apache-iceberg.html">Apache Iceberg</a> format, and leaves all data in your account under your control. Unlike Snowflake or Databricks (which store data in their own managed storage by default), Dremio Cloud does not create a proprietary copy of your data.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Dremio Cloud Architecture</h2>
+        <p>Dremio Cloud's multi-tenant architecture separates the control plane (managed by Dremio) from the data plane (running in your cloud account):</p><h3>Control Plane (Dremio-Managed)</h3><p>The catalog, metadata service, query coordinator, and UI are managed by Dremio as a shared SaaS service. These components are multi-tenant but isolated per organization.</p><h3>Data Plane (Customer Cloud Account)</h3><p>Query execution engines run in the customer's own AWS or Azure account, in a Dremio-managed VPC. This ensures that raw data bytes never leave the customer's cloud account — the execution happens close to the data. Dremio manages the compute scaling, health monitoring, and software updates for the data plane engines.</p><h3>Auto-Scaling Engines</h3><p>Dremio Cloud provides named virtual engines (e.g., "BI-Engine", "ETL-Engine") that auto-scale based on query load. Each engine is a cluster of Arrow-based query executors. Engines can be independently sized and configured for different workload types.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Dremio Cloud Architecture BYOS diagram" loading="lazy"><figcaption>Figure 1: Dremio Cloud — managed control plane, customer-account data plane, your own cloud storage.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Dremio Cloud vs. Snowflake vs. Databricks</h2>
+        <table class="comparison-table"><thead><tr><th>Dimension</th><th>Dremio Cloud</th><th>Snowflake</th><th>Databricks</th></tr></thead><tbody><tr><td>Data storage</td><td>Your S3/ADLS (open Iceberg)</td><td>Snowflake proprietary</td><td>Your storage (Delta/Iceberg)</td></tr><tr><td>Table format</td><td>Apache Iceberg (open)</td><td>Proprietary (FDN)</td><td>Delta Lake / Iceberg</td></tr><tr><td>Multi-engine access</td><td>Yes — Iceberg REST Catalog</td><td>Limited (Snowflake Iceberg tables)</td><td>Yes — Unity Catalog</td></tr><tr><td>BI acceleration</td><td>Reflections (transparent)</td><td>Result cache</td><td>No native equivalent</td></tr><tr><td>Pricing model</td><td>Consumption (credits)</td><td>Consumption (credits)</td><td>DBU consumption</td></tr><tr><td>Semantic layer</td><td>Built-in AI Semantic Layer</td><td>None built-in</td><td>None built-in</td></tr></tbody></table>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Getting Started with Dremio Cloud</h2>
+        <p>Starting with Dremio Cloud requires:</p><ol><li>Sign up at <code>dremio.com/get-started</code> (free trial available)</li><li>Connect your AWS S3 bucket or Azure ADLS Gen2 as a storage source</li><li>Create or register Apache Iceberg tables via Dremio's SQL editor or catalog UI</li><li>Connect BI tools (Tableau, Power BI) via Dremio's ODBC/JDBC drivers</li><li>Configure <a href="dremio-reflections.html">Reflections</a> for your most-queried tables</li></ol><p>The entire setup takes less than 30 minutes for a basic deployment. Dremio's free trial includes sufficient compute credits to evaluate the platform with production-scale data.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Dremio Cloud Getting Started diagram" loading="lazy"><figcaption>Figure 2: Dremio Cloud connects BI tools, AI agents, and SQL clients to your own Iceberg data in minutes.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Dremio Cloud makes the open <a href="data-lakehouse.html">data lakehouse</a> accessible without infrastructure expertise. By managing all platform components while leaving your data in open <a href="apache-iceberg.html">Apache Iceberg</a> format on your own cloud storage, Dremio Cloud delivers enterprise-grade analytics performance with the openness and portability that proprietary cloud warehouses cannot match. For organizations wanting to move beyond Snowflake or Databricks lock-in, Dremio Cloud is the most complete managed open lakehouse alternative.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">The underlying platform behind Dremio Cloud.</span>
+    </a>
+      <a class="related-card" href="dremio-reflections.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Reflections</span>
+      <span class="related-desc">BI acceleration available in Dremio Cloud.</span>
+    </a>
+      <a class="related-card" href="dremio-open-catalog.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Open Catalog</span>
+      <span class="related-desc">Managed Iceberg catalog in Dremio Cloud.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The open format your data stays in.</span>
+    </a>
+      <a class="related-card" href="object-storage.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Object Storage</span>
+      <span class="related-desc">S3 and ADLS — Dremio Cloud's storage layer.</span>
+    </a>
+      <a class="related-card" href="decoupled-storage-compute.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Decoupled Storage and Compute</span>
+      <span class="related-desc">The architecture Dremio Cloud embodies.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The pattern Dremio Cloud delivers as a managed service.</span>
+    </a>
+      <a class="related-card" href="semantic-layer.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Semantic Layer</span>
+      <span class="related-desc">Dremio Cloud's built-in AI Semantic Layer.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

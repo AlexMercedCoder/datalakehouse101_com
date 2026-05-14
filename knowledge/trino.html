@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trino: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Trino is, how its federated SQL query engine works across Apache Iceberg and other data sources, and when to use Trino in your data lakehouse architecture.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/trino.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Trino: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Trino is, how its federated SQL query engine works across Apache Iceberg and other data sources, and when to use Trino in your data lakehouse architecture.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/trino.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Trino: The Definitive Guide for Data Lakehouse",
+      "description": "Learn what Trino is, how its federated SQL query engine works across Apache Iceberg and other data sources, and when to use Trino in your data lakehouse architecture.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/trino.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Trino", "item": "https://datalakehouse101.com/knowledge/trino.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Trino?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Trino (formerly PrestoSQL) is an open-source, distributed SQL query engine designed for fast, interactive analytics across heterogeneous data sources. It can query Apache Iceberg, Hive, PostgreSQL, MySQL, Kafka, and dozens of other sources simultaneously using a single ANSI SQL query."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between Trino and Presto?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Trino is the continuation of the original Presto project created at Facebook. In 2020, the Presto open-source project forked: the original Facebook engineering team retained the 'Presto' name (now governed by the Presto Foundation), while the independent team renamed their fork 'Trino'. Both share a common codebase but have diverged significantly since the fork."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I use Trino instead of Dremio or Spark?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use Trino for ad-hoc federated SQL across multiple catalogs and data sources, when you need strong ANSI SQL compliance, or when you are running infrastructure where Trino's open-source, self-hosted model fits better than Dremio's. Use Dremio when you need a built-in semantic layer, BI tool optimization (Reflections), and a managed SaaS option."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Trino</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Trino: The Definitive Guide for Data Lakehouse</h1>
+      <p class="hero-lede">Trino is the open-source distributed SQL query engine built for federated analytics across heterogeneous data sources. In the data lakehouse, Trino excels at ad-hoc SQL across Apache Iceberg tables and external databases simultaneously — the engine of choice for multi-source interactive analytics.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Trino?</a></li>
+        <li><a href="#section-2">Trino and Apache Iceberg</a></li>
+        <li><a href="#section-3">Trino vs. Dremio vs. Spark</a></li>
+        <li><a href="#section-4">Trino Ecosystem: Starburst and AWS Athena</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Trino?</h2>
+        <p><strong>Trino</strong> (originally PrestoSQL, renamed in 2021) is an open-source, distributed SQL query engine designed for fast, interactive analytics across heterogeneous data sources. Originally developed at Facebook as Presto in 2012, Trino enables a single ANSI SQL query to span multiple, disparate data sources — <a href="apache-iceberg.html">Apache Iceberg</a> tables in S3, PostgreSQL databases, MySQL tables, Kafka streams, and dozens of other sources — without any data movement or ETL.</p><p>Trino's architecture is a massively parallel processing (MPP) SQL engine: a Coordinator node receives queries, plans execution, and distributes work to Worker nodes that execute in parallel against the various data sources. Results are streamed back to the Coordinator and returned to the client. Trino uses a plugin-based Connector model — each data source (Iceberg, Hive, PostgreSQL) is a connector that translates SQL operations into source-specific data reads.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Trino and Apache Iceberg</h2>
+        <p>Trino has strong, production-grade Apache Iceberg support through the Iceberg connector. Trino can read and write Iceberg tables using any compliant catalog: Iceberg REST catalog (including Dremio Open Catalog, Apache Polaris), AWS Glue, Project Nessie, and Hive Metastore with Iceberg format.</p><p>Trino's Iceberg capabilities include: full DDL (CREATE, ALTER, DROP), INSERT and MERGE INTO (using CoW semantics), time travel queries (AT SNAPSHOT and AT TIMESTAMP), schema evolution, partition pruning via hidden partitioning, and table optimization procedures. Trino's Iceberg connector is among the most actively maintained in the ecosystem, with strong participation from the Trinopolis and Starburst communities.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Trino Federated Query Architecture diagram" loading="lazy"><figcaption>Figure 1: Trino's connector model enables single SQL queries across Iceberg, databases, and streaming sources.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Trino vs. Dremio vs. Spark</h2>
+        <table class="comparison-table"><thead><tr><th>Dimension</th><th>Trino</th><th>Dremio</th><th>Apache Spark</th></tr></thead><tbody><tr><td>Primary strength</td><td>Federated ad-hoc SQL</td><td>BI + Semantic layer</td><td>Batch ETL + ML</td></tr><tr><td>Startup latency</td><td>Low (always-on)</td><td>Low (always-on)</td><td>High (cluster startup)</td></tr><tr><td>BI tool optimization</td><td>None (no materialization)</td><td>✅ Reflections</td><td>None</td></tr><tr><td>Semantic layer</td><td>None built-in</td><td>✅ Virtual Datasets</td><td>None</td></tr><tr><td>Multi-catalog</td><td>✅ Best-in-class</td><td>Good</td><td>Good (with config)</td></tr><tr><td>ML workloads</td><td>Not applicable</td><td>Not applicable</td><td>✅ MLlib, PySpark</td></tr></tbody></table>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Trino Ecosystem: Starburst and AWS Athena</h2>
+        <p>Trino has a rich commercial ecosystem:</p><h3>Starburst</h3><p>Starburst is the enterprise Trino distribution, providing the Trino engine with enterprise features: role-based access control, audit logging, data products, and a managed SaaS offering (Starburst Galaxy) on AWS, Azure, and GCP. Starburst engineers are among the largest contributors to open-source Trino.</p><h3>AWS Athena</h3><p>Amazon Athena is AWS's serverless interactive query service, built on Trino's engine (Athena v3). It is fully managed, pay-per-query, and natively integrates with S3, Glue catalog, and Iceberg tables — making it the easiest way to run Trino-compatible SQL on AWS without any infrastructure management.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Trino Ecosystem Starburst Athena diagram" loading="lazy"><figcaption>Figure 2: Trino's ecosystem — open-source engine, Starburst enterprise, and AWS Athena managed service.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Trino is the premier open-source engine for federated, ad-hoc SQL analytics across heterogeneous data sources in the data lakehouse. Its connector model, strong <a href="apache-iceberg.html">Apache Iceberg</a> support, and ANSI SQL compliance make it the default choice for organizations building open, multi-source analytics platforms without proprietary engine lock-in. In the lakehouse stack, Trino complements <a href="apache-spark.html">Spark</a> (batch ETL) and <a href="dremio.html">Dremio</a> (BI + semantic layer) to provide comprehensive query coverage across all analytics workload types.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="presto.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Presto</span>
+      <span class="related-desc">The engine Trino forked from in 2020.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">BI-optimized alternative to Trino for analytics.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">ETL engine that complements Trino in the lakehouse.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Primary table format for Trino's Iceberg connector.</span>
+    </a>
+      <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">Catalog protocol Trino uses to connect to Iceberg catalogs.</span>
+    </a>
+      <a class="related-card" href="lakehouse-federation.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Lakehouse Federation</span>
+      <span class="related-desc">Trino's core capability — federated queries across sources.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture Trino operates within.</span>
+    </a>
+      <a class="related-card" href="predicate-pushdown.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Predicate Pushdown</span>
+      <span class="related-desc">Trino pushes predicates to Iceberg metadata and connectors.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

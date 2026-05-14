@@ -1,0 +1,102 @@
+{
+  "slug": "trino",
+  "term": "Trino",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Trino: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Trino is, how its federated SQL query engine works across Apache Iceberg and other data sources, and when to use Trino in your data lakehouse architecture.",
+  "h1": "Trino: The Definitive Guide for Data Lakehouse",
+  "lede": "Trino is the open-source distributed SQL query engine built for federated analytics across heterogeneous data sources. In the data lakehouse, Trino excels at ad-hoc SQL across Apache Iceberg tables and external databases simultaneously \u2014 the engine of choice for multi-source interactive analytics.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Trino?",
+      "a": "Trino (formerly PrestoSQL) is an open-source, distributed SQL query engine designed for fast, interactive analytics across heterogeneous data sources. It can query Apache Iceberg, Hive, PostgreSQL, MySQL, Kafka, and dozens of other sources simultaneously using a single ANSI SQL query."
+    },
+    {
+      "q": "What is the difference between Trino and Presto?",
+      "a": "Trino is the continuation of the original Presto project created at Facebook. In 2020, the Presto open-source project forked: the original Facebook engineering team retained the 'Presto' name (now governed by the Presto Foundation), while the independent team renamed their fork 'Trino'. Both share a common codebase but have diverged significantly since the fork."
+    },
+    {
+      "q": "When should I use Trino instead of Dremio or Spark?",
+      "a": "Use Trino for ad-hoc federated SQL across multiple catalogs and data sources, when you need strong ANSI SQL compliance, or when you are running infrastructure where Trino's open-source, self-hosted model fits better than Dremio's. Use Dremio when you need a built-in semantic layer, BI tool optimization (Reflections), and a managed SaaS option."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Trino?",
+      "content": "<p><strong>Trino</strong> (originally PrestoSQL, renamed in 2021) is an open-source, distributed SQL query engine designed for fast, interactive analytics across heterogeneous data sources. Originally developed at Facebook as Presto in 2012, Trino enables a single ANSI SQL query to span multiple, disparate data sources \u2014 <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables in S3, PostgreSQL databases, MySQL tables, Kafka streams, and dozens of other sources \u2014 without any data movement or ETL.</p><p>Trino's architecture is a massively parallel processing (MPP) SQL engine: a Coordinator node receives queries, plans execution, and distributes work to Worker nodes that execute in parallel against the various data sources. Results are streamed back to the Coordinator and returned to the client. Trino uses a plugin-based Connector model \u2014 each data source (Iceberg, Hive, PostgreSQL) is a connector that translates SQL operations into source-specific data reads."
+    },
+    {
+      "heading": "Trino and Apache Iceberg",
+      "content": "<p>Trino has strong, production-grade Apache Iceberg support through the Iceberg connector. Trino can read and write Iceberg tables using any compliant catalog: Iceberg REST catalog (including Dremio Open Catalog, Apache Polaris), AWS Glue, Project Nessie, and Hive Metastore with Iceberg format.</p><p>Trino's Iceberg capabilities include: full DDL (CREATE, ALTER, DROP), INSERT and MERGE INTO (using CoW semantics), time travel queries (AT SNAPSHOT and AT TIMESTAMP), schema evolution, partition pruning via hidden partitioning, and table optimization procedures. Trino's Iceberg connector is among the most actively maintained in the ecosystem, with strong participation from the Trinopolis and Starburst communities.",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Trino Federated Query Architecture",
+      "diagramCaption": "Figure 1: Trino's connector model enables single SQL queries across Iceberg, databases, and streaming sources."
+    },
+    {
+      "heading": "Trino vs. Dremio vs. Spark",
+      "content": "<table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>Trino</th><th>Dremio</th><th>Apache Spark</th></tr></thead><tbody><tr><td>Primary strength</td><td>Federated ad-hoc SQL</td><td>BI + Semantic layer</td><td>Batch ETL + ML</td></tr><tr><td>Startup latency</td><td>Low (always-on)</td><td>Low (always-on)</td><td>High (cluster startup)</td></tr><tr><td>BI tool optimization</td><td>None (no materialization)</td><td>\u2705 Reflections</td><td>None</td></tr><tr><td>Semantic layer</td><td>None built-in</td><td>\u2705 Virtual Datasets</td><td>None</td></tr><tr><td>Multi-catalog</td><td>\u2705 Best-in-class</td><td>Good</td><td>Good (with config)</td></tr><tr><td>ML workloads</td><td>Not applicable</td><td>Not applicable</td><td>\u2705 MLlib, PySpark</td></tr></tbody></table>"
+    },
+    {
+      "heading": "Trino Ecosystem: Starburst and AWS Athena",
+      "content": "<p>Trino has a rich commercial ecosystem:</p><h3>Starburst</h3><p>Starburst is the enterprise Trino distribution, providing the Trino engine with enterprise features: role-based access control, audit logging, data products, and a managed SaaS offering (Starburst Galaxy) on AWS, Azure, and GCP. Starburst engineers are among the largest contributors to open-source Trino.</p><h3>AWS Athena</h3><p>Amazon Athena is AWS's serverless interactive query service, built on Trino's engine (Athena v3). It is fully managed, pay-per-query, and natively integrates with S3, Glue catalog, and Iceberg tables \u2014 making it the easiest way to run Trino-compatible SQL on AWS without any infrastructure management.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Trino Ecosystem Starburst Athena",
+      "diagramCaption": "Figure 2: Trino's ecosystem \u2014 open-source engine, Starburst enterprise, and AWS Athena managed service."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Trino is the premier open-source engine for federated, ad-hoc SQL analytics across heterogeneous data sources in the data lakehouse. Its connector model, strong <a href=\"apache-iceberg.html\">Apache Iceberg</a> support, and ANSI SQL compliance make it the default choice for organizations building open, multi-source analytics platforms without proprietary engine lock-in. In the lakehouse stack, Trino complements <a href=\"apache-spark.html\">Spark</a> (batch ETL) and <a href=\"dremio.html\">Dremio</a> (BI + semantic layer) to provide comprehensive query coverage across all analytics workload types.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "presto",
+      "term": "Presto",
+      "category": "Query Engines & Platforms",
+      "desc": "The engine Trino forked from in 2020."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "BI-optimized alternative to Trino for analytics."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "ETL engine that complements Trino in the lakehouse."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Primary table format for Trino's Iceberg connector."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "Catalog protocol Trino uses to connect to Iceberg catalogs."
+    },
+    {
+      "slug": "lakehouse-federation",
+      "term": "Lakehouse Federation",
+      "category": "Analytics & BI",
+      "desc": "Trino's core capability \u2014 federated queries across sources."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture Trino operates within."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Trino pushes predicates to Iceberg metadata and connectors."
+    }
+  ]
+}

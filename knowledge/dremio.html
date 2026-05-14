@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dremio: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Dremio is, how its intelligent query engine works, and why it is the leading data lakehouse platform for Apache Iceberg, semantic layers, and self-service analytics.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/dremio.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Dremio: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Dremio is, how its intelligent query engine works, and why it is the leading data lakehouse platform for Apache Iceberg, semantic layers, and self-service analytics.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/dremio.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Dremio: The Definitive Guide",
+      "description": "Learn what Dremio is, how its intelligent query engine works, and why it is the leading data lakehouse platform for Apache Iceberg, semantic layers, and self-service analytics.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/dremio.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Dremio", "item": "https://datalakehouse101.com/knowledge/dremio.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Dremio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio is a cloud-native data lakehouse platform that provides a SQL query engine, semantic layer, materialized query acceleration (Reflections), and an open Iceberg catalog on top of your own cloud object storage. It enables self-service analytics, BI tool connectivity, and AI agent data access without moving data into a proprietary store."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What makes Dremio different from Snowflake or Databricks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio operates on your own cloud storage with data in open Apache Iceberg format — you own the data. Snowflake and Databricks use proprietary storage. Dremio's open catalog allows any Iceberg-compatible engine to access the same tables, while Snowflake's and Databricks' catalogs are primarily engine-specific."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Dremio open source?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio has open-source components (it contributes to Apache Iceberg, Apache Arrow, Project Nessie, and Apache Polaris) and a commercial enterprise product. Dremio Community Edition is a free, self-hosted version. Dremio Cloud is the fully managed SaaS offering on AWS and Azure."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Dremio</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Dremio: The Definitive Guide</h1>
+      <p class="hero-lede">Dremio is the intelligent data lakehouse platform that unifies analytics across Apache Iceberg tables and federated sources. It combines a high-performance query engine, an AI semantic layer, Reflections for sub-second BI, and an open catalog — all on your own cloud storage.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Dremio?</a></li>
+        <li><a href="#section-2">Core Dremio Architecture</a></li>
+        <li><a href="#section-3">Dremio Cloud vs. Dremio Software</a></li>
+        <li><a href="#section-4">Dremio and Apache Iceberg</a></li>
+        <li><a href="#section-5">Dremio's Open Source Contributions</a></li>
+        <li><a href="#section-6">Dremio Connectivity and Integrations</a></li>
+        <li><a href="#section-7">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Dremio?</h2>
+        <p><strong>Dremio</strong> is a cloud-native data lakehouse platform that provides the full analytics stack on top of your own cloud object storage: a high-performance SQL query engine, an AI-powered semantic layer, materialized query acceleration via Reflections, an open <a href="apache-iceberg.html">Apache Iceberg</a> catalog, and federated query capability across heterogeneous data sources — all without requiring data to be moved into a proprietary storage format.</p><p>Founded in 2015 and headquartered in Santa Clara, California, Dremio was built specifically for the decoupled storage-and-compute paradigm. Its core design principle is that data should live in open format on cloud storage you own, and that the query engine should bring intelligence to that data rather than requiring data to be imported into a proprietary store.</p><p>Dremio's platform has three primary use cases: <strong>BI and self-service analytics</strong> (connecting Tableau, Power BI, Looker, and other tools to Iceberg data with sub-second response times via Reflections), <strong>data engineering</strong> (creating and managing Iceberg tables, running MERGE INTO for CDC pipelines, and optimizing table layouts), and <strong>AI-ready data access</strong> (exposing a semantic layer and MCP server for AI agents to discover and query enterprise data autonomously).</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Core Dremio Architecture</h2>
+        <p>Dremio's architecture has four integrated layers:</p><h3>Intelligent Query Engine</h3><p>Built on <a href="apache-arrow.html">Apache Arrow</a> for vectorized, columnar in-memory processing, Dremio's query engine reads <a href="apache-iceberg.html">Iceberg</a> metadata aggressively to minimize data scanned from object storage. Its optimizer applies <a href="predicate-pushdown.html">predicate pushdown</a>, <a href="column-pruning.html">column pruning</a>, and Reflection matching before issuing any storage reads.</p><h3>AI Semantic Layer</h3><p>Dremio's semantic layer — built on <a href="virtual-datasets.html">Virtual Datasets</a>, wikis, labels, and business metric definitions — translates raw Iceberg tables into business-friendly views. The AI Semantic Layer extends this with natural language understanding, allowing business users and AI agents to query data in business terms rather than technical SQL.</p><h3>Reflections</h3><p><a href="dremio-reflections.html">Reflections</a> are Dremio's materialized query acceleration technology. They pre-compute aggregations and raw-scan optimizations as Iceberg tables, and the query optimizer automatically routes incoming queries to the appropriate Reflection — delivering sub-second BI performance without any BI tool configuration changes.</p><h3>Open Catalog</h3><p><a href="dremio-open-catalog.html">Dremio's Open Catalog</a> implements the <a href="iceberg-rest-catalog.html">Iceberg REST Catalog specification</a>, powered by <a href="project-nessie.html">Project Nessie</a> for Git-like branching and tagging of Iceberg tables. Any engine implementing the REST catalog client can use Dremio's catalog.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Dremio Platform Architecture diagram" loading="lazy"><figcaption>Figure 1: Dremio's four-layer architecture — Query Engine, Semantic Layer, Reflections, and Open Catalog.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Dremio Cloud vs. Dremio Software</h2>
+        <p>Dremio is available in two deployment models:</p><h3>Dremio Cloud</h3><p><a href="dremio-cloud.html">Dremio Cloud</a> is the fully managed SaaS offering on AWS and Azure. Dremio manages all infrastructure — compute engines, coordinators, catalog, and monitoring. Users connect their own cloud storage (S3 or ADLS), and Dremio's managed engines query it. Dremio Cloud offers a consumption-based pricing model (pay for compute used) and auto-scaling compute engines that spin up in seconds.</p><h3>Dremio Software (Self-Hosted)</h3><p>Dremio Software is deployed by the customer in their own cloud environment (typically on Kubernetes). The customer manages the infrastructure; Dremio provides the software. This model gives maximum control over security, networking, and configuration. Dremio Community Edition is a free version of Dremio Software suitable for evaluation and small-scale production deployments.</p>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Dremio and Apache Iceberg</h2>
+        <p>Dremio's deepest technical integration is with <a href="apache-iceberg.html">Apache Iceberg</a>. Iceberg is Dremio's native table format — not a compatibility layer, but the foundational storage model for the entire platform:</p><ul><li>Full ANSI SQL DML: INSERT, UPDATE, DELETE, MERGE INTO against Iceberg tables</li><li>Time travel: AT SNAPSHOT and AT TIMESTAMP query syntax</li><li>Table rollback: revert to any historical Iceberg snapshot</li><li>Automated table optimization: compaction, Z-ordering, orphan file cleanup</li><li>Schema evolution: ADD COLUMN, DROP COLUMN, RENAME COLUMN via SQL DDL</li><li>Reflections on Iceberg: materialized acceleration stored as Iceberg tables</li></ul>
+        
+      </section>
+
+      <section id="section-5">
+        <h2>Dremio's Open Source Contributions</h2>
+        <p>Dremio is one of the largest contributors to the open lakehouse ecosystem. Key open-source contributions include: <a href="project-nessie.html">Project Nessie</a> (Git-like catalog for Iceberg, donated to the open-source community and powering multiple catalog implementations), <a href="apache-polaris.html">Apache Polaris</a> (co-developed with Snowflake, now ASF-governed), and <a href="apache-arrow.html">Apache Arrow</a> (Dremio engineers are core committers to Arrow, the columnar memory format that powers Dremio's vectorized execution and the Arrow Flight SQL protocol).
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="Lakehouse Query Engine Ecosystem diagram" loading="lazy"><figcaption>Figure 2: Dremio's role in the lakehouse engine ecosystem — uniquely combining BI, ETL, and AI workloads.</figcaption></figure>
+      </section>
+
+      <section id="section-6">
+        <h2>Dremio Connectivity and Integrations</h2>
+        <p>Dremio provides comprehensive connectivity for every type of data consumer:</p><ul><li><strong>BI Tools:</strong> ODBC and JDBC drivers for Tableau, Power BI, Looker, MicroStrategy, Qlik, and all standard SQL clients</li><li><strong>Arrow Flight SQL:</strong> High-performance binary protocol for Python, R, and application-level data access at 10–100x JDBC throughput</li><li><strong>REST API:</strong> SQL job submission and result retrieval for application integration</li><li><strong>dbt adapter:</strong> Run dbt models against Dremio's engine, creating Iceberg tables in Dremio's catalog</li><li><strong>MCP Server:</strong> Model Context Protocol server for AI agent data discovery and query access</li><li><strong>Federated sources:</strong> Connect PostgreSQL, MySQL, MongoDB, Elasticsearch, S3 files, and more as queryable sources alongside Iceberg tables</li></ul>
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Summary</h2>
+        <p>Dremio is the most complete open data lakehouse platform available in 2025 — combining a high-performance Iceberg query engine, AI semantic layer, Reflections acceleration, and an open catalog in a single cohesive product. Its commitment to open standards (<a href="apache-iceberg.html">Apache Iceberg</a>, <a href="apache-arrow.html">Apache Arrow</a>, <a href="iceberg-rest-catalog.html">Iceberg REST Catalog</a>) means organizations retain data ownership and engine flexibility while getting enterprise-grade performance and governance. For teams building on the <a href="data-lakehouse.html">data lakehouse</a>, Dremio is the query engine, semantic layer, and catalog platform that brings it all together.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio-reflections.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Reflections</span>
+      <span class="related-desc">Materialized query acceleration in Dremio.</span>
+    </a>
+      <a class="related-card" href="dremio-open-catalog.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Open Catalog</span>
+      <span class="related-desc">Dremio's Iceberg REST Catalog implementation.</span>
+    </a>
+      <a class="related-card" href="dremio-cloud.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Cloud</span>
+      <span class="related-desc">Dremio's fully managed SaaS offering.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Dremio's native table format.</span>
+    </a>
+      <a class="related-card" href="virtual-datasets.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Virtual Datasets</span>
+      <span class="related-desc">Dremio's semantic layer building block.</span>
+    </a>
+      <a class="related-card" href="project-nessie.html">
+      <span class="related-label">Catalogs</span>
+      <span class="related-term">Project Nessie</span>
+      <span class="related-desc">Git-like catalog powering Dremio's Open Catalog.</span>
+    </a>
+      <a class="related-card" href="apache-arrow.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Arrow</span>
+      <span class="related-desc">Vectorized execution foundation of Dremio's engine.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture Dremio is built for.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

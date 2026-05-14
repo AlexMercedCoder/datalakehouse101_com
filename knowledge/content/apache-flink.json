@@ -1,0 +1,102 @@
+{
+  "slug": "apache-flink",
+  "term": "Apache Flink",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Apache Flink: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Apache Flink is, how it enables real-time streaming ingestion into Apache Iceberg tables, and why Flink is the engine of choice for CDC and event-driven lakehouse pipelines.",
+  "h1": "Apache Flink: The Definitive Guide for Data Lakehouse",
+  "lede": "Apache Flink is the leading open-source stream processing engine for real-time data pipelines. In the data lakehouse, Flink is the engine that continuously ingests CDC streams, event data, and Kafka topics into Apache Iceberg tables \u2014 enabling near-real-time data freshness without batch latency.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Flink?",
+      "a": "Apache Flink is an open-source, distributed stream processing framework that processes data events in real time with low latency, exactly-once semantics, and stateful computation. It provides both DataStream API (for complex event processing) and Table/SQL API (for SQL-based stream processing)."
+    },
+    {
+      "q": "What is Apache Flink's role in the data lakehouse?",
+      "a": "In the data lakehouse, Flink is primarily used for: continuous streaming ingestion of Kafka topics or CDC streams into Apache Iceberg tables (replacing hourly or daily batch loads with minute-level or second-level data freshness), real-time event aggregations, and complex event processing pipelines."
+    },
+    {
+      "q": "Does Apache Flink write to Apache Iceberg?",
+      "a": "Yes. Flink has native Apache Iceberg sink support through the flink-iceberg connector. Flink can write streaming data to Iceberg tables with exactly-once semantics, using either append (for Bronze ingestion) or UPSERT mode (for Silver CDC pipelines). The Flink Iceberg sink handles checkpoint-based commits that align with Iceberg snapshots."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Flink?",
+      "content": "<p><strong>Apache Flink</strong> is an open-source, distributed stream processing framework designed for high-throughput, low-latency processing of continuous data streams with exactly-once semantics and stateful computation. Originally developed at the Technical University of Berlin in 2010 and donated to the Apache Software Foundation in 2014, Flink has grown into the leading open-source stream processing engine, widely used at Alibaba, Netflix, Uber, LinkedIn, and many other large-scale data organizations.</p><p>Flink's core innovation over earlier streaming frameworks (like Apache Storm) is its unified stream-batch model: Flink processes all data as streams, with bounded (finite) streams representing batch workloads and unbounded (infinite) streams representing real-time workloads. This unification means the same Flink program and the same execution semantics apply to both batch and streaming data.</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a> ecosystem, Flink's primary role is <strong>streaming ingestion</strong> \u2014 continuously reading from message queues (Apache Kafka, AWS Kinesis, Apache Pulsar) and <a href=\"change-data-capture.html\">CDC</a> sources, applying real-time transformations, and writing to <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables with exactly-once delivery guarantees. This enables lakehouse data freshness measured in seconds or minutes rather than hours."
+    },
+    {
+      "heading": "Flink and Apache Iceberg",
+      "content": "<p>The Flink-Iceberg integration is one of the most production-proven streaming Iceberg write patterns. The key components:</p><h3>Flink Iceberg Sink</h3><p>The <code>FlinkSink</code> class writes DataStream or Table API results to Iceberg tables. It buffers incoming rows, commits batches to Iceberg as new snapshots aligned with Flink checkpoints, and provides exactly-once semantics through Flink's checkpoint mechanism \u2014 ensuring that even if the Flink job restarts, each row appears exactly once in the Iceberg table.</p><h3>Append Mode</h3><p>New rows are added to the Iceberg table as new data files on each checkpoint commit. Ideal for Bronze ingestion of event streams (logs, clickstreams, IoT telemetry) where each event is immutable and unique.</p><h3>UPSERT Mode</h3><p>Updates and deletes from CDC sources are applied to the Iceberg table using Iceberg V2 equality delete files. This enables real-time CDC ingestion directly into Silver Iceberg tables without a separate MERGE INTO batch step.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Apache Flink Iceberg Streaming Ingestion Architecture",
+      "diagramCaption": "Figure 1: Flink streaming ingestion \u2014 Kafka \u2192 Flink \u2192 Iceberg with exactly-once semantics."
+    },
+    {
+      "heading": "Flink CDC: Debezium to Iceberg",
+      "content": "<p>One of the most common production Flink patterns is the Debezium CDC to Iceberg pipeline:</p><ol><li><strong>Debezium connector</strong> reads the MySQL/PostgreSQL WAL (write-ahead log) and publishes change events (INSERT, UPDATE, DELETE) to Kafka topics in Debezium JSON format</li><li><strong>Flink job</strong> reads the Kafka Debezium topics using the <code>flink-cdc-connectors</code> library, which parses Debezium events into Flink RowData with change type metadata</li><li><strong>Transformation:</strong> Optional business logic applied in Flink (joining, enrichment, deduplication)</li><li><strong>Iceberg sink:</strong> Flink writes to the target Iceberg table in UPSERT mode \u2014 inserts become new data files, updates/deletes become equality delete files</li></ol><p>This pattern delivers data from the source operational database into the Iceberg Silver table within 30\u2013120 seconds of the source change \u2014 enabling near-real-time analytics without the complexity of maintaining a custom streaming ETL pipeline."
+    },
+    {
+      "heading": "Flink vs. Spark Structured Streaming",
+      "content": "<p>Both Flink and Spark Structured Streaming can ingest data into Iceberg, but they have different strengths:</p><table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>Apache Flink</th><th>Spark Structured Streaming</th></tr></thead><tbody><tr><td>Latency</td><td>Sub-second (true streaming)</td><td>Seconds to minutes (micro-batch)</td></tr><tr><td>Exactly-once</td><td>Native, checkpoint-based</td><td>Available but more complex</td></tr><tr><td>CDC support</td><td>Native Debezium connector</td><td>Via Spark + Kafka + custom logic</td></tr><tr><td>State management</td><td>Built-in, production-grade</td><td>Limited for complex stateful ops</td></tr><tr><td>Python API</td><td>PyFlink (less mature)</td><td>PySpark (very mature)</td></tr><tr><td>Iceberg UPSERT</td><td>Native sink support</td><td>Less mature UPSERT support</td></tr></tbody></table>",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Flink vs Spark Streaming Comparison",
+      "diagramCaption": "Figure 2: Flink vs Spark Structured Streaming for Iceberg ingestion \u2014 latency and CDC support comparison."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Flink is the streaming ingestion engine of the modern data lakehouse. Its native <a href=\"apache-iceberg.html\">Apache Iceberg</a> sink, exactly-once semantics, and deep <a href=\"change-data-capture.html\">CDC</a> integration capabilities make it the optimal choice for organizations that need data freshness measured in seconds rather than hours. In the lakehouse engine stack, Flink ingests real-time data, <a href=\"apache-spark.html\">Spark</a> processes large batch transformations, and <a href=\"dremio.html\">Dremio</a> serves the resulting Iceberg tables to analysts \u2014 each engine optimized for its specific workload.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Batch alternative to Flink for Iceberg writes."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format Flink writes to via the Iceberg sink."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "Flink's primary CDC-to-Iceberg ingestion pattern."
+    },
+    {
+      "slug": "apache-kafka",
+      "term": "Apache Kafka",
+      "category": "Ingestion",
+      "desc": "The message queue Flink most commonly reads from."
+    },
+    {
+      "slug": "merge-on-read",
+      "term": "Merge-on-Read",
+      "category": "Table Formats",
+      "desc": "Flink UPSERT mode uses MoR equality delete files."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The analytics engine serving Iceberg tables Flink writes."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture Flink enables real-time ingestion for."
+    },
+    {
+      "slug": "bronze-layer",
+      "term": "Bronze Layer",
+      "category": "Architecture Patterns",
+      "desc": "Primary target of Flink append-mode streaming writes."
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "slug": "vectorized-execution",
+  "term": "Vectorized Query Execution",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Vectorized Query Execution: The Definitive Guide",
+  "metaDescription": "Learn what vectorized query execution is, how it uses Apache Arrow and SIMD instructions to accelerate analytical queries, and why it is the performance foundation of modern lakehouse engines.",
+  "h1": "Vectorized Query Execution: The Definitive Guide",
+  "lede": "Vectorized query execution processes data in column-oriented batches (vectors) rather than row-by-row, enabling SIMD CPU instructions and cache-efficient memory access patterns that deliver 10\u2013100x analytical query performance over traditional row-at-a-time execution models.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is vectorized query execution?",
+      "a": "Vectorized query execution is a query engine design where data is processed in batches of column values (vectors) rather than one row at a time. Processing an entire column's values together enables SIMD (Single Instruction Multiple Data) CPU instructions that apply one operation to 8, 16, or 32 values simultaneously, delivering dramatic throughput improvements for analytical queries."
+    },
+    {
+      "q": "What is Apache Arrow's role in vectorized execution?",
+      "a": "Apache Arrow provides the in-memory columnar format standard that vectorized engines use to represent data vectors. When a query engine uses Apache Arrow format internally, data can be passed between execution stages (and between engines) without serialization/deserialization overhead, and SIMD operations can be applied directly to Arrow memory buffers."
+    },
+    {
+      "q": "Which query engines use vectorized execution?",
+      "a": "Dremio (built on Apache Arrow), DuckDB, Apache Spark (Tungsten project, Velox), Trino (Project Hummingbird), Snowflake, and BigQuery all use vectorized execution. It is now the standard architecture for analytical query engines competing on performance."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Vectorized Query Execution?",
+      "content": "<p><strong>Vectorized query execution</strong> is a query engine architecture that processes data in <strong>column-oriented batches</strong> (called vectors) rather than handling one complete row at a time. Instead of fetching all column values for row 1, processing them, then moving to row 2, a vectorized engine fetches all values for column A for rows 1\u20131024, processes the entire batch with a single SIMD CPU operation, then moves to column B for the same batch of rows.</p><p>This approach aligns with how modern CPUs work most efficiently: SIMD (Single Instruction, Multiple Data) instructions in SSE, AVX2, and AVX-512 instruction sets can apply a single arithmetic or comparison operation to 4, 8, 16, or 32 numeric values simultaneously. By processing data in column-oriented batches, vectorized engines keep the CPU's execution units saturated with useful work and minimize the instruction dispatch overhead that dominates row-at-a-time processing.</p><p>The result is analytical query performance that is 10\u2013100x faster than traditional row-at-a-time SQL engines \u2014 the key performance advantage that makes <a href=\"dremio.html\">Dremio</a>, DuckDB, Snowflake, and other modern analytical engines competitive for sub-second BI queries on large datasets.</p>"
+    },
+    {
+      "heading": "Vectorized vs. Row-at-a-Time Execution",
+      "content": "<p>To understand why vectorized execution is so much faster, consider a simple sum aggregation: <code>SELECT SUM(revenue) FROM orders</code>.</p><h3>Row-at-a-Time Execution (Volcano Model)</h3><p>The traditional Volcano model: for each row, call next() to fetch the row, extract the revenue column, add to accumulator, repeat. Per-row overhead: function call overhead, type dispatch, branch mispredictions, cache misses (row data is not contiguous in memory). For 1 billion rows, this means 1 billion function calls.</p><h3>Vectorized Execution</h3><p>Fetch a batch of 1024 revenue values as a contiguous double[] array. Apply AVX2 vectorized sum to 4 doubles simultaneously: 256 AVX operations for 1024 values. Repeat for the next 1024 values. For 1 billion rows: ~976,563 vectorized batch operations. CPU cache is warm (data is contiguous); SIMD units are fully utilized; branch prediction is perfect (no type dispatch).</p><p>The throughput difference can be 10\u201350x for simple aggregations and even larger for complex multi-column operations.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Vectorized Execution vs Row-at-a-Time",
+      "diagramCaption": "Figure 1: Vectorized execution processes entire column batches with SIMD \u2014 vs row-at-a-time's per-row overhead."
+    },
+    {
+      "heading": "Apache Arrow: The Vectorized Execution Standard",
+      "content": "<p><a href=\"apache-arrow.html\">Apache Arrow</a> defines the in-memory columnar format standard used by vectorized engines. An Arrow RecordBatch is a fixed-size batch of column buffers \u2014 contiguous memory arrays of typed values (int64[], double[], utf8 string buffers) with null bitmaps. Arrow's format is designed specifically for vectorized processing: column buffers are cache-aligned, SIMD-accessible, and zero-copy shareable between processes and engines.</p><p>When <a href=\"dremio.html\">Dremio</a> uses Apache Arrow as its internal execution format, data moves between query stages (scan, filter, aggregate, join) without any serialization \u2014 each stage receives Arrow RecordBatches and returns Arrow RecordBatches. SIMD operations apply directly to the Arrow buffer memory. The Arrow Flight SQL protocol transmits results between Dremio and clients also in Arrow format \u2014 zero-copy for Python clients using PyArrow.",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Apache Arrow Vectorized Execution Format",
+      "diagramCaption": "Figure 2: Apache Arrow's columnar format enables zero-copy data sharing and SIMD processing across query stages."
+    },
+    {
+      "heading": "Vectorized Execution in the Lakehouse Stack",
+      "content": "<p>Vectorized execution interacts with the lakehouse stack at multiple levels:</p><h3>Parquet Column Chunk Decoding</h3><p>Apache Parquet stores data in column chunks with RLE/Dictionary encoding. Vectorized decoders read entire column chunks at once, applying batch decoding that feeds directly into Arrow column buffers \u2014 enabling a continuous vectorized pipeline from storage bytes to query result.</p><h3>Predicate Evaluation</h3><p>Row-level filter predicates (WHERE revenue > 1000) are evaluated on entire column batches using vectorized comparisons, producing bit vectors that identify rows to keep. These bit vectors are then applied to all other column batches simultaneously \u2014 no per-row branching.</p><h3>SIMD-Optimized Hash Aggregation</h3><p>Hash GROUP BY operations use SIMD-optimized hash tables that process multiple rows simultaneously, dramatically accelerating the most common analytical query pattern."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Vectorized query execution is the performance foundation of every modern analytical engine \u2014 including <a href=\"dremio.html\">Dremio</a>, Snowflake, BigQuery, DuckDB, and <a href=\"apache-spark.html\">Spark's</a> Tungsten engine. By aligning data processing with CPU SIMD capabilities through column-oriented batch operations, vectorized engines achieve 10\u2013100x throughput improvements over traditional row-at-a-time SQL execution. In the <a href=\"data-lakehouse.html\">data lakehouse</a>, vectorized execution built on <a href=\"apache-arrow.html\">Apache Arrow</a> is what makes sub-second BI queries on petabyte-scale Iceberg tables possible \u2014 the engine-level technology that powers every Reflection response, every dashboard refresh, and every AI agent data query.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-arrow",
+      "term": "Apache Arrow",
+      "category": "File Formats & Storage",
+      "desc": "The columnar format standard enabling vectorized execution."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Builds its engine entirely on Arrow-based vectorized execution."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "Columnar storage format that feeds vectorized decoders."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Predicate evaluation is vectorized in modern engines."
+    },
+    {
+      "slug": "column-pruning",
+      "term": "Column Pruning",
+      "category": "Query Engines & Platforms",
+      "desc": "Column pruning reduces the vectors that must be processed."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "Vectorized execution as a physical optimization strategy."
+    },
+    {
+      "slug": "data-skipping",
+      "term": "Data Skipping",
+      "category": "Analytics & BI",
+      "desc": "Complement to vectorized execution for reducing data processed."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Vectorized execution makes lakehouse analytics competitive."
+    }
+  ]
+}

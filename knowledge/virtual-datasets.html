@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Datasets in Dremio: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Dremio Virtual Datasets are, how they create a semantic layer above raw Iceberg data, and how they enable self-service analytics without exposing raw table complexity.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/virtual-datasets.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Virtual Datasets in Dremio: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Dremio Virtual Datasets are, how they create a semantic layer above raw Iceberg data, and how they enable self-service analytics without exposing raw table complexity.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/virtual-datasets.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Virtual Datasets in Dremio: The Definitive Guide",
+      "description": "Learn what Dremio Virtual Datasets are, how they create a semantic layer above raw Iceberg data, and how they enable self-service analytics without exposing raw table complexity.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/virtual-datasets.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Virtual Datasets (Dremio)", "item": "https://datalakehouse101.com/knowledge/virtual-datasets.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a Virtual Dataset in Dremio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A Virtual Dataset (VDS) in Dremio is a named, saved SQL query that presents a transformed or simplified view of one or more underlying data sources. It acts as a virtual table in Dremio's catalog — queryable by any BI tool or SQL client — without materializing any data. The query executes against the underlying sources at runtime."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How are Virtual Datasets different from physical tables?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Virtual Datasets do not store data — they are defined SQL transformations that execute against physical data (Iceberg tables or other sources) at query time. Physical Datasets are direct registrations of actual data files. A VDS can join multiple physical tables, apply business logic, rename columns, and filter rows — presenting a clean view without any data movement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can Dremio Reflections accelerate Virtual Datasets?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Reflections can be defined on Virtual Datasets, not just physical Iceberg tables. A Reflection on a VDS pre-computes the VDS's transformation and stores the result as an optimized Iceberg table, enabling sub-second query responses for the VDS without re-executing the transformation logic at query time."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Virtual Datasets (Dremio)</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Query Engines & Platforms</span>
+      <h1>Virtual Datasets in Dremio: The Definitive Guide</h1>
+      <p class="hero-lede">Virtual Datasets are Dremio's mechanism for building a semantic layer above raw Iceberg tables. They are named, reusable SQL views that present clean, business-friendly data representations — decoupling the physical data model from the analytical data model that business users see.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Are Virtual Datasets?</a></li>
+        <li><a href="#section-2">VDS as a Semantic Layer</a></li>
+        <li><a href="#section-3">Reflections on Virtual Datasets</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Are Virtual Datasets?</h2>
+        <p><strong>Virtual Datasets (VDS)</strong> are <a href="dremio.html">Dremio's</a> primary semantic layer building block. A VDS is a named, saved SQL query that defines a clean, business-friendly transformation of one or more underlying data sources — Iceberg tables, other VDSs, or federated sources. It appears as a named table in Dremio's catalog, queryable by any BI tool or SQL client exactly like a physical table.</p><p>The key property of a VDS is that it is <strong>virtual</strong> — no data is materialized or moved. The VDS definition is a SQL query that executes against the underlying sources at runtime. This means VDSs always reflect the current state of the underlying data, without any refresh lag.</p><p>VDSs enable the decoupling of the physical data model (how data is stored in Iceberg) from the analytical data model (what business users see). Data engineers create and maintain VDSs that apply business logic, join tables, rename columns to business terminology, and filter sensitive data — while BI analysts query the clean, consistent, business-friendly views without needing to understand the raw Iceberg table structure.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>VDS as a Semantic Layer</h2>
+        <p>Virtual Datasets form the foundation of Dremio's <a href="semantic-layer.html">semantic layer</a>. A well-designed VDS hierarchy typically has multiple levels:</p><h3>Foundation VDS (Base Layer)</h3><p>Direct, light-touch views of Iceberg tables that add column aliases, apply basic data type casts, and filter PII columns. These VDSs provide a clean, governed starting point that hides raw storage complexity.</p><h3>Business Logic VDS (Middle Layer)</h3><p>VDSs that join foundation VDSs, apply business calculations (revenue = quantity × unit_price), implement business rules (exclude cancelled orders), and expose business metrics (LTV, churn rate, conversion rate).</p><h3>BI-Ready VDS (Presentation Layer)</h3><p>VDSs optimized for specific BI tools or business domains — a 'Sales Dashboard VDS' that pre-joins all tables needed for the sales dashboard, named with business-friendly column names exactly as the BI tool expects them.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-1.png" alt="Dremio Virtual Dataset Semantic Layer Hierarchy diagram" loading="lazy"><figcaption>Figure 1: VDS hierarchy — Foundation, Business Logic, and BI-Ready layers build a complete semantic model.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Reflections on Virtual Datasets</h2>
+        <p>One of the most powerful Dremio patterns is combining VDSs with <a href="dremio-reflections.html">Reflections</a>. A Reflection defined on a VDS pre-computes the VDS's transformation and stores the result as an optimized Iceberg table. When queries arrive against the VDS, Dremio's optimizer routes them to the Reflection rather than re-executing the transformation at runtime.</p><p>This enables a pattern where complex VDS transformations (multi-table joins, window functions, business metric calculations) are pre-computed once and reused across all subsequent queries — combining the semantic clarity of VDSs with the performance of materialized views, with zero query rewrite required.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/dremio-diagram-2.png" alt="VDS with Reflection Acceleration diagram" loading="lazy"><figcaption>Figure 2: Reflections on VDSs pre-compute transformations for sub-second BI performance.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Virtual Datasets are the semantic layer foundation of <a href="dremio.html">Dremio's</a> lakehouse platform. By decoupling the physical Iceberg data model from the analytical data model that business users see, VDSs enable true self-service analytics — analysts work with clean, governed, business-friendly views while data engineers maintain the underlying transformations. Combined with <a href="dremio-reflections.html">Reflections</a>, VDSs provide both semantic clarity and sub-second performance — the combination that makes the open <a href="data-lakehouse.html">data lakehouse</a> competitive with proprietary BI-optimized cloud warehouses.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">The platform providing Virtual Datasets.</span>
+    </a>
+      <a class="related-card" href="dremio-reflections.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Reflections</span>
+      <span class="related-desc">Acceleration built on top of Virtual Datasets.</span>
+    </a>
+      <a class="related-card" href="semantic-layer.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Semantic Layer</span>
+      <span class="related-desc">The concept VDSs implement in Dremio.</span>
+    </a>
+      <a class="related-card" href="physical-datasets.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Physical Datasets</span>
+      <span class="related-desc">The physical sources VDSs are built on.</span>
+    </a>
+      <a class="related-card" href="self-service-analytics.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Self-Service Analytics</span>
+      <span class="related-desc">VDSs enable self-service by hiding complexity.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The physical table format VDSs abstract.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture VDSs make accessible for analytics.</span>
+    </a>
+      <a class="related-card" href="sql-analytics.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">SQL Analytics</span>
+      <span class="related-desc">VDSs expose Iceberg data as clean SQL-queryable views.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

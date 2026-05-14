@@ -1,0 +1,102 @@
+{
+  "slug": "physical-datasets",
+  "term": "Physical Datasets (Dremio)",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Physical Datasets in Dremio: The Definitive Guide",
+  "metaDescription": "Learn what Physical Datasets are in Dremio, how they register data sources including Apache Iceberg tables and federated sources, and how they serve as the foundation for Virtual Datasets.",
+  "h1": "Physical Datasets in Dremio: The Definitive Guide",
+  "lede": "Physical Datasets are Dremio's direct registrations of actual data sources \u2014 Apache Iceberg tables, Parquet files, database tables, or any other supported source. They represent the raw data layer in Dremio's catalog, forming the foundation that Virtual Datasets and Reflections build upon.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is a Physical Dataset in Dremio?",
+      "a": "A Physical Dataset (PDS) in Dremio is a direct registration of an actual data source in Dremio's catalog. It points to a specific Iceberg table, Parquet file collection, database table, or other supported data source. The PDS exposes the source as a queryable object in Dremio's namespace without any transformation."
+    },
+    {
+      "q": "What types of data sources can be Physical Datasets in Dremio?",
+      "a": "Physical Datasets can represent: Apache Iceberg tables (in Dremio's catalog or external catalogs), Parquet/ORC/JSON files in object storage, relational database tables (PostgreSQL, MySQL, Oracle), NoSQL source tables (MongoDB), and other federated sources. Each PDS type has source-specific configuration."
+    },
+    {
+      "q": "How do Physical Datasets relate to Virtual Datasets?",
+      "a": "Physical Datasets are the raw data foundation. Virtual Datasets are transformations built on top of Physical Datasets. A VDS joins, filters, or transforms one or more PDS sources to create a business-friendly view. The PDS \u2192 VDS hierarchy is the core of Dremio's semantic layer architecture."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Are Physical Datasets?",
+      "content": "<p><strong>Physical Datasets (PDS)</strong> are <a href=\"dremio.html\">Dremio's</a> direct registrations of actual data sources in its catalog namespace. A PDS is a pointer to real data \u2014 an <a href=\"apache-iceberg.html\">Apache Iceberg</a> table, a collection of Parquet files in S3, a PostgreSQL table, or any other data source that Dremio supports. Unlike <a href=\"virtual-datasets.html\">Virtual Datasets</a>, PDS do not transform or compute anything \u2014 they simply expose the underlying source as a queryable object in Dremio's catalog, preserving the source's schema exactly.</p><p>Physical Datasets are the base layer of Dremio's data architecture. Everything built in Dremio \u2014 VDSs, Reflections, semantic definitions \u2014 ultimately traces back to one or more Physical Datasets. Understanding PDS is essential for designing a well-organized Dremio catalog hierarchy."
+    },
+    {
+      "heading": "PDS Types and Source Connectivity",
+      "content": "<p>Dremio supports Physical Datasets from a wide range of source types:</p><h3>Iceberg Tables</h3><p>Tables registered in Dremio's Open Catalog (via the Nessie catalog) or in external Iceberg catalogs (AWS Glue, Apache Polaris). These are Dremio's native, first-class PDS type \u2014 full DML, time travel, schema evolution, and Reflections are all supported.</p><h3>File-Based PDS</h3><p>Parquet, ORC, JSON, CSV, or Avro files in object storage (S3, ADLS, GCS). Dremio can register entire S3 folders as PDS, inferring the schema from the file contents. File-based PDS support Reflections but not full DML.</p><h3>Relational Database Tables</h3><p>Tables from PostgreSQL, MySQL, Oracle, SQL Server, and other JDBC sources. Dremio federates queries to these sources, pushing down predicates for efficiency. VDSs can join relational PDS with Iceberg PDS.</p><h3>NoSQL and Other Sources</h3><p>MongoDB collections, Elasticsearch indexes, and other specialized sources. Dremio translates SQL predicates to the native query language of each source.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Physical Dataset Source Types in Dremio",
+      "diagramCaption": "Figure 1: Physical Datasets connect Dremio to Iceberg tables, files, databases, and other sources."
+    },
+    {
+      "heading": "PDS Schema Inference and Refresh",
+      "content": "<p>When a Physical Dataset is first registered in Dremio, Dremio infers its schema by reading the source metadata. For Iceberg tables, the schema is read from the Iceberg table metadata. For Parquet files, Dremio reads the file footers. For JDBC sources, Dremio queries the database's information schema.</p><p>For file-based PDS, schema refresh is important: if new files are added to an S3 folder with additional columns, Dremio's schema for that PDS may be stale. Dremio provides manual schema refresh (via the UI or API) and can be configured to automatically refresh schemas on a schedule or when queries detect schema mismatches.</p><p>For Iceberg PDS, schema is always current \u2014 Dremio reads the current Iceberg table metadata for every query, so schema evolution (new columns, renamed columns) is immediately reflected without any manual refresh.",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "PDS Schema Inference and Catalog",
+      "diagramCaption": "Figure 2: PDS schema inference \u2014 Iceberg schemas are always current; file schemas refreshed on schedule."
+    },
+    {
+      "heading": "PDS and the Data Governance Model",
+      "content": "<p>Physical Datasets are the access control boundary in Dremio. Access permissions are granted at the PDS level (and can be inherited through the namespace hierarchy). A VDS that queries a restricted PDS will fail for users who don't have access to that PDS \u2014 ensuring that VDS abstraction cannot bypass data governance policies.</p><p>This makes PDS the correct place to apply: column masking policies (hide PII in the PDS, expose clean data in VDSs), row-level security (filter sensitive rows at the PDS before VDS can aggregate them), and source-level access controls (only specific teams can query certain database PDS sources)."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Physical Datasets are the foundation of <a href=\"dremio.html\">Dremio's</a> data architecture \u2014 the layer where actual data sources are registered, schemas are defined, and access controls are enforced. Understanding PDS types and the PDS \u2192 VDS \u2192 Reflection hierarchy is fundamental to designing a scalable, governed <a href=\"data-lakehouse.html\">data lakehouse</a> catalog in Dremio. Well-organized PDS registrations make the entire semantic layer above them cleaner, more maintainable, and easier for business users to navigate.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "Semantic transformations built on Physical Datasets."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The platform managing Physical Datasets."
+    },
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "Acceleration built on Physical Dataset sources."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The primary Physical Dataset type in Dremio."
+    },
+    {
+      "slug": "lakehouse-federation",
+      "term": "Lakehouse Federation",
+      "category": "Analytics & BI",
+      "desc": "Federated PDS sources queried alongside Iceberg tables."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "PDS is the access control boundary in Dremio."
+    },
+    {
+      "slug": "dremio-open-catalog",
+      "term": "Dremio Open Catalog",
+      "category": "Query Engines & Platforms",
+      "desc": "The catalog where Iceberg PDS are registered."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "The primary file format for file-based PDS."
+    }
+  ]
+}

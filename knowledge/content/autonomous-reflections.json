@@ -1,0 +1,98 @@
+{
+  "slug": "autonomous-reflections",
+  "term": "Autonomous Reflections",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Autonomous Reflections in Dremio: The Definitive Guide",
+  "metaDescription": "Learn how Dremio Autonomous Reflections automatically analyze query patterns and create, update, and drop Reflections to optimize lakehouse performance without manual tuning.",
+  "h1": "Autonomous Reflections in Dremio: The Definitive Guide",
+  "lede": "Autonomous Reflections extend Dremio Reflections with AI-driven automation \u2014 analyzing historical query patterns to automatically create, refresh, and retire materialized accelerations, removing the need for manual reflection design and tuning.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What are Autonomous Reflections?",
+      "a": "Autonomous Reflections is a Dremio feature that uses machine learning to analyze historical query patterns and automatically create, modify, and drop Reflections to optimally accelerate the observed workload \u2014 without requiring a data engineer to manually design reflection configurations."
+    },
+    {
+      "q": "How does Dremio decide which Reflections to create autonomously?",
+      "a": "Dremio's autonomous reflection engine analyzes query history: which tables are queried most frequently, which columns appear in GROUP BY and WHERE clauses, which aggregations are most repeated. It then proposes and creates Reflections that would accelerate the highest-impact queries."
+    },
+    {
+      "q": "Are Autonomous Reflections available in all Dremio editions?",
+      "a": "Autonomous Reflections is an enterprise feature available in Dremio Cloud and Dremio Enterprise Edition. Dremio Community Edition supports manually configured Reflections but not the autonomous recommendation and creation engine."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Are Autonomous Reflections?",
+      "content": "<p><strong>Autonomous Reflections</strong> is <a href=\"dremio.html\">Dremio's</a> AI-driven reflection management system that analyzes historical query patterns and automatically creates, modifies, and drops <a href=\"dremio-reflections.html\">Reflections</a> to optimize the query acceleration layer for the observed workload \u2014 without requiring manual reflection design by a data engineer or DBA.</p><p>Traditional <a href=\"dremio-reflections.html\">Dremio Reflections</a> require someone to understand the query workload, identify high-impact aggregations and scan patterns, and manually configure Reflections to accelerate them. This works well for predictable, stable workloads but breaks down as query patterns evolve \u2014 requiring ongoing manual tuning to keep Reflections aligned with actual query patterns.</p><p>Autonomous Reflections automates this entire process. Dremio continuously monitors the query workload, identifies new acceleration opportunities, and adjusts the Reflection portfolio dynamically \u2014 ensuring that the most impactful queries are always accelerated without requiring human intervention."
+    },
+    {
+      "heading": "How Autonomous Reflections Work",
+      "content": "<p>The Autonomous Reflections engine operates in a continuous loop:</p><ol><li><strong>Query monitoring:</strong> Dremio logs metadata for every query \u2014 the table accessed, columns referenced in SELECT and WHERE, GROUP BY dimensions, aggregation functions, and execution time.</li><li><strong>Pattern analysis:</strong> The system identifies frequently repeated query patterns, clustering similar queries by table and access pattern.</li><li><strong>Reflection recommendation:</strong> For high-frequency patterns, the engine generates Reflection candidates \u2014 specific Raw or Aggregation Reflection configurations that would accelerate those queries.</li><li><strong>Cost-benefit evaluation:</strong> Each candidate is evaluated for: expected query speedup, Reflection storage cost, refresh cost (how expensive it is to keep fresh), and estimated query savings based on frequency.</li><li><strong>Reflection creation:</strong> High-value candidates are created automatically and refreshed on the configured schedule.</li><li><strong>Retirement:</strong> Reflections whose query patterns have shifted and are no longer being used are automatically retired and their storage reclaimed.</li></ol>",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Autonomous Reflections Lifecycle",
+      "diagramCaption": "Figure 1: Autonomous Reflections \u2014 continuous query analysis, Reflection creation, and retirement."
+    },
+    {
+      "heading": "Benefits Over Manual Reflections",
+      "content": "<p>Autonomous Reflections provide significant operational advantages over manually configured Reflections:</p><ul><li><strong>No expertise required:</strong> Data engineers do not need to understand the query workload to optimize it. Autonomous Reflections handle the optimization automatically.</li><li><strong>Always up-to-date:</strong> As query patterns evolve (new dashboards launched, old ones retired), Autonomous Reflections adjust the portfolio automatically \u2014 no manual tuning sessions needed.</li><li><strong>Cost optimization:</strong> By retiring unused Reflections and focusing on high-impact ones, Autonomous Reflections minimize Reflection storage costs while maximizing query acceleration.</li><li><strong>Coverage at scale:</strong> Large deployments with hundreds of tables and thousands of daily queries are impossible to manually tune. Autonomous Reflections handle this scale effortlessly.</li></ul>",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Autonomous Reflections Benefits",
+      "diagramCaption": "Figure 2: Autonomous Reflections optimize the acceleration layer continuously without human intervention."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Autonomous Reflections represent the next generation of query acceleration for the <a href=\"data-lakehouse.html\">data lakehouse</a> \u2014 moving from manually designed materializations to AI-driven, continuously optimized acceleration that adapts to actual workloads automatically. For <a href=\"dremio.html\">Dremio</a> deployments at scale, Autonomous Reflections are the practical path to maintaining peak BI performance without a dedicated performance engineering team.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "The materialization technology Autonomous Reflections manages."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The platform providing Autonomous Reflections."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "Autonomous Reflections as an optimization strategy."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture Autonomous Reflections accelerates."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "Virtual Datasets that Autonomous Reflections accelerate."
+    },
+    {
+      "slug": "dremio-cloud",
+      "term": "Dremio Cloud",
+      "category": "Query Engines & Platforms",
+      "desc": "Managed platform offering Autonomous Reflections."
+    },
+    {
+      "slug": "self-service-analytics",
+      "term": "Self-Service Analytics",
+      "category": "Analytics & BI",
+      "desc": "Autonomous Reflections enable self-service without performance trade-offs."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Reflections are stored as Iceberg tables."
+    }
+  ]
+}

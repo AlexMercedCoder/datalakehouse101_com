@@ -1,0 +1,102 @@
+{
+  "slug": "apache-spark",
+  "term": "Apache Spark",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Apache Spark: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Apache Spark is, how it powers Iceberg ETL and ML workloads, and when to use Spark vs Dremio, Trino, or Flink in your data lakehouse architecture.",
+  "h1": "Apache Spark: The Definitive Guide for Data Lakehouse",
+  "lede": "Apache Spark is the most widely deployed distributed data processing engine in the world. In the data lakehouse, Spark is the workhorse for large-scale ETL, Apache Iceberg table management, and machine learning pipelines \u2014 the engine that transforms raw data into analytical gold.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Spark?",
+      "a": "Apache Spark is an open-source, distributed data processing engine designed for large-scale data transformation, analytics, and machine learning. It provides APIs in Python (PySpark), Scala, Java, R, and SQL, and runs on clusters to process datasets too large for a single machine."
+    },
+    {
+      "q": "What is Apache Spark's role in the data lakehouse?",
+      "a": "In the data lakehouse, Spark is primarily used for: large-scale ETL/ELT transformations (reading raw Bronze data, applying business logic, writing Silver/Gold Iceberg tables), Apache Iceberg table management (compaction, schema evolution, DML), and ML feature engineering pipelines that require Spark's full distributed Python ecosystem."
+    },
+    {
+      "q": "Should I use Spark or Dremio for analytics queries?",
+      "a": "Use Spark for large-scale batch ETL, Iceberg table management, and ML workflows. Use Dremio for interactive analytics, BI tool connectivity, self-service SQL, and queries requiring sub-second response via Reflections. They are complementary \u2014 Spark transforms data into Iceberg tables that Dremio serves to analysts."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Spark?",
+      "content": "<p><strong>Apache Spark</strong> is the world's most widely deployed open-source distributed data processing engine. Originally developed at UC Berkeley's AMPLab in 2009 and donated to the Apache Software Foundation in 2013, Spark enables processing of datasets from gigabytes to petabytes by distributing computation across a cluster of machines, with a unified API spanning batch processing, SQL analytics, streaming, and machine learning.</p><p>Spark's key design insight was replacing Hadoop MapReduce's disk-based intermediate storage with in-memory processing using resilient distributed datasets (RDDs). This made Spark 10\u2013100x faster than MapReduce for iterative algorithms and interactive queries \u2014 transforming the data engineering landscape.</p><p>In the 2025 lakehouse ecosystem, Spark occupies a specific, critical role: it is the primary engine for large-scale <a href=\"etl.html\">ETL</a> and <a href=\"elt.html\">ELT</a> transformations, the most feature-complete <a href=\"apache-iceberg.html\">Apache Iceberg</a> write client, and the backbone of ML feature engineering pipelines. It is the workhorse engine that prepares data, while engines like <a href=\"dremio.html\">Dremio</a> and <a href=\"trino.html\">Trino</a> serve that prepared data to analysts."
+    },
+    {
+      "heading": "Spark and Apache Iceberg",
+      "content": "<p>Apache Spark has the most complete and mature Apache Iceberg integration of any engine. Spark was the primary development environment for Iceberg during its early years, and Spark + Iceberg remains the most widely used combination for Iceberg table creation and management.</p><p>Spark's Iceberg capabilities include: creating Iceberg tables (DDL), reading and writing with full ACID compliance, all V2 DML operations (INSERT, UPDATE, DELETE, MERGE INTO with both CoW and MoR), schema evolution DDL, partition evolution, time travel queries, snapshot management (expire, rollback), compaction (RewriteDataFiles, RewriteManifests), and the full Iceberg stored procedure API (<code>CALL catalog.system.*</code>).</p><p>Configuring Spark with Iceberg requires adding the Iceberg Spark extension to the SparkSession: <code>spark.jars.packages org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.x.x</code> and setting the SparkCatalog configuration to point to an Iceberg catalog backend (REST, Nessie, Glue, or Hive Metastore).",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Apache Spark in Lakehouse ETL Architecture",
+      "diagramCaption": "Figure 1: Spark's role in the lakehouse \u2014 ETL/ELT engine that writes to Iceberg tables consumed by analytics engines."
+    },
+    {
+      "heading": "PySpark for Data Engineering",
+      "content": "<p>PySpark \u2014 the Python API for Apache Spark \u2014 is the dominant interface for data engineering teams working with Spark in the modern lakehouse. PySpark provides:</p><ul><li><strong>DataFrame API:</strong> A pandas-like API for distributed data transformation, with lazy evaluation and a query optimizer (Catalyst) that optimizes execution plans</li><li><strong>Spark SQL:</strong> Full SQL interface for querying DataFrames and Iceberg tables \u2014 the same SQL familiar to analysts but executing on distributed Spark clusters</li><li><strong>ML Pipelines (MLlib):</strong> Distributed ML algorithms, feature engineering, and model training on large datasets</li><li><strong>Spark Structured Streaming:</strong> Streaming DataFrame API for continuous processing of Kafka, Kinesis, or file streams into Iceberg tables</li></ul>"
+    },
+    {
+      "heading": "Spark vs. Dremio for Analytics",
+      "content": "<p>Spark and Dremio serve different analytical needs and are best understood as complementary rather than competing:</p><table class=\"comparison-table\"><thead><tr><th>Use Case</th><th>Spark</th><th>Dremio</th></tr></thead><tbody><tr><td>Large-scale batch ETL</td><td>\u2705 Primary choice</td><td>Limited</td></tr><tr><td>Iceberg table management</td><td>\u2705 Most complete</td><td>\u2705 Automated</td></tr><tr><td>Interactive SQL (sub-second)</td><td>Poor (startup latency)</td><td>\u2705 Reflections</td></tr><tr><td>BI tool connectivity</td><td>Via Spark Connect / JDBC</td><td>\u2705 ODBC/JDBC/Arrow</td></tr><tr><td>ML workloads</td><td>\u2705 MLlib, PySpark</td><td>Not applicable</td></tr><tr><td>Semantic layer</td><td>None built-in</td><td>\u2705 Virtual Datasets</td></tr></tbody></table>",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Spark vs Dremio Role Comparison",
+      "diagramCaption": "Figure 2: Spark and Dremio are complementary \u2014 Spark transforms data, Dremio serves it to analysts."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Spark is the essential ETL and ML engine of the data lakehouse. Its deep <a href=\"apache-iceberg.html\">Apache Iceberg</a> integration, massive ecosystem (PySpark, MLlib, Structured Streaming), and proven scalability make it irreplaceable for the data transformation workloads that produce the Silver and Gold Iceberg tables that power analytics. In the multi-engine lakehouse, Spark is the engine that creates and manages data; engines like <a href=\"dremio.html\">Dremio</a> and <a href=\"trino.html\">Trino</a> are the engines that serve that data efficiently to analysts and applications.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The analytics engine complementing Spark for BI workloads."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format Spark manages and writes."
+    },
+    {
+      "slug": "trino",
+      "term": "Trino",
+      "category": "Query Engines & Platforms",
+      "desc": "Federated SQL engine, often paired with Spark."
+    },
+    {
+      "slug": "apache-flink",
+      "term": "Apache Flink",
+      "category": "Query Engines & Platforms",
+      "desc": "Streaming alternative to Spark Structured Streaming."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Core Concepts",
+      "desc": "Spark's primary data lakehouse use case."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Core Concepts",
+      "desc": "Spark processes data through Bronze, Silver, Gold layers."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Spark's RewriteDataFiles for Iceberg table maintenance."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "Spark Structured Streaming processes CDC into Iceberg."
+    }
+  ]
+}

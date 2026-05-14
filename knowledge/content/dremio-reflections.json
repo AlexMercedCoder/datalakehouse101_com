@@ -1,0 +1,106 @@
+{
+  "slug": "dremio-reflections",
+  "term": "Dremio Reflections",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Dremio Reflections: The Definitive Guide",
+  "metaDescription": "Learn what Dremio Reflections are, how raw and aggregation Reflections work, and how they deliver sub-second BI performance on Apache Iceberg data without query rewrites.",
+  "h1": "Dremio Reflections: The Definitive Guide",
+  "lede": "Dremio Reflections are intelligent, pre-computed materializations that transparently accelerate queries on Apache Iceberg data. No query rewrites, no BI tool changes \u2014 Dremio's optimizer automatically routes queries to the best available Reflection, delivering sub-second analytics on petabyte-scale lakehouses.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What are Dremio Reflections?",
+      "a": "Dremio Reflections are pre-computed, materialized representations of Iceberg data stored as optimized Iceberg tables. The Dremio query optimizer automatically selects the most beneficial Reflection for each incoming query, routing the query to the pre-computed result rather than scanning raw data files \u2014 delivering sub-second response times."
+    },
+    {
+      "q": "Do users need to change their queries to benefit from Reflections?",
+      "a": "No. Reflections are completely transparent to query writers and BI tools. Users write the same SQL against the same table or Virtual Dataset; Dremio's optimizer decides at planning time whether to use a Reflection or scan raw data. No query rewrites or tool configuration changes are needed."
+    },
+    {
+      "q": "What types of Reflections does Dremio support?",
+      "a": "Dremio supports two types: Raw Reflections (pre-scanned, compacted, and optionally sorted/partitioned copies of the source data for fast full-scan queries) and Aggregation Reflections (pre-aggregated rollups storing GROUP BY results for instant OLAP-style queries)."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Are Dremio Reflections?",
+      "content": "<p><strong>Dremio Reflections</strong> are the materialized query acceleration technology at the heart of <a href=\"dremio.html\">Dremio's</a> sub-second BI performance. A Reflection is a pre-computed, optimized representation of all or part of an <a href=\"apache-iceberg.html\">Apache Iceberg</a> table or <a href=\"virtual-datasets.html\">Virtual Dataset</a>, stored as an Iceberg table in Dremio-managed storage. When a query arrives, Dremio's query optimizer considers all available Reflections and automatically routes the query to the most beneficial one \u2014 transparently, without any modification to the query or BI tool.</p><p>Reflections solve the fundamental tension in analytics between data freshness and query performance. Raw Iceberg data on object storage is always current, but scanning it for complex aggregations across billions of rows takes seconds to minutes. Pre-aggregated data answers those queries in milliseconds, but maintaining a separate summary table requires pipeline engineering. Reflections bridge this gap: Dremio automatically maintains the pre-computed materializations, automatically refreshes them when source data changes, and automatically routes queries to them.</p>"
+    },
+    {
+      "heading": "Raw Reflections",
+      "content": "<p><strong>Raw Reflections</strong> are pre-scanned, compacted, and optionally sorted copies of source Iceberg tables. They are beneficial for queries that scan large amounts of raw data \u2014 full-table reads, large range scans, and queries joining multiple large tables.</p><p>A Raw Reflection pre-reads source Parquet files, applies column projection (retaining only the columns included in the Reflection), applies optional sorting and partitioning for optimized access patterns, and stores the result as a compact Iceberg table in Dremio's Reflection store. When a query against the source table can be answered by the columns in the Raw Reflection, Dremio routes it to the Reflection \u2014 which may be 5\u201350x smaller than the original table due to column projection and compaction.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Dremio Reflections Acceleration Architecture",
+      "diagramCaption": "Figure 1: Dremio Reflections sit between the query and raw data \u2014 the optimizer routes queries to the best Reflection."
+    },
+    {
+      "heading": "Aggregation Reflections",
+      "content": "<p><strong>Aggregation Reflections</strong> pre-compute GROUP BY aggregations \u2014 sums, counts, averages, min/max \u2014 across specified dimension and measure columns. They are specifically designed for OLAP-style analytical queries: revenue by region by month, order counts by product category by day, customer activity metrics by segment.</p><p>An Aggregation Reflection stores the pre-computed grouped result as a compact Iceberg table. When a query arrives that requests aggregations matching (or derivable from) a Reflection's pre-computed groupings, Dremio routes it to the Reflection. A query for \"revenue by region\" can be answered by a Reflection that pre-computed \"revenue by region by product\" \u2014 Dremio re-aggregates the Reflection's product-level data to produce region-level totals, which is far faster than scanning the original row-level table."
+    },
+    {
+      "heading": "Reflection Transparency and Autonomy",
+      "content": "<p>Two properties make Reflections uniquely powerful compared to traditional materialized views:</p><h3>Query Transparency</h3><p>Reflections are completely transparent to query writers. A BI analyst writing <code>SELECT region, SUM(revenue) FROM sales GROUP BY region</code> does not know or care whether Dremio routes this to a raw Iceberg scan or an Aggregation Reflection. The result is identical \u2014 only the latency differs (seconds vs. milliseconds). No query changes, no BI tool reconfiguration, no analyst training required.</p><h3>Autonomous Reflections</h3><p><a href=\"autonomous-reflections.html\">Autonomous Reflections</a> extend the concept further: Dremio analyzes historical query patterns and automatically creates, modifies, and drops Reflections to optimize for the actual query workload. Instead of requiring a data engineer to manually design and maintain Reflections, Autonomous Reflections continuously optimize the acceleration layer based on observed usage.",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Dremio Reflections Transparency",
+      "diagramCaption": "Figure 2: Reflection routing is transparent \u2014 BI tools, analysts, and AI agents all benefit automatically."
+    },
+    {
+      "heading": "Reflection Refresh and Staleness",
+      "content": "<p>Reflections must be kept synchronized with their source Iceberg tables to remain useful. Dremio supports three refresh strategies:</p><ul><li><strong>Full refresh:</strong> Recompute the entire Reflection from the current source snapshot. Accurate but expensive for large tables.</li><li><strong>Incremental refresh:</strong> Read only the new Iceberg snapshots since the last refresh and append or update the Reflection incrementally. Much more efficient for large tables with regular appends.</li><li><strong>Never refresh (manual):</strong> Used for static reference data that changes infrequently.</li></ul><p>When a Reflection becomes stale (the source has been updated but the Reflection has not yet refreshed), Dremio can either serve queries from the stale Reflection (acceptable for BI dashboards with moderate staleness tolerance) or fall back to scanning raw source data (guaranteeing freshness at the cost of performance). This behavior is configurable per Reflection."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Dremio Reflections are the technology that makes the <a href=\"data-lakehouse.html\">data lakehouse</a> competitive with a proprietary cloud data warehouse for BI performance. By pre-computing optimized materializations of Iceberg data and transparently routing queries to them, Reflections deliver sub-second response times on petabyte-scale lakehouses without any sacrifice of data openness, engine flexibility, or query compatibility. For any organization running <a href=\"dremio.html\">Dremio</a> as their lakehouse query engine, Reflections are the first optimization lever to pull for improving dashboard performance.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The platform providing Reflections acceleration."
+    },
+    {
+      "slug": "autonomous-reflections",
+      "term": "Autonomous Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "AI-driven automatic Reflection management."
+    },
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "Semantic layer views that Reflections can accelerate."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Reflections are stored as and built on Iceberg tables."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "Reflections accelerate the semantic layer query path."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "Reflection matching is part of Dremio's query optimization."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Reflections use compacted Iceberg files for fast reads."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Reflections make the lakehouse competitive for BI."
+    }
+  ]
+}

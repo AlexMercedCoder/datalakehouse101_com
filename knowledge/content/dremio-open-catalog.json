@@ -1,0 +1,102 @@
+{
+  "slug": "dremio-open-catalog",
+  "term": "Dremio Open Catalog",
+  "category": "Query Engines & Platforms",
+  "metaTitle": "Dremio Open Catalog: The Definitive Guide",
+  "metaDescription": "Learn what Dremio Open Catalog is, how it implements the Iceberg REST Catalog spec with Git-like Nessie branching, and why it enables true multi-engine lakehouse interoperability.",
+  "h1": "Dremio Open Catalog: The Definitive Guide",
+  "lede": "Dremio Open Catalog is an Apache Iceberg-native catalog that implements the Iceberg REST Catalog specification with Git-like branching and tagging via Project Nessie. Any engine \u2014 Spark, Trino, Flink \u2014 can connect to it, making Dremio the open catalog for the multi-engine lakehouse.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Dremio Open Catalog?",
+      "a": "Dremio Open Catalog is Dremio's Apache Iceberg catalog service that implements the Iceberg REST Catalog API specification, powered by Project Nessie for Git-like table branching and tagging. It allows any Iceberg-compatible engine (Spark, Trino, Flink, Dremio) to create, read, and update Iceberg tables through a shared, interoperable catalog."
+    },
+    {
+      "q": "How does Dremio Open Catalog differ from AWS Glue or Hive Metastore?",
+      "a": "Dremio Open Catalog implements the Iceberg REST Catalog spec natively, supports Git-like branching (via Nessie) for isolated data experimentation, and includes credential vending for secure storage access. AWS Glue is AWS-specific; Hive Metastore is pre-REST-Catalog era and lacks Iceberg-native semantics."
+    },
+    {
+      "q": "Can Spark and Trino use Dremio Open Catalog?",
+      "a": "Yes. Any engine implementing the Iceberg REST catalog client \u2014 Spark, Trino, Flink, PyIceberg \u2014 can connect to Dremio Open Catalog using standard REST catalog configuration. Tables created by Spark are immediately visible to Dremio and Trino, and vice versa."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Dremio Open Catalog?",
+      "content": "<p><strong>Dremio Open Catalog</strong> is <a href=\"dremio.html\">Dremio's</a> Apache Iceberg catalog service \u2014 the metadata store that registers Iceberg tables, manages namespaces, and coordinates access across multiple query engines. It implements the <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog specification</a>, meaning any engine with an Iceberg REST catalog client can connect to it as a drop-in catalog backend.</p><p>Under the hood, Dremio Open Catalog is powered by <a href=\"project-nessie.html\">Project Nessie</a> \u2014 the Git-like transactional catalog developed by Dremio. Nessie adds branching and tagging semantics on top of the Iceberg snapshot model: data engineers can create isolated branches for experiments, merge changes atomically when validated, and tag specific table states for reproducible ML training datasets.</p><p>Dremio Open Catalog is available both as part of <a href=\"dremio-cloud.html\">Dremio Cloud</a> (managed, serverless) and as a standalone service that can be deployed independently for organizations that want a managed open catalog without using Dremio as their primary query engine.</p>"
+    },
+    {
+      "heading": "Key Open Catalog Features",
+      "content": "<p>Dremio Open Catalog provides capabilities beyond basic catalog registration:</p><h3>Iceberg REST API Compliance</h3><p>Full implementation of the Iceberg REST Catalog specification \u2014 namespaces, table CRUD, metadata load, transaction commit, token-based auth. Any conformant Iceberg client connects without modification.</p><h3>Git-Like Branching (Nessie)</h3><p>Create branches for isolated data experimentation. Commit changes atomically. Merge branches when validated. Tag specific commits for reproducible ML datasets. All the power of Git workflows applied to lakehouse tables.</p><h3>Credential Vending</h3><p>The catalog returns short-lived, scoped cloud storage credentials alongside table metadata. Engines get exactly the permissions needed to read or write the specific table requested \u2014 no broad long-lived credentials required.</p><h3>Multi-Engine Interoperability</h3><p>Tables registered in Dremio Open Catalog are accessible simultaneously by Dremio, Apache Spark, Trino, Apache Flink, and any other Iceberg REST catalog client. Schema changes from one engine are immediately visible to all others.",
+      "diagram": "dremio-diagram-1.png",
+      "diagramAlt": "Dremio Open Catalog Architecture",
+      "diagramCaption": "Figure 1: Dremio Open Catalog as the shared Iceberg catalog for a multi-engine lakehouse."
+    },
+    {
+      "heading": "Connecting to Dremio Open Catalog",
+      "content": "<p>Connecting any Iceberg-compatible engine to Dremio Open Catalog uses the standard Iceberg REST catalog configuration:</p><p><strong>Apache Spark:</strong></p><pre><code>spark.sql.catalog.dremio=org.apache.iceberg.spark.SparkCatalog\nspark.sql.catalog.dremio.type=rest\nspark.sql.catalog.dremio.uri=https://your-catalog.dremio.cloud\nspark.sql.catalog.dremio.credential=&lt;token&gt;</code></pre><p><strong>Trino:</strong></p><pre><code>connector.name=iceberg\niceberg.catalog.type=rest\niceberg.rest-catalog.uri=https://your-catalog.dremio.cloud\niceberg.rest-catalog.security=OAUTH2</code></pre><p>Once connected, tables created or modified by any engine appear in all other engines immediately \u2014 through the shared catalog's consistent metadata view."
+    },
+    {
+      "heading": "Open Catalog and Data Governance",
+      "content": "<p>Dremio Open Catalog enforces access control at the catalog API layer \u2014 not in the query engine. This means security policies are consistent regardless of which engine is querying. A principal without access to a namespace cannot load that namespace's table metadata, regardless of whether they're using Dremio, Spark, or Trino.</p><p>Access control in Dremio Open Catalog is managed through role-based policies on namespaces and tables: read access, write access, manage (create/drop) access, and admin. Combined with credential vending, this creates a security model where neither the query engine nor the storage credentials need to carry the full security policy \u2014 the catalog is the enforcement point.",
+      "diagram": "dremio-diagram-2.png",
+      "diagramAlt": "Open Catalog Multi-Engine Governance",
+      "diagramCaption": "Figure 2: Open Catalog enforces governance consistently across all connected engines."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Dremio Open Catalog is the practical implementation of the open lakehouse vision: a vendor-neutral, Iceberg REST Catalog compliant metadata store that any engine can use, governed consistently regardless of client, and extended with Git-like branching for advanced data engineering workflows. For organizations building multi-engine lakehouses on <a href=\"apache-iceberg.html\">Apache Iceberg</a>, Dremio Open Catalog provides the catalog foundation that makes true engine interoperability a reality.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "The platform providing Open Catalog."
+    },
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs",
+      "desc": "Git-like catalog engine powering Open Catalog."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "The API spec implemented by Open Catalog."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format Open Catalog manages."
+    },
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs",
+      "desc": "Alternative open REST Catalog implementation."
+    },
+    {
+      "slug": "multi-engine-interoperability",
+      "term": "Multi-Engine Interoperability",
+      "category": "Analytics & BI",
+      "desc": "What Open Catalog enables across engines."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Access control enforced at the catalog layer."
+    },
+    {
+      "slug": "dremio-cloud",
+      "term": "Dremio Cloud",
+      "category": "Query Engines & Platforms",
+      "desc": "Managed hosting of Dremio Open Catalog."
+    }
+  ]
+}

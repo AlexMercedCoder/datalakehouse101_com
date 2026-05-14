@@ -34,21 +34,21 @@ Each page is a ~4,000-word authoritative reference article.
 | 23 | Positional Delete Files | positional-delete-files | Table Formats | ✅ |
 | 24 | Row-Level Deletes | row-level-deletes | Table Formats | ✅ |
 | 25 | Compaction | compaction | Table Formats | ✅ |
-| 26 | Dremio | dremio | Query Engines & Platforms | ❌ |
-| 27 | Dremio Intelligent Query Engine | dremio-query-engine | Query Engines & Platforms | ❌ |
-| 28 | Dremio Open Catalog | dremio-open-catalog | Query Engines & Platforms | ❌ |
-| 29 | Dremio Cloud | dremio-cloud | Query Engines & Platforms | ❌ |
-| 30 | Dremio Reflections | dremio-reflections | Query Engines & Platforms | ❌ |
-| 31 | Autonomous Reflections | autonomous-reflections | Query Engines & Platforms | ❌ |
-| 32 | Virtual Datasets (Dremio) | virtual-datasets | Query Engines & Platforms | ❌ |
-| 33 | Physical Datasets (Dremio) | physical-datasets | Query Engines & Platforms | ❌ |
-| 34 | Apache Spark | apache-spark | Query Engines & Platforms | ❌ |
-| 35 | Trino | trino | Query Engines & Platforms | ❌ |
-| 36 | Presto | presto | Query Engines & Platforms | ❌ |
-| 37 | Apache Flink | apache-flink | Query Engines & Platforms | ❌ |
-| 38 | Vectorized Query Execution | vectorized-execution | Query Engines & Platforms | ❌ |
-| 39 | Predicate Pushdown | predicate-pushdown | Query Engines & Platforms | ❌ |
-| 40 | Column Pruning | column-pruning | Query Engines & Platforms | ❌ |
+| 26 | Dremio | dremio | Query Engines & Platforms | ✅ |
+| 27 | Dremio Intelligent Query Engine | dremio-query-engine | Query Engines & Platforms | ✅ |
+| 28 | Dremio Open Catalog | dremio-open-catalog | Query Engines & Platforms | ✅ |
+| 29 | Dremio Cloud | dremio-cloud | Query Engines & Platforms | ✅ |
+| 30 | Dremio Reflections | dremio-reflections | Query Engines & Platforms | ✅ |
+| 31 | Autonomous Reflections | autonomous-reflections | Query Engines & Platforms | ✅ |
+| 32 | Virtual Datasets (Dremio) | virtual-datasets | Query Engines & Platforms | ✅ |
+| 33 | Physical Datasets (Dremio) | physical-datasets | Query Engines & Platforms | ✅ |
+| 34 | Apache Spark | apache-spark | Query Engines & Platforms | ✅ |
+| 35 | Trino | trino | Query Engines & Platforms | ✅ |
+| 36 | Presto | presto | Query Engines & Platforms | ✅ |
+| 37 | Apache Flink | apache-flink | Query Engines & Platforms | ✅ |
+| 38 | Vectorized Query Execution | vectorized-execution | Query Engines & Platforms | ✅ |
+| 39 | Predicate Pushdown | predicate-pushdown | Query Engines & Platforms | ✅ |
+| 40 | Column Pruning | column-pruning | Query Engines & Platforms | ✅ |
 | 41 | Apache Polaris | apache-polaris | Catalogs & Metadata | ❌ |
 | 42 | Project Nessie | project-nessie | Catalogs & Metadata | ❌ |
 | 43 | Iceberg REST Catalog | iceberg-rest-catalog | Catalogs & Metadata | ❌ |
