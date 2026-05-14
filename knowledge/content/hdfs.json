@@ -1,0 +1,98 @@
+{
+  "slug": "hdfs",
+  "term": "Apache Hadoop HDFS",
+  "category": "File Formats & Storage",
+  "metaTitle": "Apache Hadoop HDFS: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Apache Hadoop HDFS is, its role as the original data lake storage layer, and why modern lakehouses are migrating from HDFS to cloud object storage.",
+  "h1": "Apache Hadoop HDFS: The Definitive Guide",
+  "lede": "Apache Hadoop HDFS (Hadoop Distributed File System) was the original storage layer of the data lake era. Though being replaced by cloud object storage in modern lakehouses, HDFS remains in production at many enterprises and Apache Iceberg supports it as a storage backend during migration.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Hadoop HDFS?",
+      "a": "HDFS (Hadoop Distributed File System) is the distributed file system component of the Apache Hadoop ecosystem. It stores large datasets across clusters of commodity hardware, replicating blocks across multiple nodes for fault tolerance. HDFS was the standard storage layer for Hadoop MapReduce, Apache Hive, and early Spark deployments."
+    },
+    {
+      "q": "Does Apache Iceberg support HDFS?",
+      "a": "Yes. Apache Iceberg supports HDFS as a storage backend using the hdfs:// URI scheme and Hadoop filesystem libraries. Iceberg tables on HDFS work identically to Iceberg tables on S3, with the same metadata model, snapshots, and schema evolution. HDFS support is primarily useful for organizations migrating from on-premises Hadoop to Iceberg before moving to cloud storage."
+    },
+    {
+      "q": "Why are organizations migrating from HDFS to cloud object storage?",
+      "a": "HDFS requires dedicated hardware clusters with significant operational overhead \u2014 cluster management, capacity planning, hardware maintenance, and NameNode high availability. Cloud object storage (S3, ADLS, GCS) is serverless, infinitely scalable, more durable, and dramatically cheaper for most workloads. The lakehouse on cloud object storage delivers better economics and operational simplicity than HDFS-based data lakes."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Hadoop HDFS?",
+      "content": "<p><strong>Apache Hadoop HDFS</strong> (Hadoop Distributed File System) is the distributed file system that powered the Hadoop data lake era (2008\u20132020). Designed for storing very large files across clusters of commodity hardware, HDFS splits files into 128MB blocks and replicates each block across three nodes for fault tolerance. It provided the scalable, fault-tolerant storage layer that made petabyte-scale data lakes possible before cloud storage existed.</p><p>HDFS was the foundation of the original data lake stack: Apache Hive running on MapReduce (and later Spark) read and wrote Hive tables stored on HDFS, with the Hive Metastore tracking metadata. This architecture served the enterprise data world for over a decade and many organizations still operate HDFS-based data lakes in production today.</p>"
+    },
+    {
+      "heading": "HDFS Architecture",
+      "content": "<p>HDFS uses a master-worker architecture:</p><ul><li><strong>NameNode:</strong> The master node that maintains the file system namespace \u2014 the directory tree, file metadata, and the mapping of file blocks to DataNode locations. The NameNode is a single point of failure (mitigated by HA NameNode configurations).</li><li><strong>DataNodes:</strong> Worker nodes that store actual file blocks on local disk. DataNodes replicate blocks to peer DataNodes and report block health to the NameNode.</li><li><strong>Secondary NameNode / JournalNodes:</strong> Auxiliary services for NameNode checkpoint and high availability.</li></ul><p>This architecture requires dedicated hardware infrastructure, careful capacity planning, and ongoing operational management \u2014 in sharp contrast to cloud object storage which is serverless and infinitely scalable.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "HDFS Architecture vs Cloud Object Storage",
+      "diagramCaption": "Figure 1: HDFS master-worker architecture vs cloud object storage serverless model."
+    },
+    {
+      "heading": "Migrating from HDFS to Object Storage with Iceberg",
+      "content": "<p>The migration from HDFS-based data lakes to cloud <a href=\"object-storage.html\">object storage</a> lakehouses is the dominant infrastructure modernization project in enterprise data engineering in 2025\u20132026. Apache Iceberg is a key enabler of this migration:</p><ol><li><strong>Iceberg on HDFS:</strong> Migrate Hive ORC/Parquet tables to Iceberg format while still on HDFS (gaining snapshots, ACID, schema evolution without changing storage)</li><li><strong>Distcp to S3/ADLS:</strong> Copy Iceberg data and metadata files from HDFS to cloud object storage using DistCp or cloud-native sync tools</li><li><strong>Update catalog pointers:</strong> Re-register Iceberg tables in the new cloud catalog (Glue, Polaris, Nessie) pointing to the cloud storage location</li><li><strong>Decommission HDFS:</strong> Once all tables are migrated and validated, decommission the HDFS cluster</li></ol><p>Iceberg's file-level metadata model (all metadata in object files, not in a proprietary cluster) makes this migration path straightforward \u2014 there is no cluster-internal state to migrate.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "HDFS to Cloud Object Storage Migration Path",
+      "diagramCaption": "Figure 2: HDFS to cloud object storage migration using Apache Iceberg as the bridge."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Hadoop HDFS was the foundational storage technology of the data lake era, enabling petabyte-scale distributed storage before cloud infrastructure existed. In 2025, HDFS is being systematically replaced by cloud <a href=\"object-storage.html\">object storage</a> (<a href=\"amazon-s3.html\">S3</a>, <a href=\"azure-adls.html\">ADLS</a>, <a href=\"google-cloud-storage.html\">GCS</a>) as organizations migrate to the cloud <a href=\"data-lakehouse.html\">data lakehouse</a> architecture. <a href=\"apache-iceberg.html\">Apache Iceberg's</a> support for HDFS as a storage backend provides a practical migration path \u2014 organizations can adopt Iceberg's benefits on HDFS first, then migrate storage to the cloud without changing the table format.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "Cloud replacement for HDFS in modern lakehouses."
+    },
+    {
+      "slug": "amazon-s3",
+      "term": "Amazon S3",
+      "category": "File Formats & Storage",
+      "desc": "Primary migration target from HDFS."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg supports HDFS as a migration stepping stone."
+    },
+    {
+      "slug": "hive-metastore",
+      "term": "Hive Metastore",
+      "category": "Catalogs & Metadata",
+      "desc": "The catalog that managed HDFS-era Hive tables."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Spark runs on HDFS and on cloud storage alike."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "HDFS tightly couples storage and compute \u2014 cloud doesn't."
+    },
+    {
+      "slug": "minio",
+      "term": "MinIO",
+      "category": "File Formats & Storage",
+      "desc": "On-prem S3-compatible alternative to HDFS."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The modern architecture replacing HDFS-based data lakes."
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apache Hadoop HDFS: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Apache Hadoop HDFS is, its role as the original data lake storage layer, and why modern lakehouses are migrating from HDFS to cloud object storage.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/hdfs.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Apache Hadoop HDFS: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Apache Hadoop HDFS is, its role as the original data lake storage layer, and why modern lakehouses are migrating from HDFS to cloud object storage.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/hdfs.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Apache Hadoop HDFS: The Definitive Guide",
+      "description": "Learn what Apache Hadoop HDFS is, its role as the original data lake storage layer, and why modern lakehouses are migrating from HDFS to cloud object storage.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/hdfs.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Apache Hadoop HDFS", "item": "https://datalakehouse101.com/knowledge/hdfs.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Apache Hadoop HDFS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "HDFS (Hadoop Distributed File System) is the distributed file system component of the Apache Hadoop ecosystem. It stores large datasets across clusters of commodity hardware, replicating blocks across multiple nodes for fault tolerance. HDFS was the standard storage layer for Hadoop MapReduce, Apache Hive, and early Spark deployments."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Apache Iceberg support HDFS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Apache Iceberg supports HDFS as a storage backend using the hdfs:// URI scheme and Hadoop filesystem libraries. Iceberg tables on HDFS work identically to Iceberg tables on S3, with the same metadata model, snapshots, and schema evolution. HDFS support is primarily useful for organizations migrating from on-premises Hadoop to Iceberg before moving to cloud storage."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why are organizations migrating from HDFS to cloud object storage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "HDFS requires dedicated hardware clusters with significant operational overhead — cluster management, capacity planning, hardware maintenance, and NameNode high availability. Cloud object storage (S3, ADLS, GCS) is serverless, infinitely scalable, more durable, and dramatically cheaper for most workloads. The lakehouse on cloud object storage delivers better economics and operational simplicity than HDFS-based data lakes."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Apache Hadoop HDFS</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">File Formats & Storage</span>
+      <h1>Apache Hadoop HDFS: The Definitive Guide</h1>
+      <p class="hero-lede">Apache Hadoop HDFS (Hadoop Distributed File System) was the original storage layer of the data lake era. Though being replaced by cloud object storage in modern lakehouses, HDFS remains in production at many enterprises and Apache Iceberg supports it as a storage backend during migration.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Apache Hadoop HDFS?</a></li>
+        <li><a href="#section-2">HDFS Architecture</a></li>
+        <li><a href="#section-3">Migrating from HDFS to Object Storage with Iceberg</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Apache Hadoop HDFS?</h2>
+        <p><strong>Apache Hadoop HDFS</strong> (Hadoop Distributed File System) is the distributed file system that powered the Hadoop data lake era (2008–2020). Designed for storing very large files across clusters of commodity hardware, HDFS splits files into 128MB blocks and replicates each block across three nodes for fault tolerance. It provided the scalable, fault-tolerant storage layer that made petabyte-scale data lakes possible before cloud storage existed.</p><p>HDFS was the foundation of the original data lake stack: Apache Hive running on MapReduce (and later Spark) read and wrote Hive tables stored on HDFS, with the Hive Metastore tracking metadata. This architecture served the enterprise data world for over a decade and many organizations still operate HDFS-based data lakes in production today.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>HDFS Architecture</h2>
+        <p>HDFS uses a master-worker architecture:</p><ul><li><strong>NameNode:</strong> The master node that maintains the file system namespace — the directory tree, file metadata, and the mapping of file blocks to DataNode locations. The NameNode is a single point of failure (mitigated by HA NameNode configurations).</li><li><strong>DataNodes:</strong> Worker nodes that store actual file blocks on local disk. DataNodes replicate blocks to peer DataNodes and report block health to the NameNode.</li><li><strong>Secondary NameNode / JournalNodes:</strong> Auxiliary services for NameNode checkpoint and high availability.</li></ul><p>This architecture requires dedicated hardware infrastructure, careful capacity planning, and ongoing operational management — in sharp contrast to cloud object storage which is serverless and infinitely scalable.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="HDFS Architecture vs Cloud Object Storage diagram" loading="lazy"><figcaption>Figure 1: HDFS master-worker architecture vs cloud object storage serverless model.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Migrating from HDFS to Object Storage with Iceberg</h2>
+        <p>The migration from HDFS-based data lakes to cloud <a href="object-storage.html">object storage</a> lakehouses is the dominant infrastructure modernization project in enterprise data engineering in 2025–2026. Apache Iceberg is a key enabler of this migration:</p><ol><li><strong>Iceberg on HDFS:</strong> Migrate Hive ORC/Parquet tables to Iceberg format while still on HDFS (gaining snapshots, ACID, schema evolution without changing storage)</li><li><strong>Distcp to S3/ADLS:</strong> Copy Iceberg data and metadata files from HDFS to cloud object storage using DistCp or cloud-native sync tools</li><li><strong>Update catalog pointers:</strong> Re-register Iceberg tables in the new cloud catalog (Glue, Polaris, Nessie) pointing to the cloud storage location</li><li><strong>Decommission HDFS:</strong> Once all tables are migrated and validated, decommission the HDFS cluster</li></ol><p>Iceberg's file-level metadata model (all metadata in object files, not in a proprietary cluster) makes this migration path straightforward — there is no cluster-internal state to migrate.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="HDFS to Cloud Object Storage Migration Path diagram" loading="lazy"><figcaption>Figure 2: HDFS to cloud object storage migration using Apache Iceberg as the bridge.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Apache Hadoop HDFS was the foundational storage technology of the data lake era, enabling petabyte-scale distributed storage before cloud infrastructure existed. In 2025, HDFS is being systematically replaced by cloud <a href="object-storage.html">object storage</a> (<a href="amazon-s3.html">S3</a>, <a href="azure-adls.html">ADLS</a>, <a href="google-cloud-storage.html">GCS</a>) as organizations migrate to the cloud <a href="data-lakehouse.html">data lakehouse</a> architecture. <a href="apache-iceberg.html">Apache Iceberg's</a> support for HDFS as a storage backend provides a practical migration path — organizations can adopt Iceberg's benefits on HDFS first, then migrate storage to the cloud without changing the table format.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="object-storage.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Object Storage</span>
+      <span class="related-desc">Cloud replacement for HDFS in modern lakehouses.</span>
+    </a>
+      <a class="related-card" href="amazon-s3.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Amazon S3</span>
+      <span class="related-desc">Primary migration target from HDFS.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Iceberg supports HDFS as a migration stepping stone.</span>
+    </a>
+      <a class="related-card" href="hive-metastore.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Hive Metastore</span>
+      <span class="related-desc">The catalog that managed HDFS-era Hive tables.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Spark runs on HDFS and on cloud storage alike.</span>
+    </a>
+      <a class="related-card" href="decoupled-storage-compute.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Decoupled Storage and Compute</span>
+      <span class="related-desc">HDFS tightly couples storage and compute — cloud doesn't.</span>
+    </a>
+      <a class="related-card" href="minio.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">MinIO</span>
+      <span class="related-desc">On-prem S3-compatible alternative to HDFS.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The modern architecture replacing HDFS-based data lakes.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

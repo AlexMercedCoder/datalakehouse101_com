@@ -1,0 +1,102 @@
+{
+  "slug": "amazon-s3",
+  "term": "Amazon S3",
+  "category": "File Formats & Storage",
+  "metaTitle": "Amazon S3 for Data Lakehouse: The Definitive Guide",
+  "metaDescription": "Learn how Amazon S3 serves as the object storage foundation for data lakehouses on AWS, including S3 storage classes, strong consistency, and integration with Apache Iceberg.",
+  "h1": "Amazon S3 for Data Lakehouse: The Definitive Guide",
+  "lede": "Amazon S3 (Simple Storage Service) is the world's most widely used object storage service and the dominant storage layer for AWS-based data lakehouses. Its 11 nines durability, strong consistency, multiple storage classes, and universal API make it the natural home for Apache Iceberg data files at any scale.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Amazon S3?",
+      "a": "Amazon S3 (Simple Storage Service) is AWS's object storage service, providing unlimited storage capacity with 99.999999999% (11 nines) durability, multiple storage tiers, strong read-after-write consistency, and a universal HTTP API. It is the primary storage backend for Apache Iceberg data files and metadata in AWS-based data lakehouse architectures."
+    },
+    {
+      "q": "Why is Amazon S3 ideal for Apache Iceberg lakehouses?",
+      "a": "S3's combination of 11-nine durability, unlimited scale, low cost, strong consistency (since December 2020), and universal API makes it ideal for Iceberg. Iceberg's atomic commit model works correctly with S3's consistency guarantees. S3's storage classes (Intelligent-Tiering, Infrequent Access) enable cost optimization for historical data."
+    },
+    {
+      "q": "How does S3 storage pricing work for a lakehouse?",
+      "a": "S3 charges per GB stored per month (varies by storage class and region), per API request (PUT, GET, LIST operations), and for data transfer out of AWS. For lakehouses, storage costs dominate. S3 Standard is ~$0.023/GB/month in US East; S3 Intelligent-Tiering automatically moves infrequently accessed data to lower-cost tiers, reducing costs for cold historical data by 40\u201368%."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Amazon S3?",
+      "content": "<p><strong>Amazon S3</strong> (Simple Storage Service) is AWS's flagship object storage service, launched in 2006 as one of the first cloud services. It provides unlimited storage capacity at low cost with 99.999999999% (11 nines) object durability through automatic multi-AZ replication. S3 is the most widely used object storage service in the world and the dominant storage backend for AWS-based <a href=\"data-lakehouse.html\">data lakehouses</a>.</p><p>For <a href=\"apache-iceberg.html\">Apache Iceberg</a> lakehouses on AWS, S3 is where everything lives: Parquet data files, Avro manifest files, manifest lists, table metadata JSON files, and Iceberg catalog state. Query engines (<a href=\"dremio.html\">Dremio</a>, <a href=\"apache-spark.html\">Spark</a>, <a href=\"trino.html\">Trino</a>) access S3 through the S3 API \u2014 reading and writing objects using the same universal interface."
+    },
+    {
+      "heading": "S3 Storage Classes for Lakehouse Data",
+      "content": "<p>S3 offers multiple storage classes with different cost/access-time trade-offs \u2014 enabling lakehouse cost optimization based on data access patterns:</p><ul><li><strong>S3 Standard:</strong> Default class for frequently accessed data. Millisecond access time. Highest cost per GB. Best for Bronze/Silver/Gold layer tables actively queried.</li><li><strong>S3 Intelligent-Tiering:</strong> Automatically moves objects between access tiers based on usage patterns. No retrieval fee. Best for data with unpredictable access patterns (older partitions that are occasionally queried).</li><li><strong>S3 Standard-IA (Infrequent Access):</strong> Lower storage cost, retrieval fee per GB. Best for data accessed less than once per month.</li><li><strong>S3 Glacier Instant Retrieval:</strong> Very low storage cost, millisecond retrieval, higher retrieval fee. Best for data retained for compliance but rarely queried.</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Amazon S3 Storage Classes for Lakehouse",
+      "diagramCaption": "Figure 1: S3 storage class tiering for lakehouse data \u2014 optimize costs based on partition access frequency."
+    },
+    {
+      "heading": "S3 Strong Consistency and Iceberg",
+      "content": "<p>Amazon S3 achieved <strong>strong read-after-write consistency</strong> for all GET, PUT, LIST, and DELETE operations in December 2020. This was a critical milestone for Iceberg on S3: previously, Iceberg implementations had to work around S3's eventual consistency with mechanisms like DynamoDB lock tables. With strong consistency, Iceberg's native atomic commit mechanism (writing metadata and updating the catalog pointer) works correctly on S3 without any workarounds.</p><p>S3 strong consistency means: immediately after an Iceberg commit writes a new metadata file to S3, any subsequent GET of that key will return the new file. LIST operations immediately reflect new objects. This is the consistency model Iceberg's optimistic concurrency control requires.</p>"
+    },
+    {
+      "heading": "S3 Access Control for Lakehouses",
+      "content": "<p>S3 provides multiple access control mechanisms for securing lakehouse data:</p><ul><li><strong>IAM Policies:</strong> Identity-based policies granting specific AWS principals (IAM users, roles) access to specific S3 buckets and object prefixes</li><li><strong>Bucket Policies:</strong> Resource-based policies attached to S3 buckets, defining who can access which objects</li><li><strong>S3 Block Public Access:</strong> Account and bucket-level settings preventing any public access regardless of individual object ACLs</li><li><strong>AWS Lake Formation:</strong> Fine-grained table and column level access control layered on top of Glue-cataloged S3 data</li><li><strong>Credential Vending:</strong> Iceberg REST catalogs (Polaris, Nessie, Glue) return short-lived STS credentials scoped to specific S3 prefixes \u2014 engines get exactly the permissions needed for specific table access</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "S3 Access Control Lakehouse Security",
+      "diagramCaption": "Figure 2: S3 security layers for lakehouse data \u2014 IAM, bucket policies, Lake Formation, and credential vending."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Amazon S3 is the default storage layer for AWS-based <a href=\"data-lakehouse.html\">data lakehouses</a>, combining unlimited scale, 11-nine durability, strong consistency, cost-optimized storage tiers, and the universal S3 API that every lakehouse engine supports. For organizations building on <a href=\"apache-iceberg.html\">Apache Iceberg</a> on AWS, S3 is the natural and optimal storage foundation \u2014 directly enabling the decoupled storage-and-compute architecture that makes the open lakehouse economically superior to proprietary cloud warehouses.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "The general category S3 belongs to."
+    },
+    {
+      "slug": "azure-adls",
+      "term": "Azure ADLS",
+      "category": "File Formats & Storage",
+      "desc": "Azure's equivalent to S3 for lakehouses."
+    },
+    {
+      "slug": "google-cloud-storage",
+      "term": "Google Cloud Storage",
+      "category": "File Formats & Storage",
+      "desc": "GCP's equivalent to S3."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Stores all table data and metadata in S3."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "S3 enables this core lakehouse architectural pattern."
+    },
+    {
+      "slug": "aws-glue-catalog",
+      "term": "AWS Glue Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "The managed Iceberg catalog for S3-based lakehouses."
+    },
+    {
+      "slug": "dremio-cloud",
+      "term": "Dremio Cloud",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio Cloud connects to your S3 bucket."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "The file format stored as S3 objects."
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Cloud Storage (GCS): The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn how Google Cloud Storage serves as the object storage foundation for GCP-based Apache Iceberg data lakehouses and its key features for lakehouse architecture.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/google-cloud-storage.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Google Cloud Storage (GCS): The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn how Google Cloud Storage serves as the object storage foundation for GCP-based Apache Iceberg data lakehouses and its key features for lakehouse architecture.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/google-cloud-storage.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Google Cloud Storage (GCS): The Definitive Guide",
+      "description": "Learn how Google Cloud Storage serves as the object storage foundation for GCP-based Apache Iceberg data lakehouses and its key features for lakehouse architecture.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/google-cloud-storage.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Google Cloud Storage (GCS)", "item": "https://datalakehouse101.com/knowledge/google-cloud-storage.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Google Cloud Storage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Google Cloud Storage (GCS) is Google Cloud Platform's object storage service providing unlimited storage with high durability, strong consistency, and a universal JSON/XML API compatible with S3 tooling. It is the recommended storage backend for Apache Iceberg lakehouses on GCP."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Apache Iceberg support GCS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Apache Iceberg, Apache Spark on Dataproc, Trino, Dremio, and other engines all support GCS as an Iceberg storage backend using the gs:// URI scheme and the GCS connector for Hadoop. Google BigQuery also supports reading Iceberg tables stored in GCS via BigLake."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does GCS compare to Amazon S3 for lakehouse use cases?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "GCS and S3 have similar capabilities for lakehouse storage: unlimited scale, high durability, strong consistency, and storage class tiering. GCS's key advantages for GCP-native lakehouses are tighter BigQuery integration, native Google IAM, and GCS's uniform bucket-level access model. S3's advantages are its larger ecosystem of tooling and tutorials."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Google Cloud Storage (GCS)</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">File Formats & Storage</span>
+      <h1>Google Cloud Storage (GCS): The Definitive Guide</h1>
+      <p class="hero-lede">Google Cloud Storage (GCS) is GCP's object storage service and the storage foundation for data lakehouses on Google Cloud. Its strong consistency, multi-region options, and deep BigQuery integration make it the natural home for Apache Iceberg tables on GCP.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Google Cloud Storage?</a></li>
+        <li><a href="#section-2">GCS Storage Classes</a></li>
+        <li><a href="#section-3">GCS and BigLake</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Google Cloud Storage?</h2>
+        <p><strong>Google Cloud Storage (GCS)</strong> is Google Cloud Platform's object storage service, providing unlimited, globally consistent storage for structured and unstructured data. GCS stores data as objects in buckets, accessed via an HTTPS API compatible with both GCS-native clients and S3-compatible tooling. For <a href="apache-iceberg.html">Apache Iceberg</a> lakehouses on GCP, GCS stores all data files and metadata, accessed using the <code>gs://</code> URI scheme.</p><p>GCS provides strong read-after-write consistency for all operations globally — objects are immediately visible after upload, list operations reflect all objects, and deletes are immediately effective. This consistency model, combined with Google's global infrastructure, makes GCS a reliable foundation for Iceberg's atomic commit mechanism.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>GCS Storage Classes</h2>
+        <p>Like <a href="amazon-s3.html">Amazon S3</a>, GCS offers storage class tiers for cost optimization:</p><ul><li><strong>Standard:</strong> Most frequently accessed data. Highest cost, lowest access latency. Default for active lakehouse tables.</li><li><strong>Nearline:</strong> Data accessed less than once per month. Lower storage cost, minimum 30-day storage duration.</li><li><strong>Coldline:</strong> Data accessed less than once per quarter. Very low storage cost, minimum 90-day duration.</li><li><strong>Archive:</strong> Long-term compliance data. Lowest cost, minimum 365-day duration, higher retrieval cost.</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="GCS Lakehouse Architecture diagram" loading="lazy"><figcaption>Figure 1: GCS as GCP lakehouse storage — Iceberg on GCS with BigLake and Dataproc integration.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>GCS and BigLake</h2>
+        <p>Google BigLake extends BigQuery to query data stored in GCS — including <a href="apache-iceberg.html">Apache Iceberg</a> tables. BigLake tables registered in a BigQuery project can be queried using BigQuery SQL, with GCS providing the actual storage. This enables organizations to use BigQuery as a query engine for their open Iceberg tables without moving data into BigQuery's native storage.</p><p>BigLake also provides fine-grained access control for GCS-stored Iceberg data: column-level security and row-level filters can be applied through BigLake policies, enforced regardless of which engine queries the table.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="BigLake Iceberg on GCS diagram" loading="lazy"><figcaption>Figure 2: BigLake enables BigQuery SQL on Iceberg tables stored in GCS.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Google Cloud Storage provides the same decoupled, scalable, durable object storage foundation for GCP-based <a href="data-lakehouse.html">data lakehouses</a> that <a href="amazon-s3.html">Amazon S3</a> provides on AWS. Its native GCP integration, BigLake support for Iceberg, and strong global consistency make it the natural storage choice for organizations building on Google Cloud. As with all cloud object storage services, GCS stores data in open <a href="apache-parquet.html">Parquet</a> format that any engine can read — maintaining the openness and portability of the lakehouse architecture.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="object-storage.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Object Storage</span>
+      <span class="related-desc">GCS as a cloud object storage implementation.</span>
+    </a>
+      <a class="related-card" href="amazon-s3.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Amazon S3</span>
+      <span class="related-desc">AWS equivalent of GCS.</span>
+    </a>
+      <a class="related-card" href="azure-adls.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Azure ADLS</span>
+      <span class="related-desc">Azure equivalent of GCS.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Table format stored in GCS buckets.</span>
+    </a>
+      <a class="related-card" href="decoupled-storage-compute.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Decoupled Storage and Compute</span>
+      <span class="related-desc">GCS enables decoupled lakehouse on GCP.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Spark on Dataproc uses GCS for Iceberg storage.</span>
+    </a>
+      <a class="related-card" href="apache-parquet.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Parquet</span>
+      <span class="related-desc">Primary file format stored in GCS.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">GCS as the storage foundation of GCP lakehouses.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+{
+  "slug": "apache-parquet",
+  "term": "Apache Parquet",
+  "category": "File Formats & Storage",
+  "metaTitle": "Apache Parquet: The Definitive Guide",
+  "metaDescription": "Learn what Apache Parquet is, how its columnar format enables efficient analytics, and why it is the default file format for Apache Iceberg and the data lakehouse.",
+  "h1": "Apache Parquet: The Definitive Guide",
+  "lede": "Apache Parquet is the columnar storage file format that powers the data lakehouse. Its column-oriented layout, nested type support, compression codecs, and per-column statistics enable the predicate pushdown, column pruning, and vectorized reads that make analytical queries fast at petabyte scale.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Parquet?",
+      "a": "Apache Parquet is an open-source, columnar storage file format designed for efficient analytical processing. It stores data column-by-column rather than row-by-row, enabling query engines to read only the columns needed for a query (column pruning) and apply filter statistics to skip irrelevant data (predicate pushdown). It is the default data file format for Apache Iceberg."
+    },
+    {
+      "q": "Why is Parquet the standard for data lakehouses?",
+      "a": "Parquet's columnar layout enables two critical optimizations: column pruning (reading only needed columns) and predicate pushdown (skipping files and row groups using per-column min/max statistics). For analytical queries that touch a small subset of columns over large datasets, these optimizations reduce I/O by 90%+ vs row-oriented formats. Apache Iceberg was designed around Parquet's metadata model."
+    },
+    {
+      "q": "What compression codecs does Apache Parquet support?",
+      "a": "Parquet supports Snappy (fast compression/decompression, moderate ratio \u2014 the most common lakehouse choice), Zstandard/ZSTD (better compression ratio than Snappy with comparable speed), GZIP (high compression ratio, slower), LZ4, and BROTLI. For lakehouse data files, Snappy and ZSTD are most widely used \u2014 Snappy for maximum query speed, ZSTD for storage cost optimization."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Parquet?",
+      "content": "<p><strong>Apache Parquet</strong> is an open-source, columnar storage file format originally developed by Twitter and Cloudera, donated to the Apache Software Foundation in 2013. It is the dominant file format for analytical data storage in the lakehouse ecosystem \u2014 the default data file format for <a href=\"apache-iceberg.html\">Apache Iceberg</a>, Delta Lake, and <a href=\"apache-hudi.html\">Apache Hudi</a>.</p><p>Parquet's defining design choice is <strong>columnar storage</strong>: rather than storing each row's values together (row-oriented, like CSV or traditional OLTP storage), Parquet stores each column's values together. All revenue values for all rows are stored contiguously; all customer_id values are stored contiguously; all event_date values are stored contiguously. This layout enables two critical query optimizations that are foundational to lakehouse performance: <a href=\"column-pruning.html\">column pruning</a> and <a href=\"predicate-pushdown.html\">predicate pushdown</a>.</p>"
+    },
+    {
+      "heading": "Parquet File Structure",
+      "content": "<p>A Parquet file has a layered structure:</p><ul><li><strong>Row Groups:</strong> A Parquet file is divided into row groups \u2014 horizontal partitions containing a fixed number of rows (typically 128MB of data). Each row group contains all columns for its set of rows.</li><li><strong>Column Chunks:</strong> Within each row group, data is organized into column chunks \u2014 one per column. Each column chunk stores all values for that column within the row group, encoded and compressed together.</li><li><strong>Pages:</strong> Each column chunk is further divided into pages (typically 1MB each) for fine-grained I/O and dictionary encoding.</li><li><strong>File Footer:</strong> The Parquet file footer (at the end of the file) contains the schema definition, the byte offset and size of every row group and column chunk, and per-column-chunk statistics (min, max, null count). The footer is read first by query engines to plan column-level reads.</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Apache Parquet File Structure",
+      "diagramCaption": "Figure 1: Parquet file structure \u2014 row groups, column chunks, and footer statistics for query optimization."
+    },
+    {
+      "heading": "Parquet and Apache Iceberg",
+      "content": "<p><a href=\"apache-iceberg.html\">Apache Iceberg</a> is built around Parquet as its default data file format. Every Iceberg data file is a Parquet file. Iceberg's manifest file column statistics (lower_bounds and upper_bounds) mirror Parquet's footer statistics \u2014 they are derived from Parquet footer reads during data file ingestion.</p><p>The synergy between Iceberg and Parquet creates a multi-level optimization hierarchy: Iceberg's manifest metadata provides file-level statistics (for file skipping), and Parquet's row group statistics provide within-file row group skipping. Together, they deliver the two-level predicate pushdown that enables precise, efficient reads from petabyte-scale tables."
+    },
+    {
+      "heading": "Parquet Encoding and Compression",
+      "content": "<p>Parquet applies column-specific encodings before compression, exploiting the homogeneity of column values:</p><ul><li><strong>Dictionary encoding:</strong> Low-cardinality columns (status, region, category) store a dictionary of unique values and index references instead of repeated full values \u2014 dramatically reducing storage size</li><li><strong>RLE (Run Length Encoding):</strong> Sequences of repeated values encoded as a count + value \u2014 effective for sorted or clustered data</li><li><strong>Delta encoding:</strong> Integer columns store differences between consecutive values \u2014 very effective for timestamps and monotonically increasing IDs</li></ul><p>These encodings combined with compression codecs (Snappy, ZSTD) typically achieve 5\u201310x compression ratios for typical business data \u2014 turning 100GB of raw CSV into 10\u201320GB of Parquet.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Parquet Encoding and Compression",
+      "diagramCaption": "Figure 2: Parquet encoding strategies \u2014 dictionary, RLE, delta \u2014 before compression codec application."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Parquet is the data file format foundation of the lakehouse. Its columnar layout, nested type support, per-column statistics, and efficient compression make it uniquely suited for the analytical query patterns of the <a href=\"data-lakehouse.html\">data lakehouse</a>: read few columns, skip irrelevant files, decompress fast, and process with <a href=\"vectorized-execution.html\">vectorized SIMD</a> operations. Understanding Parquet's structure is fundamental to understanding why <a href=\"column-pruning.html\">column pruning</a>, <a href=\"predicate-pushdown.html\">predicate pushdown</a>, and <a href=\"compaction.html\">compaction</a> have such dramatic effects on lakehouse query performance.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Uses Parquet as its default data file format."
+    },
+    {
+      "slug": "column-pruning",
+      "term": "Column Pruning",
+      "category": "Query Engines & Platforms",
+      "desc": "Enabled by Parquet's columnar layout."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Enabled by Parquet's per-column statistics."
+    },
+    {
+      "slug": "vectorized-execution",
+      "term": "Vectorized Query Execution",
+      "category": "Query Engines & Platforms",
+      "desc": "Parquet's columnar layout feeds vectorized processors."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Compaction optimizes Parquet file sizes and layout."
+    },
+    {
+      "slug": "z-ordering",
+      "term": "Z-Ordering",
+      "category": "Table Formats",
+      "desc": "Z-ordering makes Parquet column statistics narrow and effective."
+    },
+    {
+      "slug": "apache-orc",
+      "term": "Apache ORC",
+      "category": "File Formats & Storage",
+      "desc": "The alternative columnar format to Parquet."
+    },
+    {
+      "slug": "apache-arrow",
+      "term": "Apache Arrow",
+      "category": "File Formats & Storage",
+      "desc": "In-memory companion to Parquet for query execution."
+    }
+  ]
+}

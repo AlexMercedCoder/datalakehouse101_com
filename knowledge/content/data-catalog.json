@@ -1,0 +1,98 @@
+{
+  "slug": "data-catalog",
+  "term": "Data Catalog",
+  "category": "Catalogs & Metadata",
+  "metaTitle": "Data Catalog: The Definitive Guide",
+  "metaDescription": "Learn what a data catalog is, how it differs from a technical metadata store, and why business data catalogs are essential for self-service analytics in the modern data lakehouse.",
+  "h1": "Data Catalog: The Definitive Guide",
+  "lede": "A data catalog is the business-facing discovery and governance layer for data assets \u2014 enabling analysts to find, understand, and trust data without knowing the physical storage details. It bridges the gap between raw Iceberg tables and the business users who need to use them.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is a data catalog?",
+      "a": "A data catalog is a metadata management tool that indexes data assets (tables, reports, ML models, dashboards) with business context \u2014 descriptions, business owners, data quality ratings, usage statistics, lineage, and classifications. It enables data discovery, governance, and trust for business users and data analysts without requiring them to know physical storage details."
+    },
+    {
+      "q": "How is a data catalog different from a technical catalog like Iceberg REST catalog?",
+      "a": "A technical catalog (like Iceberg REST or Hive Metastore) stores metadata for query engines \u2014 schemas, file locations, partition specs. A business data catalog stores metadata for humans \u2014 descriptions, glossary terms, ownership, lineage, quality metrics, and classifications. Both are needed: the technical catalog for engine access, the business catalog for human discovery and governance."
+    },
+    {
+      "q": "What are popular data catalog tools?",
+      "a": "Popular data catalog tools include Apache Atlas (open source), Collibra, Alation, DataHub (LinkedIn, open source), OpenMetadata (open source), Microsoft Purview, and Google Dataplex. Most modern data catalogs integrate with technical catalogs (Hive, Iceberg REST, Glue) to automatically ingest schema metadata and augment it with business context."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is a Data Catalog?",
+      "content": "<p>A <strong>data catalog</strong> is a curated, searchable inventory of an organization's data assets \u2014 tables, reports, dashboards, ML models, streaming topics, and APIs \u2014 enriched with business context that makes data discoverable, understandable, and trustworthy for everyone who needs to use it, from data analysts to executives to AI systems.</p><p>The distinction from a technical catalog (<a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a>, <a href=\"hive-metastore.html\">Hive Metastore</a>) is purpose: technical catalogs are designed for query engines \u2014 they store schema metadata, file locations, and partition specs that engines need to execute queries. Business data catalogs are designed for humans \u2014 they store descriptions, ownership, quality ratings, business glossary linkages, lineage graphs, and usage statistics that analysts need to find and trust data.</p><p>In the modern <a href=\"data-lakehouse.html\">data lakehouse</a>, both layers are necessary. The technical catalog (Iceberg REST) enables engines like <a href=\"dremio.html\">Dremio</a> and <a href=\"apache-spark.html\">Spark</a> to access tables. The business data catalog enables analysts to discover which tables exist, what they mean, how fresh they are, and who owns them \u2014 before they write a single query."
+    },
+    {
+      "heading": "Core Data Catalog Capabilities",
+      "content": "<p>A full-featured data catalog provides:</p><ul><li><strong>Asset discovery:</strong> Full-text search across all registered assets with filtering by type, domain, owner, quality, and classification</li><li><strong>Business descriptions:</strong> Human-readable descriptions of tables, columns, and their business meaning \u2014 written by data owners and data stewards</li><li><strong>Business glossary:</strong> Centralized definitions of business terms (LTV, churn, conversion) linked to specific tables and columns that implement those concepts</li><li><strong>Data lineage:</strong> Visual graph showing how data flows from source systems through transformations to reports \u2014 enabling impact analysis and root cause investigation</li><li><strong>Data quality:</strong> Quality metrics and profiling results (completeness, uniqueness, freshness, anomalies) displayed alongside asset metadata</li><li><strong>Ownership and stewardship:</strong> Clear data ownership assignment with contact information for questions and access requests</li><li><strong>Classifications and tags:</strong> PII classification, sensitivity labels, regulatory scope tags</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Data Catalog Business Discovery Layer",
+      "diagramCaption": "Figure 1: A data catalog sits above the technical catalog \u2014 adding business context for human discovery and governance."
+    },
+    {
+      "heading": "Open Source Data Catalogs",
+      "content": "<p>The open-source data catalog ecosystem has matured significantly:</p><h3>DataHub (LinkedIn)</h3><p>Originally developed at LinkedIn and open-sourced, DataHub is a metadata platform with push-based ingestion from hundreds of data sources, lineage tracking, business glossary, and ML feature store integration.</p><h3>OpenMetadata</h3><p>A modern, API-first open-source data catalog with a strong focus on data quality integration, automated profiling, and collaboration features. Widely adopted in the lakehouse community.</p><h3>Apache Atlas</h3><p>The original open-source metadata governance framework from the Hadoop ecosystem, deeply integrated with Apache Ranger for access control. Widely deployed in on-premises Hadoop environments.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Data Catalog Tools Ecosystem",
+      "diagramCaption": "Figure 2: Open-source and commercial data catalog options for the modern lakehouse."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>A data catalog is the business intelligence layer of the <a href=\"data-lakehouse.html\">data lakehouse</a> \u2014 transforming raw technical metadata into a curated, searchable, trusted inventory that enables self-service analytics at scale. Without a catalog, the lakehouse is a sophisticated storage and query system that only specialists can navigate. With a catalog, every analyst can discover trusted data, understand its business meaning, verify its quality, and begin analysis with confidence. For organizations building towards <a href=\"self-service-analytics.html\">self-service analytics</a>, the data catalog is as essential as the query engine itself.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "metadata-management",
+      "term": "Metadata Management",
+      "category": "Catalogs & Metadata",
+      "desc": "The broader practice data catalogs support."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "Technical catalog that business catalogs integrate with."
+    },
+    {
+      "slug": "self-service-analytics",
+      "term": "Self-Service Analytics",
+      "category": "Analytics & BI",
+      "desc": "Data catalogs enable self-service by improving discoverability."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Catalogs are central to data governance programs."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "Semantic layers and catalogs both add business context to data."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture data catalogs make navigable."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's Virtual Datasets serve as an embedded catalog."
+    },
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs & Metadata",
+      "desc": "Technical catalog complementing business data catalogs."
+    }
+  ]
+}

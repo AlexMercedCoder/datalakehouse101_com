@@ -1,0 +1,98 @@
+{
+  "slug": "google-cloud-storage",
+  "term": "Google Cloud Storage (GCS)",
+  "category": "File Formats & Storage",
+  "metaTitle": "Google Cloud Storage (GCS): The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn how Google Cloud Storage serves as the object storage foundation for GCP-based Apache Iceberg data lakehouses and its key features for lakehouse architecture.",
+  "h1": "Google Cloud Storage (GCS): The Definitive Guide",
+  "lede": "Google Cloud Storage (GCS) is GCP's object storage service and the storage foundation for data lakehouses on Google Cloud. Its strong consistency, multi-region options, and deep BigQuery integration make it the natural home for Apache Iceberg tables on GCP.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Google Cloud Storage?",
+      "a": "Google Cloud Storage (GCS) is Google Cloud Platform's object storage service providing unlimited storage with high durability, strong consistency, and a universal JSON/XML API compatible with S3 tooling. It is the recommended storage backend for Apache Iceberg lakehouses on GCP."
+    },
+    {
+      "q": "Does Apache Iceberg support GCS?",
+      "a": "Yes. Apache Iceberg, Apache Spark on Dataproc, Trino, Dremio, and other engines all support GCS as an Iceberg storage backend using the gs:// URI scheme and the GCS connector for Hadoop. Google BigQuery also supports reading Iceberg tables stored in GCS via BigLake."
+    },
+    {
+      "q": "How does GCS compare to Amazon S3 for lakehouse use cases?",
+      "a": "GCS and S3 have similar capabilities for lakehouse storage: unlimited scale, high durability, strong consistency, and storage class tiering. GCS's key advantages for GCP-native lakehouses are tighter BigQuery integration, native Google IAM, and GCS's uniform bucket-level access model. S3's advantages are its larger ecosystem of tooling and tutorials."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Google Cloud Storage?",
+      "content": "<p><strong>Google Cloud Storage (GCS)</strong> is Google Cloud Platform's object storage service, providing unlimited, globally consistent storage for structured and unstructured data. GCS stores data as objects in buckets, accessed via an HTTPS API compatible with both GCS-native clients and S3-compatible tooling. For <a href=\"apache-iceberg.html\">Apache Iceberg</a> lakehouses on GCP, GCS stores all data files and metadata, accessed using the <code>gs://</code> URI scheme.</p><p>GCS provides strong read-after-write consistency for all operations globally \u2014 objects are immediately visible after upload, list operations reflect all objects, and deletes are immediately effective. This consistency model, combined with Google's global infrastructure, makes GCS a reliable foundation for Iceberg's atomic commit mechanism.</p>"
+    },
+    {
+      "heading": "GCS Storage Classes",
+      "content": "<p>Like <a href=\"amazon-s3.html\">Amazon S3</a>, GCS offers storage class tiers for cost optimization:</p><ul><li><strong>Standard:</strong> Most frequently accessed data. Highest cost, lowest access latency. Default for active lakehouse tables.</li><li><strong>Nearline:</strong> Data accessed less than once per month. Lower storage cost, minimum 30-day storage duration.</li><li><strong>Coldline:</strong> Data accessed less than once per quarter. Very low storage cost, minimum 90-day duration.</li><li><strong>Archive:</strong> Long-term compliance data. Lowest cost, minimum 365-day duration, higher retrieval cost.</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "GCS Lakehouse Architecture",
+      "diagramCaption": "Figure 1: GCS as GCP lakehouse storage \u2014 Iceberg on GCS with BigLake and Dataproc integration."
+    },
+    {
+      "heading": "GCS and BigLake",
+      "content": "<p>Google BigLake extends BigQuery to query data stored in GCS \u2014 including <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables. BigLake tables registered in a BigQuery project can be queried using BigQuery SQL, with GCS providing the actual storage. This enables organizations to use BigQuery as a query engine for their open Iceberg tables without moving data into BigQuery's native storage.</p><p>BigLake also provides fine-grained access control for GCS-stored Iceberg data: column-level security and row-level filters can be applied through BigLake policies, enforced regardless of which engine queries the table.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "BigLake Iceberg on GCS",
+      "diagramCaption": "Figure 2: BigLake enables BigQuery SQL on Iceberg tables stored in GCS."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Google Cloud Storage provides the same decoupled, scalable, durable object storage foundation for GCP-based <a href=\"data-lakehouse.html\">data lakehouses</a> that <a href=\"amazon-s3.html\">Amazon S3</a> provides on AWS. Its native GCP integration, BigLake support for Iceberg, and strong global consistency make it the natural storage choice for organizations building on Google Cloud. As with all cloud object storage services, GCS stores data in open <a href=\"apache-parquet.html\">Parquet</a> format that any engine can read \u2014 maintaining the openness and portability of the lakehouse architecture.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "GCS as a cloud object storage implementation."
+    },
+    {
+      "slug": "amazon-s3",
+      "term": "Amazon S3",
+      "category": "File Formats & Storage",
+      "desc": "AWS equivalent of GCS."
+    },
+    {
+      "slug": "azure-adls",
+      "term": "Azure ADLS",
+      "category": "File Formats & Storage",
+      "desc": "Azure equivalent of GCS."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Table format stored in GCS buckets."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "GCS enables decoupled lakehouse on GCP."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Spark on Dataproc uses GCS for Iceberg storage."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "Primary file format stored in GCS."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "GCS as the storage foundation of GCP lakehouses."
+    }
+  ]
+}

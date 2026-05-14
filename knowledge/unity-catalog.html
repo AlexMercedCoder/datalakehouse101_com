@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity Catalog: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Databricks Unity Catalog is, how it provides unified governance for the Databricks Lakehouse, its open-source release, and how it compares to Apache Polaris.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/unity-catalog.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Unity Catalog: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Databricks Unity Catalog is, how it provides unified governance for the Databricks Lakehouse, its open-source release, and how it compares to Apache Polaris.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/unity-catalog.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Unity Catalog: The Definitive Guide",
+      "description": "Learn what Databricks Unity Catalog is, how it provides unified governance for the Databricks Lakehouse, its open-source release, and how it compares to Apache Polaris.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/unity-catalog.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Unity Catalog", "item": "https://datalakehouse101.com/knowledge/unity-catalog.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Unity Catalog?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Unity Catalog is Databricks' unified governance layer for all assets in the Databricks Lakehouse Platform — tables (Delta Lake and Iceberg), ML models, notebooks, dashboards, and files. It provides centralized RBAC access control, data lineage tracking, automated data discovery, and audit logging across all Databricks workspaces in an account."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Unity Catalog open source?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, as of 2024. Databricks open-sourced Unity Catalog under the Apache License 2.0. The open-source version (OSS Unity Catalog) can be deployed outside Databricks and exposes an Iceberg REST Catalog API, allowing non-Databricks engines to register and query Iceberg tables in a Unity Catalog."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can non-Databricks engines use Unity Catalog?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "With the open-source release, yes. OSS Unity Catalog exposes an Iceberg REST Catalog API that any conformant engine (Spark, Trino, Dremio, PyIceberg) can connect to. In the managed Databricks version, external engine access is available via the Iceberg REST API endpoint for tables configured as external Iceberg tables."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Unity Catalog</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Catalogs & Metadata</span>
+      <h1>Unity Catalog: The Definitive Guide</h1>
+      <p class="hero-lede">Unity Catalog is Databricks' unified governance catalog for the Lakehouse Platform — providing centralized access control, lineage tracking, and data discovery across Delta Lake tables, ML models, notebooks, and dashboards. Its 2024 open-source release added Iceberg REST Catalog support.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Unity Catalog?</a></li>
+        <li><a href="#section-2">Unity Catalog Governance Features</a></li>
+        <li><a href="#section-3">Unity Catalog vs. Apache Polaris</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Unity Catalog?</h2>
+        <p><strong>Unity Catalog</strong> is Databricks' unified governance and metadata catalog for the Databricks Lakehouse Platform. Introduced in 2021, it replaced workspace-level Hive Metastores with a centralized, account-level catalog that spans all Databricks workspaces — providing consistent access control, lineage, and discoverability across the entire organization's data and AI assets.</p><p>Unity Catalog uses a three-level namespace hierarchy: <code>catalog.schema.table</code> (compared to HMS's two-level <code>database.table</code>). This three-level structure allows organizations to organize data by environment (prod, dev), domain (sales, marketing), and subject area — providing more flexible organizational taxonomy than the traditional HMS structure.</p><p>In 2024, Databricks made a significant strategic move by <strong>open-sourcing Unity Catalog</strong> under Apache License 2.0. The open-source version (OSS Unity Catalog) can be deployed independently of Databricks and exposes an <a href="iceberg-rest-catalog.html">Iceberg REST Catalog API</a>, enabling non-Databricks engines to connect.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Unity Catalog Governance Features</h2>
+        <p>Unity Catalog provides comprehensive governance across all Databricks assets:</p><ul><li><strong>Centralized RBAC:</strong> Account-level user management with workspace inheritance. Permissions assigned at catalog, schema, table, column, and row level</li><li><strong>Column-level security:</strong> Data masking policies applied transparently to specific columns for specific user groups</li><li><strong>Row-level security:</strong> Dynamic row filters applied based on the querying user's identity</li><li><strong>Data lineage:</strong> Automatic tracking of how tables are created and modified — which upstream tables each table depends on, which downstream tables depend on each table</li><li><strong>Audit logging:</strong> All data access events logged for compliance and security investigation</li><li><strong>Data discovery:</strong> Search-based discovery of tables, columns, and AI assets across the account</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Unity Catalog Governance Architecture diagram" loading="lazy"><figcaption>Figure 1: Unity Catalog's governance scope — centralized across all workspaces, all asset types.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Unity Catalog vs. Apache Polaris</h2>
+        <table class="comparison-table"><thead><tr><th>Dimension</th><th>Unity Catalog</th><th>Apache Polaris</th></tr></thead><tbody><tr><td>Governance scope</td><td>Tables, models, notebooks, files</td><td>Iceberg tables only</td></tr><tr><td>Lineage tracking</td><td>Yes (automatic)</td><td>No</td></tr><tr><td>Open source</td><td>Yes (Apache 2.0, 2024)</td><td>Yes (ASF)</td></tr><tr><td>Engine dependency</td><td>Optimized for Databricks</td><td>Vendor-neutral</td></tr><tr><td>Git-like branching</td><td>No</td><td>No</td></tr><tr><td>REST Catalog API</td><td>Yes (OSS version)</td><td>Yes</td></tr></tbody></table><p>Unity Catalog is the right choice for organizations fully committed to the Databricks platform who want comprehensive cross-asset governance. Polaris and Nessie are better choices for organizations prioritizing vendor neutrality and multi-cloud portability.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Unity Catalog vs Polaris Comparison diagram" loading="lazy"><figcaption>Figure 2: Unity Catalog vs Apache Polaris — governance scope and vendor dependency trade-offs.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Unity Catalog is the most comprehensive governance catalog in the commercial lakehouse ecosystem — spanning tables, ML models, notebooks, and dashboards with fine-grained access control, lineage, and discovery in a single system. Its 2024 open-source release and Iceberg REST API support moved it into the broader ecosystem, making it a viable catalog for multi-engine environments. For pure Databricks shops, Unity Catalog is the natural choice; for organizations building on open standards and multi-engine lakehouses, <a href="apache-polaris.html">Apache Polaris</a> or <a href="project-nessie.html">Project Nessie</a> provide stronger vendor neutrality.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">Vendor-neutral ASF alternative to Unity Catalog.</span>
+    </a>
+      <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">API exposed by OSS Unity Catalog.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Open table format Unity Catalog supports.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Unity Catalog's comprehensive governance capabilities.</span>
+    </a>
+      <a class="related-card" href="catalog-interoperability.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Catalog Interoperability</span>
+      <span class="related-desc">Unity Catalog's REST API enables broader interoperability.</span>
+    </a>
+      <a class="related-card" href="project-nessie.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Project Nessie</span>
+      <span class="related-desc">Open-source Git-like catalog alternative.</span>
+    </a>
+      <a class="related-card" href="hive-metastore.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Hive Metastore</span>
+      <span class="related-desc">Legacy catalog Unity Catalog replaced in Databricks.</span>
+    </a>
+      <a class="related-card" href="metadata-management.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Metadata Management</span>
+      <span class="related-desc">Unity Catalog's metadata management capabilities.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

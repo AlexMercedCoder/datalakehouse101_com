@@ -1,0 +1,98 @@
+{
+  "slug": "azure-adls",
+  "term": "Azure Data Lake Storage (ADLS)",
+  "category": "File Formats & Storage",
+  "metaTitle": "Azure ADLS: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Azure Data Lake Storage Gen2 is, how it serves as the object storage foundation for Azure-based Apache Iceberg lakehouses, and its key features for enterprise data.",
+  "h1": "Azure Data Lake Storage (ADLS): The Definitive Guide",
+  "lede": "Azure Data Lake Storage Gen2 (ADLS Gen2) is Microsoft's enterprise-grade object storage for data lakehouses on Azure. Its hierarchical namespace, Azure AD integration, and ACL-based access control make it the natural storage layer for Apache Iceberg tables on Microsoft Azure.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Azure ADLS Gen2?",
+      "a": "Azure Data Lake Storage Gen2 is Microsoft's cloud object storage service optimized for big data analytics. It combines Azure Blob Storage's unlimited scale and low cost with a hierarchical namespace and POSIX-compatible ACLs for fine-grained access control. It is the recommended storage backend for Apache Iceberg lakehouses on Microsoft Azure."
+    },
+    {
+      "q": "How does ADLS Gen2 differ from Azure Blob Storage?",
+      "a": "ADLS Gen2 is built on Azure Blob Storage but adds a hierarchical namespace (true directory semantics with atomic rename), POSIX ACLs (file and directory level permissions), and optimized drivers for big data workloads (ABFS protocol). Standard Blob Storage uses a flat namespace and only container-level RBAC."
+    },
+    {
+      "q": "Does Apache Iceberg support ADLS Gen2?",
+      "a": "Yes. Apache Iceberg, Dremio, Spark, and Trino all support ADLS Gen2 as a storage backend via the Azure Blob File System (ABFS) driver. Iceberg stores data files and metadata in ADLS Gen2 containers using the abfss:// URI scheme."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Azure ADLS Gen2?",
+      "content": "<p><strong>Azure Data Lake Storage Gen2</strong> (ADLS Gen2) is Microsoft's enterprise object storage service for data lakes and lakehouses on Azure. It combines Azure Blob Storage's unlimited scale and cost efficiency with a <strong>hierarchical namespace</strong> (enabling true directory semantics and atomic directory operations) and <strong>POSIX ACLs</strong> (file and directory-level permissions compatible with Hadoop security models).</p><p>For <a href=\"apache-iceberg.html\">Apache Iceberg</a> lakehouses on Azure, ADLS Gen2 is the recommended storage backend. Iceberg data files (Parquet) and metadata files (Avro manifests, JSON table metadata) are stored as ADLS Gen2 blobs in containers, accessed via the ABFS (Azure Blob File System) protocol using the <code>abfss://</code> URI scheme.</p>"
+    },
+    {
+      "heading": "ADLS Gen2 vs Amazon S3",
+      "content": "<table class=\"comparison-table\"><thead><tr><th>Feature</th><th>ADLS Gen2</th><th>Amazon S3</th></tr></thead><tbody><tr><td>Namespace</td><td>Hierarchical (true directories)</td><td>Flat (prefix-simulated directories)</td></tr><tr><td>Auth integration</td><td>Azure AD / Entra ID</td><td>AWS IAM</td></tr><tr><td>Access control</td><td>POSIX ACLs + RBAC</td><td>IAM + Bucket Policies</td></tr><tr><td>Atomic rename</td><td>Yes (directory level)</td><td>No (copy + delete)</td></tr><tr><td>Durability</td><td>16 nines (LRS/ZRS/GRS)</td><td>11 nines (standard)</td></tr></tbody></table>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "ADLS Gen2 Iceberg Lakehouse Architecture",
+      "diagramCaption": "Figure 1: ADLS Gen2 as the Azure lakehouse storage layer \u2014 Iceberg on Azure with native AD access control."
+    },
+    {
+      "heading": "ADLS and Dremio Cloud on Azure",
+      "content": "<p><a href=\"dremio-cloud.html\">Dremio Cloud</a> on Azure uses ADLS Gen2 as the BYOS (Bring Your Own Storage) backend. Organizations connect their own ADLS Gen2 containers to Dremio Cloud, and Dremio's managed execution engines read and write Iceberg tables in those containers. Azure AD service principals and managed identities handle authentication, with Dremio's Open Catalog providing credential vending for per-table scoped access.</p>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "ADLS Gen2 Dremio Cloud Azure",
+      "diagramCaption": "Figure 2: Dremio Cloud on Azure with ADLS Gen2 \u2014 managed query engine on your own storage."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Azure Data Lake Storage Gen2 is the storage foundation for Azure-based <a href=\"data-lakehouse.html\">data lakehouses</a>. Its hierarchical namespace, Azure AD integration, and POSIX ACLs make it enterprise-ready for governed <a href=\"apache-iceberg.html\">Apache Iceberg</a> deployments. For organizations standardizing on Microsoft Azure, ADLS Gen2 provides the same decoupled storage-and-compute benefits as <a href=\"amazon-s3.html\">Amazon S3</a> with Azure-native identity and security integration.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "ADLS Gen2 as a cloud object storage implementation."
+    },
+    {
+      "slug": "amazon-s3",
+      "term": "Amazon S3",
+      "category": "File Formats & Storage",
+      "desc": "AWS equivalent of ADLS Gen2."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Table format stored in ADLS Gen2 containers."
+    },
+    {
+      "slug": "dremio-cloud",
+      "term": "Dremio Cloud",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio Cloud supports ADLS Gen2 on Azure."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "ADLS Gen2 enables decoupled lakehouse architecture."
+    },
+    {
+      "slug": "google-cloud-storage",
+      "term": "Google Cloud Storage",
+      "category": "File Formats & Storage",
+      "desc": "GCP equivalent of ADLS Gen2."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "Primary file format stored in ADLS Gen2."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "ADLS POSIX ACLs and Azure AD enable lakehouse governance."
+    }
+  ]
+}

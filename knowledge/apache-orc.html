@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apache ORC: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Apache ORC is, how its columnar format compares to Parquet, and its role in the Hive ecosystem and modern Apache Iceberg data lakehouses.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/apache-orc.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Apache ORC: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Apache ORC is, how its columnar format compares to Parquet, and its role in the Hive ecosystem and modern Apache Iceberg data lakehouses.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/apache-orc.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Apache ORC: The Definitive Guide",
+      "description": "Learn what Apache ORC is, how its columnar format compares to Parquet, and its role in the Hive ecosystem and modern Apache Iceberg data lakehouses.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/apache-orc.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Apache ORC", "item": "https://datalakehouse101.com/knowledge/apache-orc.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Apache ORC?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache ORC (Optimized Row Columnar) is an open-source, columnar storage file format developed for the Apache Hive ecosystem. Like Parquet, ORC stores data column-by-column with statistics for predicate pushdown. ORC is the native format for Hive ACID tables and includes built-in bloom filter indexes and lightweight indexes that Parquet lacks natively."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Apache Iceberg support ORC?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Apache Iceberg supports ORC as a data file format alongside Parquet and Avro. Tables can be created with ORC format using the 'write.format.default=orc' table property. ORC support in Iceberg is primarily useful for organizations migrating from Hive ORC tables to Iceberg without converting file formats."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I use ORC or Parquet for new Iceberg tables?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For new Iceberg tables, Parquet is the recommended default. Parquet has broader query engine support, is more heavily optimized in most engines' Iceberg readers, and has stronger ecosystem tooling. ORC is best when migrating existing Hive ORC tables to Iceberg format to avoid the cost of file conversion."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Apache ORC</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">File Formats & Storage</span>
+      <h1>Apache ORC: The Definitive Guide</h1>
+      <p class="hero-lede">Apache ORC (Optimized Row Columnar) is the columnar file format born from the Apache Hive ecosystem — offering strong compression, ACID support in Hive, and built-in bloom filter indexes. Apache Iceberg supports ORC alongside Parquet, and ORC remains common in Hive-legacy environments.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Apache ORC?</a></li>
+        <li><a href="#section-2">ORC vs. Parquet</a></li>
+        <li><a href="#section-3">ORC in Apache Iceberg</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Apache ORC?</h2>
+        <p><strong>Apache ORC</strong> (Optimized Row Columnar) is an open-source, columnar storage file format created at Hortonworks in 2013 specifically to address performance limitations of the original Hive RCFile format. ORC became the standard file format for Apache Hive — especially for Hive ACID tables (which require ORC for row-level insert/update/delete support in Hive) — and was widely adopted in the Hadoop ecosystem.</p><p>ORC, like <a href="apache-parquet.html">Apache Parquet</a>, stores data column-by-column with column-level statistics and compression. Both are columnar formats optimized for analytical workloads; they share the core design philosophy but differ in implementation details — particularly in their index structures, ACID capabilities, and ecosystem support.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>ORC vs. Parquet</h2>
+        <table class="comparison-table"><thead><tr><th>Feature</th><th>Apache ORC</th><th>Apache Parquet</th></tr></thead><tbody><tr><td>Column storage</td><td>Yes</td><td>Yes</td></tr><tr><td>Per-column stats</td><td>Yes (min/max/sum/bloom)</td><td>Yes (min/max/null count)</td></tr><tr><td>Bloom filter index</td><td>Built-in</td><td>Requires separate config</td></tr><tr><td>Nested types</td><td>Yes</td><td>Yes (stronger ecosystem)</td></tr><tr><td>Hive ACID support</td><td>Yes (native)</td><td>No</td></tr><tr><td>Iceberg support</td><td>Yes (non-default)</td><td>Yes (default)</td></tr><tr><td>Ecosystem breadth</td><td>Hive, Spark, Trino</td><td>Universal</td></tr></tbody></table>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="ORC vs Parquet Comparison diagram" loading="lazy"><figcaption>Figure 1: ORC vs Parquet — feature comparison for lakehouse file format selection.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>ORC in Apache Iceberg</h2>
+        <p><a href="apache-iceberg.html">Apache Iceberg</a> supports ORC as an alternative data file format. Tables configured with ORC format use ORC files for data storage while retaining all of Iceberg's metadata features: snapshots, time travel, schema evolution, and partition evolution all work identically with ORC files. Iceberg's manifest file statistics are derived from ORC file statistics using the same mechanism as Parquet.</p><p>ORC support in Iceberg is primarily a migration enabler: organizations with existing Hive ORC tables can migrate to Iceberg format (gaining snapshots, ACID, and schema evolution) without converting existing ORC data files to Parquet. New files can be written as Parquet while historical files remain ORC — Iceberg handles mixed-format tables correctly.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="ORC in Apache Iceberg Migration Path diagram" loading="lazy"><figcaption>Figure 2: ORC in Iceberg — migration path for Hive ORC tables to Iceberg without file format conversion.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Apache ORC is the columnar format of the Hadoop/Hive era — highly optimized, with built-in bloom filter indexes and native Hive ACID support. In the modern <a href="data-lakehouse.html">data lakehouse</a>, <a href="apache-parquet.html">Apache Parquet</a> is the dominant format due to its broader engine support and Iceberg ecosystem maturity. ORC remains relevant for Hive legacy migrations and environments where Hive ACID semantics are still required. For new Iceberg tables, Parquet is the clear default choice.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-parquet.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Parquet</span>
+      <span class="related-desc">The dominant alternative to ORC in the lakehouse.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Supports both ORC and Parquet as data file formats.</span>
+    </a>
+      <a class="related-card" href="hive-metastore.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Hive Metastore</span>
+      <span class="related-desc">The ecosystem where ORC originated.</span>
+    </a>
+      <a class="related-card" href="predicate-pushdown.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Predicate Pushdown</span>
+      <span class="related-desc">ORC bloom filter index enhances predicate pushdown.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">ORC tables require compaction like Parquet tables.</span>
+    </a>
+      <a class="related-card" href="apache-avro.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Avro</span>
+      <span class="related-desc">Row-oriented format used for Iceberg metadata files.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Supports reading and writing ORC via Iceberg.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture where ORC and Parquet compete as data formats.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

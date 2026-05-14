@@ -1,0 +1,102 @@
+{
+  "slug": "apache-gravitino",
+  "term": "Apache Gravitino",
+  "category": "Catalogs & Metadata",
+  "metaTitle": "Apache Gravitino: The Definitive Guide",
+  "metaDescription": "Learn what Apache Gravitino is, how it acts as a universal metadata layer federating multiple catalogs, and its role in multi-catalog lakehouse governance.",
+  "h1": "Apache Gravitino: The Definitive Guide",
+  "lede": "Apache Gravitino is an open-source federated metadata layer that provides a unified API and governance model across multiple catalogs \u2014 Iceberg, Hive, JDBC databases, and others. It is the multi-catalog abstraction layer that lets engines discover and govern data across heterogeneous catalog systems.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Gravitino?",
+      "a": "Apache Gravitino (formerly part of the Datastrato project) is an open-source federated metadata service that provides a unified metadata API across multiple catalog types \u2014 Iceberg, Hive Metastore, JDBC databases, Kafka, and others. It acts as a universal catalog federation layer, presenting a single namespace across disparate catalog backends."
+    },
+    {
+      "q": "How is Apache Gravitino different from Apache Polaris?",
+      "a": "Polaris is an Iceberg-specific REST catalog. Gravitino is a federated metadata layer that connects to multiple catalog types \u2014 including Iceberg REST catalogs, Hive Metastores, JDBC databases, and message queues. Gravitino provides a unified namespace and governance model across all of them, while Polaris focuses on first-class Iceberg catalog capabilities."
+    },
+    {
+      "q": "What is Gravitino's relationship to the Apache Software Foundation?",
+      "a": "Apache Gravitino entered the Apache Software Foundation Incubator in 2024, donated by Datastrato. It is in the process of graduating from incubation to a top-level Apache project."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Gravitino?",
+      "content": "<p><strong>Apache Gravitino</strong> is an open-source, federated metadata service and universal catalog API that connects to multiple heterogeneous catalog backends \u2014 <a href=\"apache-iceberg.html\">Apache Iceberg</a> REST catalogs, <a href=\"hive-metastore.html\">Hive Metastore</a>, JDBC relational databases, Apache Kafka, and others \u2014 and presents them through a single, unified metadata API and namespace.</p><p>The problem Gravitino solves is multi-catalog fragmentation: large organizations typically have data spread across many catalog systems \u2014 legacy HMS tables, Iceberg REST catalog tables, relational database schemas, streaming topics. Without a federation layer, every engine must be configured separately for each catalog, and there is no unified view of all available data assets, no consistent access control across catalog types, and no cross-catalog lineage.</p><p>Gravitino provides a single API surface that federates all these catalogs: engines and users can discover and query data from any connected catalog through Gravitino's unified namespace, and access control policies can be applied consistently across all catalog types.</p>"
+    },
+    {
+      "heading": "Gravitino's Federated Catalog Architecture",
+      "content": "<p>Gravitino operates with a plugin-based catalog connector model:</p><ul><li><strong>Gravitino Server:</strong> The central metadata service exposing Gravitino's unified REST API</li><li><strong>Catalog Connectors (plugins):</strong> Each connector implements the protocol to communicate with a specific catalog type \u2014 Iceberg REST, Hive Thrift, JDBC, Kafka, etc.</li><li><strong>Metalake:</strong> Gravitino's top-level namespace concept \u2014 a logical container for multiple catalogs belonging to an organization or project</li><li><strong>Unified Namespace:</strong> Tables from all connected catalogs are addressable via a unified <code>metalake.catalog.schema.table</code> path</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Apache Gravitino Federated Catalog Architecture",
+      "diagramCaption": "Figure 1: Gravitino's federated architecture \u2014 connecting multiple catalogs under a unified metadata API."
+    },
+    {
+      "heading": "Gravitino and Trino Integration",
+      "content": "<p>One of Gravitino's most practical integrations is with <a href=\"trino.html\">Trino</a>. Gravitino provides a Trino connector that allows Trino to discover and query tables from all Gravitino-connected catalogs through Gravitino's unified namespace \u2014 without configuring each catalog separately in Trino's catalog configuration files.</p><p>This dramatically simplifies Trino configuration in multi-catalog environments: instead of maintaining dozens of Trino catalog configuration files (one per catalog backend), a single Gravitino connector configuration gives Trino access to all catalogs registered in Gravitino. As new catalogs are added to Gravitino, they are automatically discoverable by Trino without any Trino reconfiguration."
+    },
+    {
+      "heading": "Gravitino Access Control",
+      "content": "<p>Gravitino adds a unified access control layer that spans all connected catalogs. Access policies defined in Gravitino apply across catalog types \u2014 a user granted read access to a specific schema in Gravitino's namespace has that access enforced regardless of whether the underlying catalog is Iceberg REST or HMS. This provides consistent governance without requiring separate policy management in each catalog system.</p>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Gravitino Access Control Across Catalogs",
+      "diagramCaption": "Figure 2: Gravitino's unified access control \u2014 policies apply consistently across all catalog types."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Gravitino addresses a real pain point in large-scale data organizations: the proliferation of disconnected catalog systems. By federating multiple catalogs behind a unified metadata API and governance model, Gravitino reduces the operational complexity of multi-catalog environments and provides consistent access control across catalog types. For organizations with legacy HMS deployments, Iceberg REST catalogs, and relational databases that need a unified view of all data assets, Gravitino is the federation layer that makes the <a href=\"data-lakehouse.html\">data lakehouse</a> vision of unified data access practical.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs & Metadata",
+      "desc": "Iceberg-specific REST catalog Gravitino can connect to."
+    },
+    {
+      "slug": "hive-metastore",
+      "term": "Hive Metastore",
+      "category": "Catalogs & Metadata",
+      "desc": "Legacy catalog Gravitino federates alongside Iceberg."
+    },
+    {
+      "slug": "catalog-interoperability",
+      "term": "Catalog Interoperability",
+      "category": "Catalogs & Metadata",
+      "desc": "The problem Gravitino solves."
+    },
+    {
+      "slug": "trino",
+      "term": "Trino",
+      "category": "Query Engines & Platforms",
+      "desc": "Primary engine using Gravitino for multi-catalog queries."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "One of the catalog types Gravitino federates."
+    },
+    {
+      "slug": "metadata-management",
+      "term": "Metadata Management",
+      "category": "Catalogs & Metadata",
+      "desc": "Gravitino as a federated metadata management layer."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Unified governance across catalogs via Gravitino."
+    },
+    {
+      "slug": "lakehouse-federation",
+      "term": "Lakehouse Federation",
+      "category": "Analytics & BI",
+      "desc": "Gravitino enables catalog federation for federated queries."
+    }
+  ]
+}

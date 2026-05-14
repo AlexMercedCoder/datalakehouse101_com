@@ -49,26 +49,26 @@ Each page is a ~4,000-word authoritative reference article.
 | 38 | Vectorized Query Execution | vectorized-execution | Query Engines & Platforms | ✅ |
 | 39 | Predicate Pushdown | predicate-pushdown | Query Engines & Platforms | ✅ |
 | 40 | Column Pruning | column-pruning | Query Engines & Platforms | ✅ |
-| 41 | Apache Polaris | apache-polaris | Catalogs & Metadata | ❌ |
-| 42 | Project Nessie | project-nessie | Catalogs & Metadata | ❌ |
-| 43 | Iceberg REST Catalog | iceberg-rest-catalog | Catalogs & Metadata | ❌ |
-| 44 | Hive Metastore | hive-metastore | Catalogs & Metadata | ❌ |
-| 45 | AWS Glue Data Catalog | aws-glue-catalog | Catalogs & Metadata | ❌ |
-| 46 | Unity Catalog | unity-catalog | Catalogs & Metadata | ❌ |
-| 47 | Apache Gravitino | apache-gravitino | Catalogs & Metadata | ❌ |
-| 48 | Data Catalog | data-catalog | Catalogs & Metadata | ❌ |
-| 49 | Metadata Management | metadata-management | Catalogs & Metadata | ❌ |
-| 50 | Catalog Interoperability | catalog-interoperability | Catalogs & Metadata | ❌ |
-| 51 | Apache Parquet | apache-parquet | File Formats & Storage | ❌ |
-| 52 | Apache ORC | apache-orc | File Formats & Storage | ❌ |
-| 53 | Apache Avro | apache-avro | File Formats & Storage | ❌ |
-| 54 | Apache Arrow | apache-arrow | File Formats & Storage | ❌ |
-| 55 | Object Storage | object-storage | File Formats & Storage | ❌ |
-| 56 | Amazon S3 | amazon-s3 | File Formats & Storage | ❌ |
-| 57 | Azure Data Lake Storage (ADLS) | azure-adls | File Formats & Storage | ❌ |
-| 58 | Google Cloud Storage (GCS) | google-cloud-storage | File Formats & Storage | ❌ |
-| 59 | MinIO | minio | File Formats & Storage | ❌ |
-| 60 | Apache Hadoop HDFS | hdfs | File Formats & Storage | ❌ |
+| 41 | Apache Polaris | apache-polaris | Catalogs & Metadata | ✅ |
+| 42 | Project Nessie | project-nessie | Catalogs & Metadata | ✅ |
+| 43 | Iceberg REST Catalog | iceberg-rest-catalog | Catalogs & Metadata | ✅ |
+| 44 | Hive Metastore | hive-metastore | Catalogs & Metadata | ✅ |
+| 45 | AWS Glue Data Catalog | aws-glue-catalog | Catalogs & Metadata | ✅ |
+| 46 | Unity Catalog | unity-catalog | Catalogs & Metadata | ✅ |
+| 47 | Apache Gravitino | apache-gravitino | Catalogs & Metadata | ✅ |
+| 48 | Data Catalog | data-catalog | Catalogs & Metadata | ✅ |
+| 49 | Metadata Management | metadata-management | Catalogs & Metadata | ✅ |
+| 50 | Catalog Interoperability | catalog-interoperability | Catalogs & Metadata | ✅ |
+| 51 | Apache Parquet | apache-parquet | File Formats & Storage | ✅ |
+| 52 | Apache ORC | apache-orc | File Formats & Storage | ✅ |
+| 53 | Apache Avro | apache-avro | File Formats & Storage | ✅ |
+| 54 | Apache Arrow | apache-arrow | File Formats & Storage | ✅ |
+| 55 | Object Storage | object-storage | File Formats & Storage | ✅ |
+| 56 | Amazon S3 | amazon-s3 | File Formats & Storage | ✅ |
+| 57 | Azure Data Lake Storage (ADLS) | azure-adls | File Formats & Storage | ✅ |
+| 58 | Google Cloud Storage (GCS) | google-cloud-storage | File Formats & Storage | ✅ |
+| 59 | MinIO | minio | File Formats & Storage | ✅ |
+| 60 | Apache Hadoop HDFS | hdfs | File Formats & Storage | ✅ |
 | 61 | Semantic Layer | semantic-layer | Analytics & BI | ❌ |
 | 62 | AI Semantic Layer (Dremio) | ai-semantic-layer | Analytics & BI | ❌ |
 | 63 | SQL Analytics | sql-analytics | Analytics & BI | ❌ |

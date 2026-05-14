@@ -1,0 +1,102 @@
+{
+  "slug": "aws-glue-catalog",
+  "term": "AWS Glue Data Catalog",
+  "category": "Catalogs & Metadata",
+  "metaTitle": "AWS Glue Data Catalog: The Definitive Guide",
+  "metaDescription": "Learn what AWS Glue Data Catalog is, how it supports Apache Iceberg as a serverless managed catalog on AWS, and how it compares to Polaris and Nessie for the open lakehouse.",
+  "h1": "AWS Glue Data Catalog: The Definitive Guide",
+  "lede": "AWS Glue Data Catalog is Amazon's serverless, managed metadata catalog for the AWS data lake ecosystem. It supports Apache Iceberg via the Iceberg REST Catalog API, integrates natively with S3, Athena, EMR, and Lake Formation, and is the default catalog for most AWS-based lakehouse deployments.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is AWS Glue Data Catalog?",
+      "a": "AWS Glue Data Catalog is Amazon Web Services' serverless, managed metadata catalog for data stored on AWS. It stores table schemas, partition information, and storage locations, and now supports Apache Iceberg tables via the Iceberg REST Catalog API. It integrates natively with Amazon Athena, Amazon EMR, Amazon Redshift Spectrum, and AWS Lake Formation."
+    },
+    {
+      "q": "Does AWS Glue support Apache Iceberg?",
+      "a": "Yes. AWS Glue Data Catalog supports Apache Iceberg tables in two ways: as an Iceberg catalog backend (storing Iceberg metadata pointers for Iceberg tables written by EMR/Spark), and via the Iceberg REST Catalog API (allowing any Iceberg REST catalog client to create and query Iceberg tables in Glue). Athena v3 can query Iceberg tables registered in Glue natively."
+    },
+    {
+      "q": "Is AWS Glue Data Catalog open source?",
+      "a": "No. AWS Glue Data Catalog is a proprietary AWS managed service. While it exposes open APIs (HMS-compatible Thrift and Iceberg REST), the catalog itself is AWS infrastructure. This creates some vendor dependency \u2014 catalog state is stored in AWS, and migrating to another catalog requires table re-registration."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is AWS Glue Data Catalog?",
+      "content": "<p><strong>AWS Glue Data Catalog</strong> is Amazon Web Services' serverless, managed metadata catalog \u2014 the central repository for table schemas, partition metadata, and data locations for data stored in AWS S3. It serves as the catalog for the entire AWS analytics ecosystem: Amazon Athena queries Glue for table metadata, Amazon EMR (Spark/Hive) uses Glue as its Hive Metastore replacement, Amazon Redshift Spectrum queries Glue-registered tables in S3, and AWS Lake Formation uses Glue as its metadata backbone for fine-grained access control.</p><p>Glue Data Catalog began as an HMS-compatible catalog \u2014 supporting the same Thrift API that Apache Hive uses, making it a drop-in replacement for self-hosted HMS with serverless scaling and AWS-managed availability. Over time, AWS has added native <a href=\"apache-iceberg.html\">Apache Iceberg</a> support and an Iceberg REST Catalog API, positioning Glue as the managed catalog for the AWS-based open lakehouse."
+    },
+    {
+      "heading": "Glue and Apache Iceberg",
+      "content": "<p>AWS Glue supports Apache Iceberg in two modes:</p><h3>Iceberg Tables in Glue (Backend Mode)</h3><p>Spark jobs running on Amazon EMR can write Iceberg tables using Glue as the catalog backend. Glue stores the current metadata file location for each Iceberg table; the full Iceberg metadata tree (manifest list, manifests, data files) lives in S3. This is the most common EMR + Iceberg pattern on AWS.</p><h3>Iceberg REST Catalog API</h3><p>Glue now exposes an Iceberg REST Catalog API endpoint, allowing any Iceberg REST catalog client to connect to Glue directly \u2014 without HMS Thrift client configuration. This enables Spark, Trino, Flink, and other engines to use Glue as a REST catalog in their standard Iceberg catalog configuration.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "AWS Glue Data Catalog Architecture",
+      "diagramCaption": "Figure 1: Glue Data Catalog in the AWS lakehouse \u2014 HMS-compatible and Iceberg REST API for all engines."
+    },
+    {
+      "heading": "Glue and AWS Lake Formation",
+      "content": "<p><strong>AWS Lake Formation</strong> is AWS's data lake governance service, built on top of Glue Data Catalog. Lake Formation adds fine-grained access control to Glue-registered tables: column-level permissions, row-level filters, tag-based access policies, and cross-account data sharing.</p><p>For organizations building a governed lakehouse on AWS, the Glue + Lake Formation combination provides the access control layer without requiring a separate catalog deployment. Lake Formation permissions are enforced at the Glue catalog API level \u2014 engines querying Glue-registered Iceberg tables via Athena or EMR have their access controlled by Lake Formation policies, regardless of which engine is making the request."
+    },
+    {
+      "heading": "Glue vs. Polaris and Nessie",
+      "content": "<table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>AWS Glue</th><th>Apache Polaris</th><th>Project Nessie</th></tr></thead><tbody><tr><td>Deployment</td><td>Managed AWS service</td><td>Self-hosted or managed</td><td>Self-hosted (open source)</td></tr><tr><td>Open source</td><td>No (proprietary)</td><td>Yes (ASF)</td><td>Yes (Apache)</td></tr><tr><td>Cloud portability</td><td>AWS only</td><td>Any cloud</td><td>Any cloud</td></tr><tr><td>Git-like branching</td><td>No</td><td>No</td><td>Yes</td></tr><tr><td>REST Catalog API</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td>Lake Formation integration</td><td>Native</td><td>No</td><td>No</td></tr></tbody></table>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Glue vs Open Catalogs Comparison",
+      "diagramCaption": "Figure 2: Glue vs open catalog alternatives \u2014 AWS-native governance vs cloud-portable open standards."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>AWS Glue Data Catalog is the practical default catalog for AWS-based data lakehouses. Its native integration with Athena, EMR, Redshift Spectrum, and Lake Formation makes it the path of least resistance for AWS-centric organizations. For organizations prioritizing cloud portability, open governance, or Git-like data versioning, <a href=\"apache-polaris.html\">Apache Polaris</a> or <a href=\"project-nessie.html\">Project Nessie</a> are the open alternatives. Most AWS lakehouse deployments start with Glue and evaluate migration to open catalogs as multi-cloud or portability requirements emerge.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs & Metadata",
+      "desc": "Open alternative to Glue for multi-cloud lakehouses."
+    },
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs & Metadata",
+      "desc": "Git-like open catalog alternative."
+    },
+    {
+      "slug": "hive-metastore",
+      "term": "Hive Metastore",
+      "category": "Catalogs & Metadata",
+      "desc": "Legacy catalog that Glue replaces on AWS."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "REST API now exposed by Glue."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format Glue catalogs for Iceberg workloads."
+    },
+    {
+      "slug": "amazon-s3",
+      "term": "Amazon S3",
+      "category": "File Formats & Storage",
+      "desc": "Storage backend for Glue-cataloged Iceberg tables."
+    },
+    {
+      "slug": "catalog-interoperability",
+      "term": "Catalog Interoperability",
+      "category": "Catalogs & Metadata",
+      "desc": "Glue's REST API enables catalog interoperability."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Lake Formation governance built on Glue."
+    }
+  ]
+}

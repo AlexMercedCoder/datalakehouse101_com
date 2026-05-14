@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apache Parquet: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Apache Parquet is, how its columnar format enables efficient analytics, and why it is the default file format for Apache Iceberg and the data lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/apache-parquet.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Apache Parquet: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Apache Parquet is, how its columnar format enables efficient analytics, and why it is the default file format for Apache Iceberg and the data lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/apache-parquet.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Apache Parquet: The Definitive Guide",
+      "description": "Learn what Apache Parquet is, how its columnar format enables efficient analytics, and why it is the default file format for Apache Iceberg and the data lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/apache-parquet.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Apache Parquet", "item": "https://datalakehouse101.com/knowledge/apache-parquet.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Apache Parquet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Parquet is an open-source, columnar storage file format designed for efficient analytical processing. It stores data column-by-column rather than row-by-row, enabling query engines to read only the columns needed for a query (column pruning) and apply filter statistics to skip irrelevant data (predicate pushdown). It is the default data file format for Apache Iceberg."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is Parquet the standard for data lakehouses?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Parquet's columnar layout enables two critical optimizations: column pruning (reading only needed columns) and predicate pushdown (skipping files and row groups using per-column min/max statistics). For analytical queries that touch a small subset of columns over large datasets, these optimizations reduce I/O by 90%+ vs row-oriented formats. Apache Iceberg was designed around Parquet's metadata model."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What compression codecs does Apache Parquet support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Parquet supports Snappy (fast compression/decompression, moderate ratio — the most common lakehouse choice), Zstandard/ZSTD (better compression ratio than Snappy with comparable speed), GZIP (high compression ratio, slower), LZ4, and BROTLI. For lakehouse data files, Snappy and ZSTD are most widely used — Snappy for maximum query speed, ZSTD for storage cost optimization."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Apache Parquet</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">File Formats & Storage</span>
+      <h1>Apache Parquet: The Definitive Guide</h1>
+      <p class="hero-lede">Apache Parquet is the columnar storage file format that powers the data lakehouse. Its column-oriented layout, nested type support, compression codecs, and per-column statistics enable the predicate pushdown, column pruning, and vectorized reads that make analytical queries fast at petabyte scale.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Apache Parquet?</a></li>
+        <li><a href="#section-2">Parquet File Structure</a></li>
+        <li><a href="#section-3">Parquet and Apache Iceberg</a></li>
+        <li><a href="#section-4">Parquet Encoding and Compression</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Apache Parquet?</h2>
+        <p><strong>Apache Parquet</strong> is an open-source, columnar storage file format originally developed by Twitter and Cloudera, donated to the Apache Software Foundation in 2013. It is the dominant file format for analytical data storage in the lakehouse ecosystem — the default data file format for <a href="apache-iceberg.html">Apache Iceberg</a>, Delta Lake, and <a href="apache-hudi.html">Apache Hudi</a>.</p><p>Parquet's defining design choice is <strong>columnar storage</strong>: rather than storing each row's values together (row-oriented, like CSV or traditional OLTP storage), Parquet stores each column's values together. All revenue values for all rows are stored contiguously; all customer_id values are stored contiguously; all event_date values are stored contiguously. This layout enables two critical query optimizations that are foundational to lakehouse performance: <a href="column-pruning.html">column pruning</a> and <a href="predicate-pushdown.html">predicate pushdown</a>.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Parquet File Structure</h2>
+        <p>A Parquet file has a layered structure:</p><ul><li><strong>Row Groups:</strong> A Parquet file is divided into row groups — horizontal partitions containing a fixed number of rows (typically 128MB of data). Each row group contains all columns for its set of rows.</li><li><strong>Column Chunks:</strong> Within each row group, data is organized into column chunks — one per column. Each column chunk stores all values for that column within the row group, encoded and compressed together.</li><li><strong>Pages:</strong> Each column chunk is further divided into pages (typically 1MB each) for fine-grained I/O and dictionary encoding.</li><li><strong>File Footer:</strong> The Parquet file footer (at the end of the file) contains the schema definition, the byte offset and size of every row group and column chunk, and per-column-chunk statistics (min, max, null count). The footer is read first by query engines to plan column-level reads.</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Apache Parquet File Structure diagram" loading="lazy"><figcaption>Figure 1: Parquet file structure — row groups, column chunks, and footer statistics for query optimization.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Parquet and Apache Iceberg</h2>
+        <p><a href="apache-iceberg.html">Apache Iceberg</a> is built around Parquet as its default data file format. Every Iceberg data file is a Parquet file. Iceberg's manifest file column statistics (lower_bounds and upper_bounds) mirror Parquet's footer statistics — they are derived from Parquet footer reads during data file ingestion.</p><p>The synergy between Iceberg and Parquet creates a multi-level optimization hierarchy: Iceberg's manifest metadata provides file-level statistics (for file skipping), and Parquet's row group statistics provide within-file row group skipping. Together, they deliver the two-level predicate pushdown that enables precise, efficient reads from petabyte-scale tables.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Parquet Encoding and Compression</h2>
+        <p>Parquet applies column-specific encodings before compression, exploiting the homogeneity of column values:</p><ul><li><strong>Dictionary encoding:</strong> Low-cardinality columns (status, region, category) store a dictionary of unique values and index references instead of repeated full values — dramatically reducing storage size</li><li><strong>RLE (Run Length Encoding):</strong> Sequences of repeated values encoded as a count + value — effective for sorted or clustered data</li><li><strong>Delta encoding:</strong> Integer columns store differences between consecutive values — very effective for timestamps and monotonically increasing IDs</li></ul><p>These encodings combined with compression codecs (Snappy, ZSTD) typically achieve 5–10x compression ratios for typical business data — turning 100GB of raw CSV into 10–20GB of Parquet.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Parquet Encoding and Compression diagram" loading="lazy"><figcaption>Figure 2: Parquet encoding strategies — dictionary, RLE, delta — before compression codec application.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Apache Parquet is the data file format foundation of the lakehouse. Its columnar layout, nested type support, per-column statistics, and efficient compression make it uniquely suited for the analytical query patterns of the <a href="data-lakehouse.html">data lakehouse</a>: read few columns, skip irrelevant files, decompress fast, and process with <a href="vectorized-execution.html">vectorized SIMD</a> operations. Understanding Parquet's structure is fundamental to understanding why <a href="column-pruning.html">column pruning</a>, <a href="predicate-pushdown.html">predicate pushdown</a>, and <a href="compaction.html">compaction</a> have such dramatic effects on lakehouse query performance.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Uses Parquet as its default data file format.</span>
+    </a>
+      <a class="related-card" href="column-pruning.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Column Pruning</span>
+      <span class="related-desc">Enabled by Parquet's columnar layout.</span>
+    </a>
+      <a class="related-card" href="predicate-pushdown.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Predicate Pushdown</span>
+      <span class="related-desc">Enabled by Parquet's per-column statistics.</span>
+    </a>
+      <a class="related-card" href="vectorized-execution.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Vectorized Query Execution</span>
+      <span class="related-desc">Parquet's columnar layout feeds vectorized processors.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Compaction optimizes Parquet file sizes and layout.</span>
+    </a>
+      <a class="related-card" href="z-ordering.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Z-Ordering</span>
+      <span class="related-desc">Z-ordering makes Parquet column statistics narrow and effective.</span>
+    </a>
+      <a class="related-card" href="apache-orc.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache ORC</span>
+      <span class="related-desc">The alternative columnar format to Parquet.</span>
+    </a>
+      <a class="related-card" href="apache-arrow.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Apache Arrow</span>
+      <span class="related-desc">In-memory companion to Parquet for query execution.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

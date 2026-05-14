@@ -1,0 +1,102 @@
+{
+  "slug": "apache-polaris",
+  "term": "Apache Polaris",
+  "category": "Catalogs & Metadata",
+  "metaTitle": "Apache Polaris: The Definitive Guide",
+  "metaDescription": "Learn what Apache Polaris is, how this ASF-governed Iceberg REST Catalog enables multi-engine interoperability, and why it is the open standard for lakehouse catalog governance.",
+  "h1": "Apache Polaris: The Definitive Guide",
+  "lede": "Apache Polaris is the Apache Software Foundation-governed reference implementation of the Iceberg REST Catalog specification. Donated by Snowflake in 2024, it provides open, vendor-neutral catalog governance for Apache Iceberg tables accessible by any compliant query engine.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Polaris?",
+      "a": "Apache Polaris is an open-source, ASF-governed implementation of the Apache Iceberg REST Catalog specification. It was created by Snowflake and donated to the Apache Software Foundation in 2024. Polaris provides namespace management, table registration, RBAC access control, and credential vending for Iceberg tables."
+    },
+    {
+      "q": "Who donated Apache Polaris to the ASF?",
+      "a": "Snowflake donated the Polaris catalog codebase to the Apache Software Foundation in June 2024, where it entered the Apache Incubator. This made Polaris a vendor-neutral, community-governed open-source project under ASF governance."
+    },
+    {
+      "q": "How does Apache Polaris differ from Project Nessie?",
+      "a": "Both implement the Iceberg REST Catalog spec, but differ in capabilities: Polaris focuses on multi-principal access control, credential vending, and catalog federation (connecting external catalogs). Nessie adds Git-like branching and tagging semantics. Organizations can choose based on whether they prioritize governance (Polaris) or data versioning workflows (Nessie)."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Polaris?",
+      "content": "<p><strong>Apache Polaris</strong> is an open-source <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> implementation governed by the Apache Software Foundation. Created by Snowflake as the catalog backend for Snowflake's Iceberg tables, Polaris was donated to the ASF in June 2024, making it the community-governed, vendor-neutral reference implementation of the REST catalog specification.</p><p>Polaris provides the full Iceberg REST Catalog API surface \u2014 namespace management, table CRUD, metadata loading, transaction commits, and OAuth2 token-based authentication \u2014 along with enterprise-grade features: role-based access control (RBAC) for fine-grained principal permissions, credential vending (returning short-lived cloud storage credentials alongside table metadata), and catalog federation (connecting external Hive or Iceberg catalogs as read-only federated sources).</p><p>Any engine implementing the Iceberg REST catalog client \u2014 <a href=\"apache-spark.html\">Apache Spark</a>, <a href=\"trino.html\">Trino</a>, <a href=\"apache-flink.html\">Apache Flink</a>, PyIceberg, <a href=\"dremio.html\">Dremio</a> \u2014 can connect to Apache Polaris and interact with tables registered in its catalog. This makes Polaris the neutral catalog layer in a multi-engine lakehouse."
+    },
+    {
+      "heading": "Polaris Architecture",
+      "content": "<p>Apache Polaris has three architectural layers:</p><h3>REST API Layer</h3><p>The Iceberg REST Catalog API endpoints \u2014 fully compliant with the specification. Clients authenticate with OAuth2 bearer tokens and call standard REST endpoints for all catalog operations.</p><h3>Catalog Management Layer</h3><p>Internal catalog state management: namespace hierarchy, table metadata tracking, principal and role definitions, and access policy evaluation. Polaris stores catalog state in a persistent backend (Postgres, etc.).</p><h3>Storage Integration Layer</h3><p>Polaris integrates with cloud storage providers to generate short-lived, scoped credentials. When a client loads a table, Polaris returns temporary S3, ADLS, or GCS credentials scoped to the table's storage prefix \u2014 ensuring neither the client nor a long-lived credential has broad storage access.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Apache Polaris Iceberg Catalog Ecosystem",
+      "diagramCaption": "Figure 1: Apache Polaris in the Iceberg catalog ecosystem \u2014 the ASF-governed REST catalog connecting all engines."
+    },
+    {
+      "heading": "Polaris RBAC and Access Control",
+      "content": "<p>Apache Polaris implements a comprehensive role-based access control model for Iceberg catalog resources:</p><ul><li><strong>Principals:</strong> Human users or service accounts (query engines, ETL jobs) that authenticate with Polaris</li><li><strong>Principal Roles:</strong> Named collections of permissions that can be assigned to principals</li><li><strong>Catalog Roles:</strong> Roles scoped to a specific catalog with permissions on namespaces and tables</li><li><strong>Privileges:</strong> Specific allowed operations \u2014 TABLE_READ_DATA, TABLE_WRITE_DATA, NAMESPACE_CREATE, CATALOG_MANAGE_METADATA, etc.</li></ul><p>This RBAC model enforces access control at the catalog API layer \u2014 consistently, regardless of which engine is connecting. A principal without TABLE_READ_DATA privilege cannot load table metadata, even if they have direct cloud storage credentials."
+    },
+    {
+      "heading": "Catalog Federation in Polaris",
+      "content": "<p>A distinctive Polaris feature is <strong>catalog federation</strong>: the ability to register external Hive Metastore or other Iceberg catalogs as read-only federated sources within Polaris. This allows organizations to present a unified Polaris catalog namespace that spans both Polaris-native tables and tables from legacy Hive Metastore \u2014 without migrating or copying data.</p><p>Federation is a practical migration path: teams can begin registering new tables in Polaris while continuing to access legacy Hive tables through the federated view. Over time, tables can be migrated to Polaris-native registration as migration bandwidth allows.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Polaris Catalog Federation",
+      "diagramCaption": "Figure 2: Polaris catalog federation \u2014 unified view across Polaris-native and legacy Hive Metastore tables."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Polaris is the ASF's answer to the question of what the community-governed, vendor-neutral Iceberg catalog should look like. Its comprehensive RBAC model, credential vending, and catalog federation capabilities make it a production-grade catalog for organizations that need enterprise governance without vendor lock-in. Combined with <a href=\"apache-iceberg.html\">Apache Iceberg's</a> table format and any compliant query engine, Polaris completes the open lakehouse stack.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "The API specification Polaris implements."
+    },
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs & Metadata",
+      "desc": "Alternative REST catalog with Git-like branching."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format Polaris catalogs."
+    },
+    {
+      "slug": "dremio-open-catalog",
+      "term": "Dremio Open Catalog",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's REST catalog using Nessie."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Polaris enforces governance via RBAC."
+    },
+    {
+      "slug": "multi-engine-interoperability",
+      "term": "Multi-Engine Interoperability",
+      "category": "Analytics & BI",
+      "desc": "What Polaris enables across engines."
+    },
+    {
+      "slug": "hive-metastore",
+      "term": "Hive Metastore",
+      "category": "Catalogs & Metadata",
+      "desc": "Legacy catalog that Polaris can federate."
+    },
+    {
+      "slug": "catalog-interoperability",
+      "term": "Catalog Interoperability",
+      "category": "Catalogs & Metadata",
+      "desc": "The broader goal Polaris advances."
+    }
+  ]
+}

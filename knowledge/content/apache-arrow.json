@@ -1,0 +1,98 @@
+{
+  "slug": "apache-arrow",
+  "term": "Apache Arrow",
+  "category": "File Formats & Storage",
+  "metaTitle": "Apache Arrow: The Definitive Guide",
+  "metaDescription": "Learn what Apache Arrow is, how its in-memory columnar format powers vectorized query engines, and why Arrow Flight SQL is the high-performance data access protocol for the lakehouse.",
+  "h1": "Apache Arrow: The Definitive Guide",
+  "lede": "Apache Arrow is the in-memory columnar data format that powers modern analytical query engines. It enables zero-copy data sharing between processes, SIMD-optimized vectorized processing, and language-agnostic interoperability \u2014 the performance backbone of Dremio, DuckDB, Pandas 2.0, and the entire modern analytics stack.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Arrow?",
+      "a": "Apache Arrow is an open-source, language-agnostic in-memory columnar data format and collection of libraries for efficient analytical data processing. It defines a standardized columnar memory layout that enables zero-copy data sharing between processes and programming languages, and supports SIMD-optimized vectorized operations for analytical query performance."
+    },
+    {
+      "q": "How does Apache Arrow relate to Apache Parquet?",
+      "a": "Parquet is a disk/object-storage file format optimized for compression and predicate pushdown. Arrow is an in-memory format optimized for query processing speed. When a query engine reads Parquet files, it decodes them into Arrow format in memory for vectorized processing. Parquet is the at-rest format; Arrow is the in-flight/in-memory format."
+    },
+    {
+      "q": "What is Arrow Flight SQL?",
+      "a": "Arrow Flight SQL is a high-performance data access protocol built on Arrow Flight (a binary RPC framework using gRPC + Arrow format). It transmits query results between servers and clients in Arrow columnar format, achieving 10\u2013100x higher throughput than JDBC for bulk data transfer. Dremio exposes Arrow Flight SQL for Python, R, and application-level data access."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Arrow?",
+      "content": "<p><strong>Apache Arrow</strong> is an open-source project that defines a standardized, language-agnostic in-memory columnar data format and provides libraries for efficient analytical data processing in C++, Python, Java, R, Go, Rust, JavaScript, and other languages. Originally launched by Wes McKinney (creator of pandas) and Dremio in 2016, Arrow has become the universal in-memory data interchange standard for the analytics ecosystem.</p><p>Arrow's core contribution is a <strong>standardized columnar memory layout</strong>: a specification for how columnar data should be represented in RAM that is identical across all languages and platforms. When Python pandas, Java Spark, and C++ Dremio all use Arrow format internally, they can share data in memory without any serialization or format conversion \u2014 zero-copy data sharing between languages and processes.</p><p>This zero-copy property is Arrow's most impactful performance feature: in traditional analytics pipelines, moving data from Spark (JVM) to Python (CPython) requires serialization to a byte stream and deserialization on the other side \u2014 copying the data twice. With Arrow, Python and Spark can share the same memory buffer \u2014 no copying, no serialization overhead."
+    },
+    {
+      "heading": "Arrow in Query Engine Architecture",
+      "content": "<p>Arrow is the in-memory data format for every modern analytical query engine:</p><ul><li><a href=\"dremio.html\">Dremio</a>: Built entirely on Arrow \u2014 all internal data movement uses Arrow RecordBatches, enabling SIMD vectorized operators and zero-copy result transmission to Arrow Flight SQL clients</li><li>Apache Spark (Tungsten project): Uses Arrow format for Python UDF data exchange (eliminating serialization overhead) and Arrow-based vectorized readers</li><li>DuckDB: Uses Arrow format for in-memory processing and exposes an Arrow IPC interface for Python integration</li><li>Pandas 2.0: Arrow-backed DataFrames as an optional storage backend for zero-copy interoperability with Arrow-native engines</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Apache Arrow In-Memory Engine Architecture",
+      "diagramCaption": "Figure 1: Arrow as the universal in-memory format \u2014 zero-copy data sharing across engines and languages."
+    },
+    {
+      "heading": "Arrow Flight SQL: High-Performance Data Access",
+      "content": "<p><strong>Arrow Flight SQL</strong> is a high-performance data access protocol that transmits SQL query results between servers and clients using Arrow columnar format over gRPC. It is designed as a high-throughput replacement for JDBC/ODBC for bulk data access scenarios.</p><p>JDBC transmits data in row-oriented format, serializing each row independently \u2014 efficient for small result sets but extremely slow for bulk transfers. Arrow Flight SQL transmits data in Arrow columnar RecordBatches \u2014 the same format the query engine uses internally. A Python data science workload pulling 100M rows from Dremio via Arrow Flight SQL avoids: JDBC serialization overhead, row-to-column conversion overhead, and Python object creation overhead \u2014 replacing all of these with a direct Arrow buffer handoff into PyArrow or Pandas 2.0.</p><p>Throughput improvements from JDBC to Arrow Flight SQL are typically 10\u2013100x for bulk data access workloads \u2014 a transformative difference for data science and ML feature engineering pipelines.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Arrow Flight SQL High Performance Data Access",
+      "diagramCaption": "Figure 2: Arrow Flight SQL vs JDBC \u2014 columnar bulk transfer vs row-serial protocol throughput comparison."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Arrow is the performance infrastructure layer of the modern analytics stack. Its standardized in-memory columnar format enables zero-copy data sharing across languages, SIMD-optimized vectorized processing in query engines, and the Arrow Flight SQL high-throughput data access protocol. For the <a href=\"data-lakehouse.html\">data lakehouse</a>, Arrow is the invisible connective tissue that links Parquet files on S3 to vectorized engine operators, Python data science workloads to SQL query results, and AI agent data requests to enterprise lakehouse tables \u2014 all with maximum throughput and minimum overhead.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "On-disk format decoded into Arrow for in-memory processing."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Built entirely on Arrow for vectorized execution."
+    },
+    {
+      "slug": "vectorized-execution",
+      "term": "Vectorized Query Execution",
+      "category": "Query Engines & Platforms",
+      "desc": "Arrow format enables SIMD vectorized execution."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Uses Arrow for Python UDF data exchange."
+    },
+    {
+      "slug": "apache-avro",
+      "term": "Apache Avro",
+      "category": "File Formats & Storage",
+      "desc": "Row-oriented serialization format complementing Arrow."
+    },
+    {
+      "slug": "column-pruning",
+      "term": "Column Pruning",
+      "category": "Query Engines & Platforms",
+      "desc": "Pruned columns flow as Arrow buffers in the engine."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Arrow is the execution format powering lakehouse analytics."
+    },
+    {
+      "slug": "predicate-pushdown",
+      "term": "Predicate Pushdown",
+      "category": "Query Engines & Platforms",
+      "desc": "Filtered rows flow as Arrow batches through engine operators."
+    }
+  ]
+}

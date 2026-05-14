@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Glue Data Catalog: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what AWS Glue Data Catalog is, how it supports Apache Iceberg as a serverless managed catalog on AWS, and how it compares to Polaris and Nessie for the open lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/aws-glue-catalog.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="AWS Glue Data Catalog: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what AWS Glue Data Catalog is, how it supports Apache Iceberg as a serverless managed catalog on AWS, and how it compares to Polaris and Nessie for the open lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/aws-glue-catalog.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "AWS Glue Data Catalog: The Definitive Guide",
+      "description": "Learn what AWS Glue Data Catalog is, how it supports Apache Iceberg as a serverless managed catalog on AWS, and how it compares to Polaris and Nessie for the open lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/aws-glue-catalog.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "AWS Glue Data Catalog", "item": "https://datalakehouse101.com/knowledge/aws-glue-catalog.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is AWS Glue Data Catalog?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AWS Glue Data Catalog is Amazon Web Services' serverless, managed metadata catalog for data stored on AWS. It stores table schemas, partition information, and storage locations, and now supports Apache Iceberg tables via the Iceberg REST Catalog API. It integrates natively with Amazon Athena, Amazon EMR, Amazon Redshift Spectrum, and AWS Lake Formation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does AWS Glue support Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. AWS Glue Data Catalog supports Apache Iceberg tables in two ways: as an Iceberg catalog backend (storing Iceberg metadata pointers for Iceberg tables written by EMR/Spark), and via the Iceberg REST Catalog API (allowing any Iceberg REST catalog client to create and query Iceberg tables in Glue). Athena v3 can query Iceberg tables registered in Glue natively."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is AWS Glue Data Catalog open source?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. AWS Glue Data Catalog is a proprietary AWS managed service. While it exposes open APIs (HMS-compatible Thrift and Iceberg REST), the catalog itself is AWS infrastructure. This creates some vendor dependency — catalog state is stored in AWS, and migrating to another catalog requires table re-registration."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">AWS Glue Data Catalog</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Catalogs & Metadata</span>
+      <h1>AWS Glue Data Catalog: The Definitive Guide</h1>
+      <p class="hero-lede">AWS Glue Data Catalog is Amazon's serverless, managed metadata catalog for the AWS data lake ecosystem. It supports Apache Iceberg via the Iceberg REST Catalog API, integrates natively with S3, Athena, EMR, and Lake Formation, and is the default catalog for most AWS-based lakehouse deployments.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is AWS Glue Data Catalog?</a></li>
+        <li><a href="#section-2">Glue and Apache Iceberg</a></li>
+        <li><a href="#section-3">Glue and AWS Lake Formation</a></li>
+        <li><a href="#section-4">Glue vs. Polaris and Nessie</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is AWS Glue Data Catalog?</h2>
+        <p><strong>AWS Glue Data Catalog</strong> is Amazon Web Services' serverless, managed metadata catalog — the central repository for table schemas, partition metadata, and data locations for data stored in AWS S3. It serves as the catalog for the entire AWS analytics ecosystem: Amazon Athena queries Glue for table metadata, Amazon EMR (Spark/Hive) uses Glue as its Hive Metastore replacement, Amazon Redshift Spectrum queries Glue-registered tables in S3, and AWS Lake Formation uses Glue as its metadata backbone for fine-grained access control.</p><p>Glue Data Catalog began as an HMS-compatible catalog — supporting the same Thrift API that Apache Hive uses, making it a drop-in replacement for self-hosted HMS with serverless scaling and AWS-managed availability. Over time, AWS has added native <a href="apache-iceberg.html">Apache Iceberg</a> support and an Iceberg REST Catalog API, positioning Glue as the managed catalog for the AWS-based open lakehouse.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Glue and Apache Iceberg</h2>
+        <p>AWS Glue supports Apache Iceberg in two modes:</p><h3>Iceberg Tables in Glue (Backend Mode)</h3><p>Spark jobs running on Amazon EMR can write Iceberg tables using Glue as the catalog backend. Glue stores the current metadata file location for each Iceberg table; the full Iceberg metadata tree (manifest list, manifests, data files) lives in S3. This is the most common EMR + Iceberg pattern on AWS.</p><h3>Iceberg REST Catalog API</h3><p>Glue now exposes an Iceberg REST Catalog API endpoint, allowing any Iceberg REST catalog client to connect to Glue directly — without HMS Thrift client configuration. This enables Spark, Trino, Flink, and other engines to use Glue as a REST catalog in their standard Iceberg catalog configuration.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="AWS Glue Data Catalog Architecture diagram" loading="lazy"><figcaption>Figure 1: Glue Data Catalog in the AWS lakehouse — HMS-compatible and Iceberg REST API for all engines.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Glue and AWS Lake Formation</h2>
+        <p><strong>AWS Lake Formation</strong> is AWS's data lake governance service, built on top of Glue Data Catalog. Lake Formation adds fine-grained access control to Glue-registered tables: column-level permissions, row-level filters, tag-based access policies, and cross-account data sharing.</p><p>For organizations building a governed lakehouse on AWS, the Glue + Lake Formation combination provides the access control layer without requiring a separate catalog deployment. Lake Formation permissions are enforced at the Glue catalog API level — engines querying Glue-registered Iceberg tables via Athena or EMR have their access controlled by Lake Formation policies, regardless of which engine is making the request.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Glue vs. Polaris and Nessie</h2>
+        <table class="comparison-table"><thead><tr><th>Dimension</th><th>AWS Glue</th><th>Apache Polaris</th><th>Project Nessie</th></tr></thead><tbody><tr><td>Deployment</td><td>Managed AWS service</td><td>Self-hosted or managed</td><td>Self-hosted (open source)</td></tr><tr><td>Open source</td><td>No (proprietary)</td><td>Yes (ASF)</td><td>Yes (Apache)</td></tr><tr><td>Cloud portability</td><td>AWS only</td><td>Any cloud</td><td>Any cloud</td></tr><tr><td>Git-like branching</td><td>No</td><td>No</td><td>Yes</td></tr><tr><td>REST Catalog API</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td>Lake Formation integration</td><td>Native</td><td>No</td><td>No</td></tr></tbody></table>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Glue vs Open Catalogs Comparison diagram" loading="lazy"><figcaption>Figure 2: Glue vs open catalog alternatives — AWS-native governance vs cloud-portable open standards.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>AWS Glue Data Catalog is the practical default catalog for AWS-based data lakehouses. Its native integration with Athena, EMR, Redshift Spectrum, and Lake Formation makes it the path of least resistance for AWS-centric organizations. For organizations prioritizing cloud portability, open governance, or Git-like data versioning, <a href="apache-polaris.html">Apache Polaris</a> or <a href="project-nessie.html">Project Nessie</a> are the open alternatives. Most AWS lakehouse deployments start with Glue and evaluate migration to open catalogs as multi-cloud or portability requirements emerge.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">Open alternative to Glue for multi-cloud lakehouses.</span>
+    </a>
+      <a class="related-card" href="project-nessie.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Project Nessie</span>
+      <span class="related-desc">Git-like open catalog alternative.</span>
+    </a>
+      <a class="related-card" href="hive-metastore.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Hive Metastore</span>
+      <span class="related-desc">Legacy catalog that Glue replaces on AWS.</span>
+    </a>
+      <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">REST API now exposed by Glue.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format Glue catalogs for Iceberg workloads.</span>
+    </a>
+      <a class="related-card" href="amazon-s3.html">
+      <span class="related-label">File Formats & Storage</span>
+      <span class="related-term">Amazon S3</span>
+      <span class="related-desc">Storage backend for Glue-cataloged Iceberg tables.</span>
+    </a>
+      <a class="related-card" href="catalog-interoperability.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Catalog Interoperability</span>
+      <span class="related-desc">Glue's REST API enables catalog interoperability.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Lake Formation governance built on Glue.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

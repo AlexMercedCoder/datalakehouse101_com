@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Nessie: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Project Nessie is, how its Git-like branching and tagging works for Apache Iceberg tables, and why it powers Dremio Open Catalog for data engineering workflows.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/project-nessie.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Project Nessie: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Project Nessie is, how its Git-like branching and tagging works for Apache Iceberg tables, and why it powers Dremio Open Catalog for data engineering workflows.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/project-nessie.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Project Nessie: The Definitive Guide",
+      "description": "Learn what Project Nessie is, how its Git-like branching and tagging works for Apache Iceberg tables, and why it powers Dremio Open Catalog for data engineering workflows.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/project-nessie.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Project Nessie", "item": "https://datalakehouse101.com/knowledge/project-nessie.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Project Nessie?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Project Nessie is an open-source catalog for Apache Iceberg (and Delta Lake) that implements Git-like version control semantics for table metadata. It supports creating branches, committing changes, merging branches, and tagging specific states — enabling isolated data experimentation, reproducible ML datasets, and atomic cross-table commits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Nessie branching work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In Nessie, a branch is a named pointer to a specific commit in the catalog's transaction history. Each commit represents an atomic change to the catalog state — creating a table, modifying a table schema, adding data. Branches can be created from any commit, allowing isolated experimentation. When a branch is ready, it can be merged back to main, applying all commits atomically."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Nessie's relationship to Dremio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Project Nessie was created and is actively developed by Dremio. It powers Dremio Open Catalog as the underlying catalog engine. Nessie is also available as a standalone open-source catalog that any Iceberg-compatible engine can connect to via the Iceberg REST Catalog API."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Project Nessie</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Catalogs & Metadata</span>
+      <h1>Project Nessie: The Definitive Guide</h1>
+      <p class="hero-lede">Project Nessie is an open-source transactional catalog for Apache Iceberg that brings Git-like branching and tagging to lakehouse data. Create isolated branches for experiments, tag reproducible ML datasets, and merge validated changes atomically — version control for your data lake.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Project Nessie?</a></li>
+        <li><a href="#section-2">Git-Like Branching for Data</a></li>
+        <li><a href="#section-3">Nessie Tags for ML Reproducibility</a></li>
+        <li><a href="#section-4">Nessie and Dremio Open Catalog</a></li>
+        <li><a href="#section-5">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Project Nessie?</h2>
+        <p><strong>Project Nessie</strong> is an open-source, transactional catalog for <a href="apache-iceberg.html">Apache Iceberg</a> tables that adds Git-like version control semantics to catalog metadata management. Developed by <a href="dremio.html">Dremio</a> and available as an open-source standalone service, Nessie tracks catalog changes (table creates, schema modifications, snapshot updates) as commits on a transaction log, and allows those commits to be organized into branches and tags — exactly like Git organizes code commits.</p><p>Nessie implements the <a href="iceberg-rest-catalog.html">Iceberg REST Catalog specification</a>, meaning any Iceberg-compatible engine can connect to it as a drop-in catalog. The branching and tagging features are expressed through Nessie-specific extensions to the REST API or through the Nessie CLI/UI — they are optional capabilities layered on top of the standard catalog operations.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Git-Like Branching for Data</h2>
+        <p>Nessie's branching model mirrors Git's design:</p><h3>Main Branch</h3><p>The production state of the catalog. Tables on main are the authoritative, production-ready versions. All production engines read from and write to main by default.</p><h3>Feature Branches</h3><p>Data engineers create branches for experimental transformations, schema changes, or new table additions. All changes on a feature branch are isolated — they do not affect main or any other branch. Engines connected to the feature branch see only that branch's catalog state.</p><h3>Merge</h3><p>When a feature branch is validated (data quality checks pass, queries produce correct results), the branch is merged into main — atomically applying all catalog changes from the branch to production. If two branches have conflicting changes, Nessie detects the conflict and prevents an uncontrolled overwrite.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Project Nessie Git-Like Branching diagram" loading="lazy"><figcaption>Figure 1: Nessie branching — isolated feature branches, atomic merge to main, tagged releases.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Nessie Tags for ML Reproducibility</h2>
+        <p>One of Nessie's most valuable capabilities for ML teams is <strong>catalog tagging</strong>. A Nessie tag is an immutable pointer to a specific catalog commit — like a Git release tag. When an ML model is trained on a specific version of training data, a Nessie tag can record the exact catalog state at training time.</p><p>Three months later, when the model needs to be retrained or debugged, the team connects to Nessie at the tagged commit and sees exactly the same tables, schemas, and data as at training time — regardless of how many changes have been made to the data since. This makes ML model training reproducible across time without duplicating data.</p><p>Tags also enable point-in-time compliance snapshots: a tag created at quarter-end records the exact data state used for financial reporting, providing an immutable audit trail without any data copying.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Nessie and Dremio Open Catalog</h2>
+        <p>Project Nessie is the catalog engine behind <a href="dremio-open-catalog.html">Dremio Open Catalog</a>. When using Dremio Cloud or Dremio's self-hosted platform, the Open Catalog UI and API expose Nessie's branching and tagging capabilities through an enterprise-grade interface — including branch creation and management, tag creation, branch comparison (showing which tables differ between branches), and merge workflows with conflict detection.</p><p>Organizations using Dremio Cloud get Nessie's capabilities in a fully managed, enterprise-supported form. Organizations that prefer a self-hosted, open-source catalog can deploy Nessie independently and connect any Iceberg engine to it.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Nessie as Dremio Open Catalog Engine diagram" loading="lazy"><figcaption>Figure 2: Nessie powers Dremio Open Catalog — branching and tagging accessible via enterprise UI.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Summary</h2>
+        <p>Project Nessie brings the most powerful pattern in software development — version control — to lakehouse data management. Its Git-like branching and tagging model enables isolated data experimentation, atomic cross-table commits, reproducible ML datasets, and immutable audit snapshots — all on top of open <a href="apache-iceberg.html">Apache Iceberg</a> tables without data duplication. As the engine behind <a href="dremio-open-catalog.html">Dremio Open Catalog</a>, Nessie's capabilities are available in both open-source and enterprise-managed forms.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio-open-catalog.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Open Catalog</span>
+      <span class="related-desc">Enterprise product powered by Nessie.</span>
+    </a>
+      <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">The API specification Nessie implements.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format Nessie catalogs.</span>
+    </a>
+      <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">Alternative REST catalog with stronger RBAC focus.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">The company that created and maintains Nessie.</span>
+    </a>
+      <a class="related-card" href="time-travel.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Time Travel</span>
+      <span class="related-desc">Nessie tags complement Iceberg time travel.</span>
+    </a>
+      <a class="related-card" href="schema-evolution.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Schema Evolution</span>
+      <span class="related-desc">Schema changes tracked as Nessie commits.</span>
+    </a>
+      <a class="related-card" href="catalog-interoperability.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Catalog Interoperability</span>
+      <span class="related-desc">Nessie connects any Iceberg engine via REST catalog.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

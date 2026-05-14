@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalog Interoperability: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what catalog interoperability means in the data lakehouse, how the Iceberg REST Catalog specification enables it, and why it is essential for the open, multi-engine lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/catalog-interoperability.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Catalog Interoperability: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what catalog interoperability means in the data lakehouse, how the Iceberg REST Catalog specification enables it, and why it is essential for the open, multi-engine lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/catalog-interoperability.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Catalog Interoperability: The Definitive Guide",
+      "description": "Learn what catalog interoperability means in the data lakehouse, how the Iceberg REST Catalog specification enables it, and why it is essential for the open, multi-engine lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/catalog-interoperability.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Catalog Interoperability", "item": "https://datalakehouse101.com/knowledge/catalog-interoperability.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is catalog interoperability?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Catalog interoperability is the ability for different query engines (Dremio, Spark, Trino, Flink) to connect to the same catalog and access the same tables through a standard API, without requiring engine-specific catalog plugins or custom integrations. The Iceberg REST Catalog specification is the standard that enables catalog interoperability in the open lakehouse ecosystem."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is catalog interoperability important?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Without catalog interoperability, each engine sees only its own tables. A table created by Spark cannot be immediately queried by Dremio without manual re-registration. With interoperability, all engines share a single catalog namespace — tables created by any engine are immediately visible and queryable by all other engines, with consistent schema and access control."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which catalog implementations provide the best interoperability?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Catalogs that fully implement the Iceberg REST Catalog specification provide the best interoperability: Apache Polaris, Project Nessie, Dremio Open Catalog, and AWS Glue's REST endpoint. Any engine with an Iceberg REST catalog client can connect to any of these catalogs interchangeably."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Catalog Interoperability</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Catalogs & Metadata</span>
+      <h1>Catalog Interoperability: The Definitive Guide</h1>
+      <p class="hero-lede">Catalog interoperability is the ability for multiple query engines to access the same tables through a shared catalog — without proprietary plugins or engine-specific integrations. The Iceberg REST Catalog specification makes this possible, enabling true plug-and-play multi-engine lakehouse architectures.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Catalog Interoperability?</a></li>
+        <li><a href="#section-2">How REST Catalog Enables Interoperability</a></li>
+        <li><a href="#section-3">Interoperability Across Catalog Implementations</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Catalog Interoperability?</h2>
+        <p><strong>Catalog interoperability</strong> is the technical property that allows multiple heterogeneous query engines to access, create, and modify tables in a shared catalog through a standard API — without requiring custom, engine-specific integrations for each catalog backend. In the <a href="data-lakehouse.html">data lakehouse</a> context, catalog interoperability is what makes the 'multi-engine' promise real: not just theoretically possible, but operationally seamless.</p><p>Before the <a href="iceberg-rest-catalog.html">Iceberg REST Catalog specification</a>, catalog integrations were point-to-point: Spark had its own HiveCatalog implementation, Trino had its own HMS connector, Presto had its own. Adding a new catalog backend required implementing a new connector for each engine — an O(engines × catalogs) engineering burden. With the REST catalog specification, each engine implements one REST client and each catalog implements one REST server — reducing the integration burden to O(engines + catalogs).</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>How REST Catalog Enables Interoperability</h2>
+        <p>The <a href="iceberg-rest-catalog.html">Iceberg REST Catalog specification</a> defines a standard HTTP API for all catalog operations. Any engine implementing the REST client can connect to any catalog implementing the REST server:</p><ul><li><strong>Table discovery:</strong> List namespaces and tables via standard GET endpoints</li><li><strong>Metadata loading:</strong> Load table metadata (current metadata file location + storage credentials) via standard GET endpoint</li><li><strong>Commit:</strong> Commit new snapshots via standard POST endpoint</li><li><strong>Auth:</strong> OAuth2 token-based authentication — any engine can authenticate with any catalog using the same flow</li></ul><p>When <a href="dremio.html">Dremio</a> and <a href="apache-spark.html">Apache Spark</a> both connect to the same <a href="apache-polaris.html">Apache Polaris</a> catalog, they share one namespace. A table Spark creates is immediately queryable by Dremio, with the same schema and the same access control policies applied to both engines' requests.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Catalog Interoperability REST API Architecture diagram" loading="lazy"><figcaption>Figure 1: REST Catalog interoperability — any engine connects to any catalog via the standard HTTP API.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Interoperability Across Catalog Implementations</h2>
+        <p>Catalog interoperability also means that organizations can switch catalog backends without reconfiguring engines. If a team starts with <a href="aws-glue-catalog.html">AWS Glue</a> as their catalog and later migrates to <a href="apache-polaris.html">Apache Polaris</a> for better governance, the engine configuration change is minimal — update the REST catalog URI in the engine's Iceberg catalog config. No engine-specific plugins need to be replaced, no data needs to be copied, and no table registrations need to be redone (tables are re-registered in the new catalog pointing to the same physical data files).</p><p>This portability is fundamental to avoiding catalog lock-in — one of the most insidious forms of vendor lock-in in the pre-REST-catalog era. Organizations that standardized on a proprietary catalog (like AWS Glue before its REST API) found that migrating to a different catalog required significant re-engineering of all engine configurations and integrations.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Catalog Interoperability Multi-Engine Access diagram" loading="lazy"><figcaption>Figure 2: Multi-engine catalog interoperability — Spark, Trino, Flink, and Dremio sharing one catalog.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Catalog interoperability — enabled by the <a href="iceberg-rest-catalog.html">Iceberg REST Catalog specification</a> — is the technical foundation of the open, multi-engine <a href="data-lakehouse.html">data lakehouse</a>. It transforms the catalog from a proprietary integration point into a commodity service: organizations can choose their preferred catalog implementation (<a href="apache-polaris.html">Apache Polaris</a>, <a href="project-nessie.html">Project Nessie</a>, AWS Glue, <a href="dremio-open-catalog.html">Dremio Open Catalog</a>) based on features and governance needs, confident that all their engines will connect to it through the same standard API. This is the vendor-neutral, open-ecosystem architecture that the data lakehouse community has been building toward.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">The specification enabling catalog interoperability.</span>
+    </a>
+      <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">ASF catalog implementing the interoperability standard.</span>
+    </a>
+      <a class="related-card" href="project-nessie.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Project Nessie</span>
+      <span class="related-desc">Git-like catalog with REST interoperability.</span>
+    </a>
+      <a class="related-card" href="multi-engine-interoperability.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Multi-Engine Interoperability</span>
+      <span class="related-desc">Engine-level complement to catalog interoperability.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format that catalog interoperability is designed for.</span>
+    </a>
+      <a class="related-card" href="dremio-open-catalog.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Open Catalog</span>
+      <span class="related-desc">Dremio's interoperable REST catalog.</span>
+    </a>
+      <a class="related-card" href="aws-glue-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">AWS Glue Data Catalog</span>
+      <span class="related-desc">AWS catalog with REST catalog interoperability.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture catalog interoperability enables.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

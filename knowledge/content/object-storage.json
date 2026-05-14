@@ -1,0 +1,98 @@
+{
+  "slug": "object-storage",
+  "term": "Object Storage",
+  "category": "File Formats & Storage",
+  "metaTitle": "Object Storage: The Definitive Guide",
+  "metaDescription": "Learn what object storage is, why S3-compatible object storage is the foundation of the data lakehouse, and how it enables decoupled storage and compute at petabyte scale.",
+  "h1": "Object Storage: The Definitive Guide",
+  "lede": "Object storage is the storage foundation of the data lakehouse \u2014 infinitely scalable, pay-per-byte cloud storage (S3, ADLS, GCS) where Iceberg data files live. Its HTTP API, flat namespace, and durability characteristics make it the ideal decoupled storage layer for multi-engine lakehouse architectures.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is object storage?",
+      "a": "Object storage is a cloud storage model where data is stored as discrete objects \u2014 each object has a unique key (path), its binary data payload, and metadata. Unlike file systems (which use hierarchical directories) or block storage (which uses fixed-size blocks), object storage uses a flat namespace where objects are addressed by key. Amazon S3, Azure ADLS, Google Cloud Storage, and MinIO are the leading object storage systems."
+    },
+    {
+      "q": "Why is object storage the foundation of the data lakehouse?",
+      "a": "Object storage provides infinite scale at low cost with a simple HTTP API that any engine can access without proprietary storage drivers. Its durability (11 nines for S3), availability, and decoupled billing model (pay for storage separately from compute) make it ideal for the decoupled storage-and-compute architecture of the data lakehouse."
+    },
+    {
+      "q": "What is S3-compatible object storage?",
+      "a": "S3-compatible object storage implements Amazon S3's HTTP API, allowing any tool built for S3 to work with it without modification. MinIO, Ceph, and many cloud providers offer S3-compatible APIs. Apache Iceberg, Parquet readers, and all major lakehouse engines access object storage through the S3 API \u2014 making S3 compatibility the universal storage interface standard for the lakehouse ecosystem."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Object Storage?",
+      "content": "<p><strong>Object storage</strong> is a cloud storage architecture where data is stored as discrete objects \u2014 each object consisting of a unique key (the object's address), its data payload (arbitrary binary data), and metadata (key-value pairs describing the object). Unlike traditional file systems with hierarchical directory trees, object storage uses a flat namespace: all objects in a bucket are addressed by their full key path without actual directory hierarchy.</p><p>The leading object storage services are: <a href=\"amazon-s3.html\">Amazon S3</a> (AWS), <a href=\"azure-adls.html\">Azure Data Lake Storage Gen2</a> (Azure), <a href=\"google-cloud-storage.html\">Google Cloud Storage</a> (GCP), and <a href=\"minio.html\">MinIO</a> (open-source, self-hosted). All provide HTTP/HTTPS APIs for object upload, download, list, and delete operations \u2014 making storage access language-agnostic and infrastructure-agnostic.</p><p>Object storage is the storage layer of the <a href=\"data-lakehouse.html\">data lakehouse</a> because it combines unlimited scale, extremely low cost, high durability (S3's 99.999999999% durability guarantee), and a universal API that any engine can access without proprietary storage drivers or specialized network configuration."
+    },
+    {
+      "heading": "Object Storage and the Lakehouse Architecture",
+      "content": "<p>Object storage enables the defining characteristic of the <a href=\"data-lakehouse.html\">data lakehouse</a>: <a href=\"decoupled-storage-compute.html\">decoupled storage and compute</a>. Because object storage is:</p><ul><li><strong>Independently scalable:</strong> Storage grows independently of compute \u2014 no need to provision more compute to store more data</li><li><strong>Independently billed:</strong> Storage costs are separate from compute costs \u2014 idle data incurs only storage costs, not compute costs</li><li><strong>Multi-engine accessible:</strong> Any engine (<a href=\"apache-spark.html\">Spark</a>, <a href=\"dremio.html\">Dremio</a>, <a href=\"trino.html\">Trino</a>, <a href=\"apache-flink.html\">Flink</a>) can read from and write to the same S3 bucket simultaneously</li><li><strong>Globally durable:</strong> Multi-AZ replication ensures data survives hardware failures without any application-level handling</li></ul><p>...the data lakehouse can place all data in one location and bring any number of compute engines to it \u2014 the opposite of the traditional data warehouse model where data must be loaded into the warehouse's proprietary storage.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Object Storage as Lakehouse Foundation",
+      "diagramCaption": "Figure 1: Object storage as the shared foundation \u2014 multiple engines access the same Iceberg data files simultaneously."
+    },
+    {
+      "heading": "S3 Consistency and Iceberg",
+      "content": "<p>A historical challenge for data lakehouses built on S3 was S3's eventual consistency model: after writing a new object, list operations might not immediately return the new object, causing race conditions in table management operations. <strong>Amazon S3 achieved strong read-after-write consistency in December 2020</strong> \u2014 a landmark change that made building correct Iceberg implementations on S3 dramatically simpler.</p><p>Apache Iceberg's atomic commit model also works correctly with S3's consistency: Iceberg commits by writing a new metadata file and updating the catalog pointer atomically. With S3's strong consistency, readers immediately see the new metadata file after it is written, and the catalog update is the atomic serialization point that prevents concurrent write conflicts.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Object Storage S3 Consistency Iceberg",
+      "diagramCaption": "Figure 2: S3 strong consistency + Iceberg atomic commits enable correct multi-writer lakehouse tables."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Object storage is the inexpensive, infinitely scalable, durably reliable foundation that makes the <a href=\"data-lakehouse.html\">data lakehouse</a> economically viable at any scale. By storing all data as objects on <a href=\"amazon-s3.html\">S3</a>, <a href=\"azure-adls.html\">ADLS</a>, or <a href=\"google-cloud-storage.html\">GCS</a>, organizations eliminate the storage scaling bottlenecks, proprietary storage costs, and single-engine lock-in of traditional data warehouses \u2014 while gaining the multi-engine interoperability and open format flexibility that define the open lakehouse architecture.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "amazon-s3",
+      "term": "Amazon S3",
+      "category": "File Formats & Storage",
+      "desc": "The leading object storage implementation."
+    },
+    {
+      "slug": "azure-adls",
+      "term": "Azure ADLS",
+      "category": "File Formats & Storage",
+      "desc": "Microsoft's object storage for lakehouses."
+    },
+    {
+      "slug": "google-cloud-storage",
+      "term": "Google Cloud Storage",
+      "category": "File Formats & Storage",
+      "desc": "GCP's object storage service."
+    },
+    {
+      "slug": "minio",
+      "term": "MinIO",
+      "category": "File Formats & Storage",
+      "desc": "Open-source S3-compatible object storage."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "Object storage enables decoupled lakehouse architecture."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Stores all data files and metadata in object storage."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "The columnar format of objects stored in object storage."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture built on object storage."
+    }
+  ]
+}

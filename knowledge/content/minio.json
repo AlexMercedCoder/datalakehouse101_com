@@ -1,0 +1,98 @@
+{
+  "slug": "minio",
+  "term": "MinIO",
+  "category": "File Formats & Storage",
+  "metaTitle": "MinIO: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what MinIO is, how its S3-compatible object storage enables on-premises and hybrid data lakehouses, and how to use MinIO with Apache Iceberg for local development.",
+  "h1": "MinIO: The Definitive Guide",
+  "lede": "MinIO is the high-performance, S3-compatible open-source object storage server that brings cloud-native object storage to on-premises, edge, and hybrid environments. It is the standard storage backend for local Apache Iceberg development and on-premises lakehouse deployments.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is MinIO?",
+      "a": "MinIO is an open-source, high-performance, S3-compatible object storage server that can be deployed on any infrastructure \u2014 bare metal, Kubernetes, on-premises, or edge. It implements the Amazon S3 API, so any tool built for S3 works with MinIO without modification. It is the leading open-source alternative to cloud-managed object storage."
+    },
+    {
+      "q": "Can Apache Iceberg use MinIO as storage?",
+      "a": "Yes. Apache Iceberg, Dremio, Spark, Trino, and all major lakehouse engines work with MinIO as a storage backend because MinIO implements the S3 API. Iceberg tables stored in MinIO use the s3:// or s3a:// URI scheme pointing to the MinIO endpoint, and behave identically to tables stored in AWS S3."
+    },
+    {
+      "q": "Why is MinIO used for local lakehouse development?",
+      "a": "MinIO is the standard storage backend for local development environments because it runs as a single Docker container, implements the full S3 API, and requires no AWS credentials or internet connectivity. Developers can run a complete lakehouse stack (MinIO + Iceberg + Dremio or Spark) entirely on their laptop."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is MinIO?",
+      "content": "<p><strong>MinIO</strong> is an open-source, high-performance object storage server that implements the <a href=\"amazon-s3.html\">Amazon S3</a> API. It can be deployed on any infrastructure \u2014 bare metal servers, Kubernetes clusters, on-premises data centers, or edge computing environments \u2014 and provides cloud-native object storage semantics without dependency on a cloud provider.</p><p>MinIO's S3 API compatibility is its most important property for the lakehouse ecosystem: every tool built for Amazon S3 \u2014 <a href=\"apache-iceberg.html\">Apache Iceberg</a>, <a href=\"apache-spark.html\">Apache Spark</a>, <a href=\"apache-flink.html\">Apache Flink</a>, <a href=\"dremio.html\">Dremio</a>, <a href=\"trino.html\">Trino</a> \u2014 works with MinIO without any code changes. The engine is simply configured with a MinIO endpoint URL instead of an S3 endpoint URL.</p>"
+    },
+    {
+      "heading": "MinIO for Local Lakehouse Development",
+      "content": "<p>MinIO is the standard storage backend for local Apache Iceberg development environments. A complete local lakehouse development stack using Docker Compose typically includes:</p><ul><li><strong>MinIO:</strong> Object storage, running on localhost:9000, S3-compatible</li><li><strong>Project Nessie or Apache Polaris:</strong> Iceberg REST catalog</li><li><strong>Apache Spark:</strong> ETL and table management</li><li><strong>Dremio or Trino:</strong> SQL analytics</li></ul><p>With this stack, a developer can create Iceberg tables in MinIO, write data with Spark, and query with Dremio \u2014 testing the complete lakehouse stack on a laptop without any cloud account or internet connectivity required. This local development pattern dramatically reduces the feedback loop for lakehouse feature development.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "MinIO Local Lakehouse Development Stack",
+      "diagramCaption": "Figure 1: MinIO in a local lakehouse stack \u2014 S3-compatible storage for laptop development."
+    },
+    {
+      "heading": "MinIO for On-Premises Lakehouses",
+      "content": "<p>For organizations with on-premises data that cannot move to the cloud (due to regulatory requirements, latency sensitivity, or data sovereignty constraints), MinIO enables a true on-premises lakehouse with cloud-native architecture:</p><ul><li>MinIO deployed on bare metal or Kubernetes provides S3-compatible storage on-premises</li><li>Apache Iceberg tables stored in MinIO use the same format as cloud-based tables</li><li>Dremio (self-hosted), Spark, and Trino connect to the on-premises MinIO as they would to S3</li><li>The same Iceberg tooling, query patterns, and governance approaches work identically</li></ul><p>This means the knowledge and tooling developed for cloud-based Iceberg lakehouses applies directly to MinIO-based on-premises deployments \u2014 reducing the skill gap between cloud and on-premises environments.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "MinIO On-Premises Lakehouse",
+      "diagramCaption": "Figure 2: MinIO enabling on-premises lakehouse with cloud-native S3-compatible storage."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>MinIO is the bridge that extends the open <a href=\"data-lakehouse.html\">data lakehouse</a> architecture beyond the cloud to on-premises, edge, and local development environments. Its S3 API compatibility means the entire lakehouse ecosystem \u2014 <a href=\"apache-iceberg.html\">Apache Iceberg</a>, <a href=\"dremio.html\">Dremio</a>, Spark, Trino, Flink \u2014 works with MinIO identically to how it works with <a href=\"amazon-s3.html\">Amazon S3</a>. For development teams, MinIO provides a frictionless local lakehouse environment; for enterprises with on-premises constraints, MinIO provides a cloud-native storage architecture without cloud dependency.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "MinIO as an S3-compatible object storage implementation."
+    },
+    {
+      "slug": "amazon-s3",
+      "term": "Amazon S3",
+      "category": "File Formats & Storage",
+      "desc": "The S3 API that MinIO implements."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg tables work identically on MinIO and S3."
+    },
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs & Metadata",
+      "desc": "Often paired with MinIO in local dev stacks."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio connects to MinIO for local or on-prem lakehouses."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "MinIO enables decoupled lakehouse on-premises."
+    },
+    {
+      "slug": "hdfs",
+      "term": "Apache Hadoop HDFS",
+      "category": "File Formats & Storage",
+      "desc": "Legacy on-premises storage that MinIO modernizes."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "MinIO brings lakehouse architecture on-premises."
+    }
+  ]
+}

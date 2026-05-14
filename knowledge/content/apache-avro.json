@@ -1,0 +1,98 @@
+{
+  "slug": "apache-avro",
+  "term": "Apache Avro",
+  "category": "File Formats & Storage",
+  "metaTitle": "Apache Avro: The Definitive Guide",
+  "metaDescription": "Learn what Apache Avro is, how its schema-embedded row format is used for streaming and Iceberg metadata, and how it differs from Parquet and ORC in the data lakehouse.",
+  "h1": "Apache Avro: The Definitive Guide",
+  "lede": "Apache Avro is a row-oriented serialization format with schema embedded in each file. In the lakehouse, Avro is the format for Apache Iceberg's manifest files and manifest lists, and the standard serialization format for Kafka streaming messages \u2014 the format that connects streaming ingestion to analytical storage.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Avro?",
+      "a": "Apache Avro is an open-source, row-oriented data serialization format that embeds a JSON schema definition within the file itself. Unlike Parquet and ORC (which are columnar and designed for analytical reads), Avro is row-oriented and designed for efficient data exchange and serialization \u2014 making it well-suited for streaming message formats and metadata storage."
+    },
+    {
+      "q": "How is Apache Avro used in Apache Iceberg?",
+      "a": "Apache Iceberg uses Avro as the format for its metadata files \u2014 manifest list files and manifest files are both Avro files. Avro's schema evolution capabilities and compact binary row format make it ideal for Iceberg's metadata records, which are small structured records (not large analytical datasets) that need efficient read/write performance."
+    },
+    {
+      "q": "Why is Avro the standard for Kafka messages?",
+      "a": "Avro is the dominant serialization format for Apache Kafka messages because it provides compact binary encoding, schema evolution support (readers can handle messages written with older or newer schemas), and integration with Kafka Schema Registry \u2014 which stores and validates Avro schemas centrally, ensuring producer/consumer schema compatibility."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Avro?",
+      "content": "<p><strong>Apache Avro</strong> is an open-source data serialization system developed within the Apache Hadoop ecosystem. Unlike the columnar analytical formats \u2014 <a href=\"apache-parquet.html\">Apache Parquet</a> and <a href=\"apache-orc.html\">Apache ORC</a> \u2014 Avro is a <strong>row-oriented format</strong> designed for efficient data serialization and exchange rather than analytical query optimization.</p><p>Avro defines data structures using a JSON schema, and serializes records into a compact binary format. The schema is embedded in Avro files (written in the file header), making them self-describing: any Avro reader can determine the data structure by reading the schema from the file header. This schema embedding is critical for streaming scenarios where producers and consumers evolve independently.</p><p>Avro's schema evolution model is one of its strongest features: Avro supports adding new fields with defaults, removing unused fields, and renaming fields \u2014 with the reader schema able to handle data written by older or newer writer schemas. This makes Avro ideal for long-running streaming pipelines where schemas evolve over time."
+    },
+    {
+      "heading": "Avro in Apache Iceberg Metadata",
+      "content": "<p>One of Avro's most important roles in the modern lakehouse is as the metadata file format for <a href=\"apache-iceberg.html\">Apache Iceberg</a>. All of Iceberg's metadata files are Avro files:</p><ul><li><strong>Manifest lists</strong> (snapshot files): Avro files listing manifest file locations and partition summaries</li><li><strong>Manifest files</strong>: Avro files listing individual data file locations with column statistics</li></ul><p>Avro's self-describing schema, efficient row encoding, and schema evolution capabilities make it a natural choice for metadata records: each manifest record is a compact structured row with well-defined fields, and Avro's schema evolution allows Iceberg to extend manifest record schemas across spec versions without breaking older readers.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Avro in Iceberg Metadata Architecture",
+      "diagramCaption": "Figure 1: Avro as Iceberg's metadata format \u2014 manifest lists and manifest files are both Avro files."
+    },
+    {
+      "heading": "Avro for Kafka Streaming",
+      "content": "<p>In streaming ingestion pipelines \u2014 the pipelines that feed data from operational systems into lakehouse Bronze tables \u2014 Avro is the dominant message serialization format for <a href=\"apache-kafka.html\">Apache Kafka</a>. The typical streaming-to-lakehouse architecture:</p><ol><li>Application services emit events to Kafka topics, serializing each event as an Avro binary record with a schema registered in the Confluent Schema Registry</li><li>The Schema Registry validates that producer schemas are compatible with consumer expectations, preventing breaking schema changes from propagating through the pipeline</li><li><a href=\"apache-flink.html\">Apache Flink</a> or Spark Structured Streaming reads Avro messages from Kafka, deserializes them using the registered schema, and writes them to Bronze Iceberg tables (in Parquet format)</li></ol><p>The Avro-Kafka-Iceberg pipeline is one of the most common streaming ingestion patterns in the lakehouse ecosystem.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Avro Kafka to Iceberg Streaming Pipeline",
+      "diagramCaption": "Figure 2: Avro serialization in the Kafka-to-Iceberg streaming pipeline."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Avro occupies a unique and important role in the lakehouse ecosystem: not as a data storage format for analytical reads (where <a href=\"apache-parquet.html\">Parquet</a> dominates), but as the serialization format for streaming messages (Kafka) and the metadata file format for <a href=\"apache-iceberg.html\">Apache Iceberg's</a> manifest system. Its schema embedding, schema evolution capabilities, and compact binary row encoding make it the right tool for these use cases \u2014 complementing Parquet's columnar analytical strengths with row-oriented streaming and metadata efficiency.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "File Formats & Storage",
+      "desc": "Columnar alternative to Avro for analytical storage."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Uses Avro for all metadata files."
+    },
+    {
+      "slug": "iceberg-manifest-files",
+      "term": "Iceberg Manifest Files",
+      "category": "Table Formats",
+      "desc": "Manifest files are Avro format files."
+    },
+    {
+      "slug": "apache-flink",
+      "term": "Apache Flink",
+      "category": "Query Engines & Platforms",
+      "desc": "Flink reads Avro Kafka messages and writes Parquet Iceberg."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC events often serialized as Avro in Kafka."
+    },
+    {
+      "slug": "schema-evolution",
+      "term": "Schema Evolution",
+      "category": "Table Formats",
+      "desc": "Avro's schema evolution model for streaming compatibility."
+    },
+    {
+      "slug": "apache-orc",
+      "term": "Apache ORC",
+      "category": "File Formats & Storage",
+      "desc": "Alternative columnar format alongside Avro and Parquet."
+    },
+    {
+      "slug": "apache-arrow",
+      "term": "Apache Arrow",
+      "category": "File Formats & Storage",
+      "desc": "In-memory format complementing Avro's on-disk/streaming role."
+    }
+  ]
+}

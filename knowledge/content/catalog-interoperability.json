@@ -1,0 +1,98 @@
+{
+  "slug": "catalog-interoperability",
+  "term": "Catalog Interoperability",
+  "category": "Catalogs & Metadata",
+  "metaTitle": "Catalog Interoperability: The Definitive Guide",
+  "metaDescription": "Learn what catalog interoperability means in the data lakehouse, how the Iceberg REST Catalog specification enables it, and why it is essential for the open, multi-engine lakehouse.",
+  "h1": "Catalog Interoperability: The Definitive Guide",
+  "lede": "Catalog interoperability is the ability for multiple query engines to access the same tables through a shared catalog \u2014 without proprietary plugins or engine-specific integrations. The Iceberg REST Catalog specification makes this possible, enabling true plug-and-play multi-engine lakehouse architectures.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is catalog interoperability?",
+      "a": "Catalog interoperability is the ability for different query engines (Dremio, Spark, Trino, Flink) to connect to the same catalog and access the same tables through a standard API, without requiring engine-specific catalog plugins or custom integrations. The Iceberg REST Catalog specification is the standard that enables catalog interoperability in the open lakehouse ecosystem."
+    },
+    {
+      "q": "Why is catalog interoperability important?",
+      "a": "Without catalog interoperability, each engine sees only its own tables. A table created by Spark cannot be immediately queried by Dremio without manual re-registration. With interoperability, all engines share a single catalog namespace \u2014 tables created by any engine are immediately visible and queryable by all other engines, with consistent schema and access control."
+    },
+    {
+      "q": "Which catalog implementations provide the best interoperability?",
+      "a": "Catalogs that fully implement the Iceberg REST Catalog specification provide the best interoperability: Apache Polaris, Project Nessie, Dremio Open Catalog, and AWS Glue's REST endpoint. Any engine with an Iceberg REST catalog client can connect to any of these catalogs interchangeably."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Catalog Interoperability?",
+      "content": "<p><strong>Catalog interoperability</strong> is the technical property that allows multiple heterogeneous query engines to access, create, and modify tables in a shared catalog through a standard API \u2014 without requiring custom, engine-specific integrations for each catalog backend. In the <a href=\"data-lakehouse.html\">data lakehouse</a> context, catalog interoperability is what makes the 'multi-engine' promise real: not just theoretically possible, but operationally seamless.</p><p>Before the <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog specification</a>, catalog integrations were point-to-point: Spark had its own HiveCatalog implementation, Trino had its own HMS connector, Presto had its own. Adding a new catalog backend required implementing a new connector for each engine \u2014 an O(engines \u00d7 catalogs) engineering burden. With the REST catalog specification, each engine implements one REST client and each catalog implements one REST server \u2014 reducing the integration burden to O(engines + catalogs).</p>"
+    },
+    {
+      "heading": "How REST Catalog Enables Interoperability",
+      "content": "<p>The <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog specification</a> defines a standard HTTP API for all catalog operations. Any engine implementing the REST client can connect to any catalog implementing the REST server:</p><ul><li><strong>Table discovery:</strong> List namespaces and tables via standard GET endpoints</li><li><strong>Metadata loading:</strong> Load table metadata (current metadata file location + storage credentials) via standard GET endpoint</li><li><strong>Commit:</strong> Commit new snapshots via standard POST endpoint</li><li><strong>Auth:</strong> OAuth2 token-based authentication \u2014 any engine can authenticate with any catalog using the same flow</li></ul><p>When <a href=\"dremio.html\">Dremio</a> and <a href=\"apache-spark.html\">Apache Spark</a> both connect to the same <a href=\"apache-polaris.html\">Apache Polaris</a> catalog, they share one namespace. A table Spark creates is immediately queryable by Dremio, with the same schema and the same access control policies applied to both engines' requests.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Catalog Interoperability REST API Architecture",
+      "diagramCaption": "Figure 1: REST Catalog interoperability \u2014 any engine connects to any catalog via the standard HTTP API."
+    },
+    {
+      "heading": "Interoperability Across Catalog Implementations",
+      "content": "<p>Catalog interoperability also means that organizations can switch catalog backends without reconfiguring engines. If a team starts with <a href=\"aws-glue-catalog.html\">AWS Glue</a> as their catalog and later migrates to <a href=\"apache-polaris.html\">Apache Polaris</a> for better governance, the engine configuration change is minimal \u2014 update the REST catalog URI in the engine's Iceberg catalog config. No engine-specific plugins need to be replaced, no data needs to be copied, and no table registrations need to be redone (tables are re-registered in the new catalog pointing to the same physical data files).</p><p>This portability is fundamental to avoiding catalog lock-in \u2014 one of the most insidious forms of vendor lock-in in the pre-REST-catalog era. Organizations that standardized on a proprietary catalog (like AWS Glue before its REST API) found that migrating to a different catalog required significant re-engineering of all engine configurations and integrations.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Catalog Interoperability Multi-Engine Access",
+      "diagramCaption": "Figure 2: Multi-engine catalog interoperability \u2014 Spark, Trino, Flink, and Dremio sharing one catalog."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Catalog interoperability \u2014 enabled by the <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog specification</a> \u2014 is the technical foundation of the open, multi-engine <a href=\"data-lakehouse.html\">data lakehouse</a>. It transforms the catalog from a proprietary integration point into a commodity service: organizations can choose their preferred catalog implementation (<a href=\"apache-polaris.html\">Apache Polaris</a>, <a href=\"project-nessie.html\">Project Nessie</a>, AWS Glue, <a href=\"dremio-open-catalog.html\">Dremio Open Catalog</a>) based on features and governance needs, confident that all their engines will connect to it through the same standard API. This is the vendor-neutral, open-ecosystem architecture that the data lakehouse community has been building toward.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "The specification enabling catalog interoperability."
+    },
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs & Metadata",
+      "desc": "ASF catalog implementing the interoperability standard."
+    },
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs & Metadata",
+      "desc": "Git-like catalog with REST interoperability."
+    },
+    {
+      "slug": "multi-engine-interoperability",
+      "term": "Multi-Engine Interoperability",
+      "category": "Analytics & BI",
+      "desc": "Engine-level complement to catalog interoperability."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format that catalog interoperability is designed for."
+    },
+    {
+      "slug": "dremio-open-catalog",
+      "term": "Dremio Open Catalog",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's interoperable REST catalog."
+    },
+    {
+      "slug": "aws-glue-catalog",
+      "term": "AWS Glue Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "AWS catalog with REST catalog interoperability."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture catalog interoperability enables."
+    }
+  ]
+}
