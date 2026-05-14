@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Travel in Apache Iceberg: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn how Apache Iceberg time travel works, how to query historical snapshots by timestamp or snapshot ID, and practical use cases for time travel in the data lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/time-travel.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Time Travel in Apache Iceberg: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn how Apache Iceberg time travel works, how to query historical snapshots by timestamp or snapshot ID, and practical use cases for time travel in the data lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/time-travel.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Time Travel in Apache Iceberg: The Definitive Guide",
+      "description": "Learn how Apache Iceberg time travel works, how to query historical snapshots by timestamp or snapshot ID, and practical use cases for time travel in the data lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/time-travel.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Time Travel", "item": "https://datalakehouse101.com/knowledge/time-travel.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is time travel in Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Time travel in Apache Iceberg is the ability to query historical table states by referencing a specific snapshot ID or timestamp. Because every transaction creates a new immutable snapshot, the full table history is preserved and queryable. No separate data copies are needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I run a time travel query in Dremio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In Dremio: SELECT * FROM my_table AT SNAPSHOT '5234567890' — or — SELECT * FROM my_table AT TIMESTAMP '2026-01-01 00:00:00'. These queries return the table's data as it existed at that snapshot or at that point in time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does Iceberg retain historical snapshots for time travel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "By default indefinitely, but most production deployments configure snapshot expiration to retain 7–30 days of history. After expiration, older snapshots are removed and time travel to those points is no longer possible. Dremio automates this cleanup."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Time Travel</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Table Formats</span>
+      <h1>Time Travel in Apache Iceberg: The Definitive Guide</h1>
+      <p class="hero-lede">Time travel is the ability to query an Apache Iceberg table as it existed at any point in the past — by snapshot ID or timestamp. It enables data debugging, audit compliance, ML reproducibility, and accidental delete recovery without maintaining separate data copies.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Time Travel?</a></li>
+        <li><a href="#section-2">Time Travel Query Syntax</a></li>
+        <li><a href="#section-3">Time Travel Use Cases</a></li>
+        <li><a href="#section-4">Time Travel and Snapshot Retention</a></li>
+        <li><a href="#section-5">Time Travel and the Medallion Architecture</a></li>
+        <li><a href="#section-6">Time Travel with Project Nessie Branches</a></li>
+        <li><a href="#section-7">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Time Travel?</h2>
+        <p><strong>Time travel</strong> is the capability to query a table as it existed at a specific point in the past — returning exactly the rows, columns, and values that were present at that historical moment. Apache Iceberg provides time travel natively through its <a href="iceberg-snapshots.html">snapshot model</a>: because every transaction creates a new immutable snapshot rather than overwriting the previous state, all historical snapshots remain accessible for querying.</p><p>Time travel is not a special-purpose feature built on top of Iceberg — it is a natural consequence of the snapshot architecture. The history exists because every write is atomic and non-destructive. Enabling time travel requires no additional configuration or storage beyond the standard Iceberg snapshot retention.</p><p>Compare this to traditional databases and data warehouses, where point-in-time recovery requires either continuous backup snapshots (expensive), log shipping (complex), or a separate audit table (application-level, fragile). In Iceberg, the historical record is built into the table format itself — no additional infrastructure required.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Time Travel Query Syntax</h2>
+        <p>Apache Iceberg defines two time travel query mechanisms, both supported natively in <a href="dremio.html">Dremio</a>, Apache Spark, and Trino:</p><h3>By Snapshot ID</h3><p><code>SELECT * FROM my_table AT SNAPSHOT '5234567890123456'</code> — queries the table exactly as it existed in the specified snapshot. The snapshot ID is a 64-bit integer assigned at commit time. Snapshot IDs can be found in the table's history: <code>SELECT * FROM my_table$history</code> (Spark syntax) or via the catalog's metadata API.</p><h3>By Timestamp</h3><p><code>SELECT * FROM my_table AT TIMESTAMP '2026-01-01 00:00:00'</code> — queries the table as it existed at or before the specified timestamp. Iceberg selects the most recent snapshot committed at or before the specified time. This is the most commonly used form because timestamps are human-readable and don't require knowing specific snapshot IDs.</p><h3>Rollback</h3><p>Beyond querying, Iceberg also supports rollback — reverting the table's current snapshot to a historical one, effectively undoing all transactions after that point. In Dremio: <code>ALTER TABLE my_table ROLLBACK TO SNAPSHOT '5234567890'</code>. This is useful for recovering from an accidental DELETE or incorrect batch load.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-2.png" alt="Iceberg Time Travel Query by Snapshot Timestamp diagram" loading="lazy"><figcaption>Figure 1: Iceberg time travel — query any historical snapshot by ID or timestamp with a single SQL clause.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Time Travel Use Cases</h2>
+        <p>Time travel enables a wide range of operational and analytical use cases:</p><h3>Data Quality Debugging</h3><p>When analysts report incorrect dashboard values after a pipeline run, time travel allows engineers to compare the table before and after the run: <code>SELECT count(*) FROM orders AT TIMESTAMP 'before_pipeline'</code> vs <code>SELECT count(*) FROM orders AT TIMESTAMP 'after_pipeline'</code>. This pinpoints exactly which records were added, changed, or deleted by the pipeline.</p><h3>Regulatory Audit</h3><p>Financial and healthcare regulations require the ability to reproduce exactly what data was used to generate a report on a specific date. With Iceberg time travel, a compliance engineer can query <code>SELECT * FROM customer_data AT TIMESTAMP '2026-03-31 23:59:59'</code> to see exactly what the customer table contained at quarter-end — without maintaining a separate audit copy.</p><h3>ML Experiment Reproducibility</h3><p>Recording the snapshot ID used for ML model training ensures that future retraining runs use exactly the same dataset. <code>SELECT * FROM features AT SNAPSHOT '...'</code> returns an identical dataset regardless of when it is run — essential for reproducible ML experiments.</p><h3>Accidental Delete Recovery</h3><p>If a DELETE statement removes important records accidentally, recovery is straightforward: query the pre-deletion snapshot to identify the deleted rows, then INSERT them back into the current table. <code>INSERT INTO my_table SELECT * FROM my_table AT TIMESTAMP 'before_delete' WHERE id IN (deleted_ids)</code>.</p>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Time Travel and Snapshot Retention</h2>
+        <p>Time travel is only available for snapshots that have not been expired. The snapshot retention policy determines how far back time travel can go. Most production deployments configure a retention window of 7–30 days.</p><p>Iceberg's <code>expireSnapshots</code> operation removes snapshots older than a specified timestamp or older than N most recent snapshots, along with their associated orphaned data files. After expiration, querying the removed snapshots returns an error.</p><p>When setting retention policies, consider: how far back users need time travel (typically 7 days covers most debugging needs), how far back regulatory auditors may need to query (may require 90 days or longer), and storage cost (each historical snapshot retains any data files that are not referenced by current snapshots — old deleted data accumulates storage cost until expiry). <a href="dremio.html">Dremio's</a> automated table optimization manages snapshot expiration based on configured retention policies.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-1.png" alt="Snapshot Retention and Time Travel Window diagram" loading="lazy"><figcaption>Figure 2: Snapshot retention policy defines the time travel window — expired snapshots are no longer queryable.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Time Travel and the Medallion Architecture</h2>
+        <p>Time travel is valuable at every layer of the <a href="medallion-architecture.html">Medallion Architecture</a>:</p><ul><li><strong>Bronze:</strong> Query raw ingested data as of a specific date to debug source system changes. Reproduce the exact raw data used in a historical pipeline run.</li><li><strong>Silver:</strong> Compare the Silver table before and after a pipeline logic change to validate the new transformation. Recover individual records deleted during GDPR processing by querying a pre-deletion Silver snapshot.</li><li><strong>Gold:</strong> Reproduce the exact Gold data used for a quarterly report. Debug why a KPI changed by querying Gold as of two different dates and comparing the result.</li></ul>
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Time Travel with Project Nessie Branches</h2>
+        <p><a href="project-nessie.html">Project Nessie</a> extends Iceberg's linear time travel model with branching semantics. In Nessie, each branch has its own independent snapshot history. Time travel within a Nessie branch queries historical snapshots on that branch specifically, not the main production branch.</p><p>This enables powerful data engineering workflows: creating an experiment branch, running a transformation, querying the experiment branch's history to validate results, and then merging to main if the results are correct. The experiment's history (and its time travel capability) is preserved on the branch indefinitely.</p>
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Summary</h2>
+        <p>Time travel is one of <a href="apache-iceberg.html">Apache Iceberg's</a> most valuable operational features. As a natural consequence of the snapshot architecture, it provides the ability to query any historical table state — without separate data copies, backup infrastructure, or application-level audit tables. This capability transforms data debugging from a guessing game into a precise, reproducible operation, and makes regulatory compliance straightforward.</p><p><a href="dremio.html">Dremio's</a> AT SNAPSHOT and AT TIMESTAMP SQL syntax makes time travel accessible to every analyst and data engineer — no Spark expertise required. Combined with Dremio's automated snapshot retention management, time travel in the data lakehouse is both powerful and operationally simple.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="iceberg-snapshots.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg Snapshots</span>
+      <span class="related-desc">The mechanism enabling time travel in Apache Iceberg.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format providing time travel natively.</span>
+    </a>
+      <a class="related-card" href="acid-transactions.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">ACID Transactions</span>
+      <span class="related-desc">Atomicity that makes every snapshot a valid time travel point.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">SQL interface for AT SNAPSHOT and AT TIMESTAMP queries.</span>
+    </a>
+      <a class="related-card" href="project-nessie.html">
+      <span class="related-label">Catalogs</span>
+      <span class="related-term">Project Nessie</span>
+      <span class="related-desc">Git-like branching extending Iceberg time travel.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Snapshot expiration during compaction affects time travel window.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Time travel is valuable at every Medallion layer.</span>
+    </a>
+      <a class="related-card" href="data-quality.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Quality</span>
+      <span class="related-desc">Time travel enables before/after data quality debugging.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

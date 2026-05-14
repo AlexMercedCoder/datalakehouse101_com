@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merge-on-Read (MoR) in Apache Iceberg: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Merge-on-Read means in Apache Iceberg, how delete files work, when to use MoR vs Copy-on-Write, and how MoR enables high-frequency CDC updates in the data lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/merge-on-read.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Merge-on-Read (MoR) in Apache Iceberg: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Merge-on-Read means in Apache Iceberg, how delete files work, when to use MoR vs Copy-on-Write, and how MoR enables high-frequency CDC updates in the data lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/merge-on-read.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Merge-on-Read (MoR) in Apache Iceberg: The Definitive Guide",
+      "description": "Learn what Merge-on-Read means in Apache Iceberg, how delete files work, when to use MoR vs Copy-on-Write, and how MoR enables high-frequency CDC updates in the data lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/merge-on-read.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Merge-on-Read (MoR)", "item": "https://datalakehouse101.com/knowledge/merge-on-read.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Merge-on-Read in Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Merge-on-Read (MoR) is an Iceberg write strategy where UPDATE and DELETE operations write small delete files alongside existing data files, rather than rewriting the data files. At query time, the engine merges the delete files with the data files to produce the correct result."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What types of delete files does Iceberg V2 support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Iceberg V2 supports two delete file types: positional delete files (recording the file path and row position of each deleted row — most efficient for random deletes) and equality delete files (recording column values that identify rows to delete — most natural for CDC upserts using record keys)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I use Merge-on-Read?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use MoR for tables with high-frequency updates or streaming CDC ingestion where the write cost of full file rewrites (Copy-on-Write) would be prohibitive. Silver layer tables receiving continuous CDC updates are the classic MoR use case."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Merge-on-Read (MoR)</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Table Formats</span>
+      <h1>Merge-on-Read (MoR) in Apache Iceberg: The Definitive Guide</h1>
+      <p class="hero-lede">Merge-on-Read is the write strategy that makes high-frequency CDC updates practical in Apache Iceberg. Instead of rewriting entire data files on every UPDATE or DELETE, MoR writes small delete files alongside existing data files, merging them at read time. Fast writes, deferred read overhead.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Merge-on-Read?</a></li>
+        <li><a href="#section-2">Iceberg V2 Delete File Types</a></li>
+        <li><a href="#section-3">MoR Write Flow</a></li>
+        <li><a href="#section-4">MoR Read Overhead and Compaction</a></li>
+        <li><a href="#section-5">MoR for CDC Pipelines</a></li>
+        <li><a href="#section-6">Choosing Between MoR and CoW</a></li>
+        <li><a href="#section-7">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Merge-on-Read?</h2>
+        <p><strong>Merge-on-Read (MoR)</strong> is the write strategy in <a href="apache-iceberg.html">Apache Iceberg</a> (V2+) where UPDATE and DELETE operations write small auxiliary <strong>delete files</strong> alongside existing data files, rather than rewriting the data files. The merge — reconciling data files with delete files to produce the correct view of the table — is deferred to query time.</p><p>MoR's fundamental advantage is write efficiency. Deleting one row from a 500MB data file in MoR mode costs the I/O of writing a tiny delete file (a few kilobytes) rather than reading and rewriting the entire 500MB file. For workloads with thousands of record-level changes per minute — such as CDC pipelines from production databases — this write efficiency difference is the factor that makes the lakehouse practical.</p><p>The trade-off is increased read overhead: queries must read both data files and their associated delete files, then merge them to filter out deleted rows and apply updated values. For tables with large delete file accumulation, this merge overhead can significantly slow down reads. <a href="compaction.html">Compaction</a> (rewriting MoR data+delete files into clean CoW files) is the maintenance operation that restores read performance.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Iceberg V2 Delete File Types</h2>
+        <p>Iceberg V2 defines two delete file types, each optimized for different use cases:</p><h3>Positional Delete Files</h3><p>A positional delete file records the exact location (file path + row position) of each deleted row. When a query reads a data file, it checks the positional delete file: rows at the recorded positions are skipped. Positional deletes are efficient for point-in-time snapshot reads and for sparse, random row deletes — the file path + position record is small and indexable.</p><h3>Equality Delete Files</h3><p>An equality delete file records the column values that identify rows to delete — for example, <code>customer_id = 'abc123'</code>. When a query reads data files, it applies the equality delete predicates: rows whose column values match any equality delete record are filtered out. Equality deletes are natural for CDC MERGE INTO workloads, where the source system identifies records by a natural key rather than a physical position.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-1.png" alt="MoR Positional and Equality Delete Files diagram" loading="lazy"><figcaption>Figure 1: MoR writes delete files alongside data files — the engine merges them at read time.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>MoR Write Flow</h2>
+        <p>The MoR write flow for a DELETE operation:</p><ol><li>The engine applies the WHERE clause to Iceberg metadata, identifying which data files contain rows matching the delete predicate</li><li>For each affected data file, the engine writes a positional delete file recording the positions of deleted rows within that file</li><li>The new delete files are recorded in a new manifest alongside their associated data files</li><li>A new snapshot is committed referencing the new manifest</li></ol><p>No data files are rewritten. The affected data files remain in storage unchanged; the delete files mark which rows within them should be excluded from query results. The entire write operation touches only a tiny fraction of the data's total size.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>MoR Read Overhead and Compaction</h2>
+        <p>MoR's write efficiency comes at the cost of read overhead. Each query against a MoR table must:</p><ol><li>Read data files</li><li>For each data file, check for associated delete files</li><li>For positional deletes: skip rows at the recorded positions</li><li>For equality deletes: filter rows matching the equality predicates</li></ol><p>As delete files accumulate from many CDC operations, this merge overhead grows. A table that was initially fast to read becomes progressively slower as delete files pile up. Scheduled <a href="compaction.html">compaction</a> (using Iceberg's RewriteDataFiles with delete file handling) merges data and delete files into clean CoW files, restoring read performance. Dremio's automated table optimization handles this transparently.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-2.png" alt="MoR Read Merge and Compaction Lifecycle diagram" loading="lazy"><figcaption>Figure 2: MoR accumulates delete files over time; compaction merges them into clean files.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>MoR for CDC Pipelines</h2>
+        <p>MoR is the standard write strategy for <a href="change-data-capture.html">CDC</a> pipeline targets in the <a href="medallion-architecture.html">Silver layer</a>. A typical CDC pipeline flow with MoR:</p><ol><li>Source database changes are captured by Debezium as Kafka events</li><li>Flink or Spark Structured Streaming reads Kafka events and writes them to Bronze Iceberg tables (append-only)</li><li>A Silver transformation job runs MERGE INTO against the Silver Iceberg table (MoR mode): inserts new records, updates existing records (writes equality delete + new insert), deletes removed records (writes equality delete)</li><li>Periodic compaction merges accumulated delete files into clean Silver data files</li></ol><p>This pattern delivers near-real-time data freshness in Silver with manageable operational complexity.
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Choosing Between MoR and CoW</h2>
+        <p>The write frequency and read/write ratio should drive the CoW vs MoR decision:</p><ul><li><strong>Gold layer tables:</strong> Use <a href="copy-on-write.html">CoW</a>. Reads dominate; batch partition overwrites are the primary write pattern. Clean files without delete overhead maximize BI query performance.</li><li><strong>Silver layer with frequent CDC updates:</strong> Use MoR. Write frequency is high; write cost of CoW would be prohibitive. Schedule regular compaction to manage delete file accumulation.</li><li><strong>Bronze layer:</strong> Append-only. Neither CoW nor MoR applies — no UPDATE or DELETE operations at the Bronze layer.</li></ul>
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Summary</h2>
+        <p>Merge-on-Read is <a href="apache-iceberg.html">Apache Iceberg's</a> write strategy for high-frequency update workloads. By writing small delete files instead of rewriting entire data files, MoR makes CDC upsert pipelines practical at scale. The read overhead from delete file accumulation is managed through regular <a href="compaction.html">compaction</a>, which merges delete files into clean data files and restores read performance. Understanding when to use MoR vs <a href="copy-on-write.html">Copy-on-Write</a> is fundamental to designing efficient Iceberg table pipelines.
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="copy-on-write.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Copy-on-Write</span>
+      <span class="related-desc">The read-optimized alternative to MoR.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format supporting MoR via V2 delete files.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Essential maintenance for MoR tables — merges delete files.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">The primary use case for MoR write strategy.</span>
+    </a>
+      <a class="related-card" href="acid-transactions.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">ACID Transactions</span>
+      <span class="related-desc">MoR implements ACID via delete file commit.</span>
+    </a>
+      <a class="related-card" href="silver-layer.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Silver Layer</span>
+      <span class="related-desc">The primary MoR use case in the Medallion Architecture.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Reads MoR tables with automated delete file merging.</span>
+    </a>
+      <a class="related-card" href="positional-delete-files.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Positional Delete Files</span>
+      <span class="related-desc">The V2 delete file type for efficient random row deletes.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

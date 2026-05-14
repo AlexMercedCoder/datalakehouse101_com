@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hidden Partitioning in Apache Iceberg: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn how Apache Iceberg hidden partitioning works, why it eliminates the need to write partition-aware queries, and how it enables automatic partition pruning for any query engine.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/hidden-partitioning.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Hidden Partitioning in Apache Iceberg: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn how Apache Iceberg hidden partitioning works, why it eliminates the need to write partition-aware queries, and how it enables automatic partition pruning for any query engine.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/hidden-partitioning.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Hidden Partitioning in Apache Iceberg: The Definitive Guide",
+      "description": "Learn how Apache Iceberg hidden partitioning works, why it eliminates the need to write partition-aware queries, and how it enables automatic partition pruning for any query engine.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/hidden-partitioning.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Hidden Partitioning", "item": "https://datalakehouse101.com/knowledge/hidden-partitioning.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is hidden partitioning in Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hidden partitioning means that Iceberg applies partition transforms (days, hours, bucket, truncate) to data columns automatically, without exposing synthetic partition columns to query writers. Users filter on the original data columns; Iceberg uses those filters to prune partition files automatically."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is hidden partitioning different from Hive partitioning?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In Hive-style partitioning, partition columns are separate, explicit columns that users must know about and filter on to get pruning benefits. In Iceberg hidden partitioning, the partition column is derived from a regular data column via a transform; users filter on the data column and get pruning automatically without knowing the partition layout."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does hidden partitioning affect how data is stored?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Data files are still physically organized by partition values derived from the transforms. The 'hidden' aspect is that the partition column is not exposed to the query writer — it exists in the metadata but is not a column users need to reference in SQL."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Hidden Partitioning</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Table Formats</span>
+      <h1>Hidden Partitioning in Apache Iceberg: The Definitive Guide</h1>
+      <p class="hero-lede">Hidden partitioning is the Iceberg feature that makes partition pruning automatic and transparent. Users write natural SQL against data columns; Iceberg applies partition transforms behind the scenes to skip irrelevant files — no partition column awareness required.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Hidden Partitioning?</a></li>
+        <li><a href="#section-2">Partition Transforms</a></li>
+        <li><a href="#section-3">Hive Partitioning vs Hidden Partitioning</a></li>
+        <li><a href="#section-4">Hidden Partitioning and Partition Evolution</a></li>
+        <li><a href="#section-5">Hidden Partitioning in Practice: Examples</a></li>
+        <li><a href="#section-6">Hidden Partitioning with Dremio</a></li>
+        <li><a href="#section-7">Best Practices for Hidden Partitioning</a></li>
+        <li><a href="#section-8">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Hidden Partitioning?</h2>
+        <p><strong>Hidden partitioning</strong> is Apache Iceberg's approach to data partitioning that separates the physical storage organization from the logical query interface. In traditional Hive-style partitioned tables, users must explicitly filter on partition columns to trigger partition pruning — for example, filtering on a synthetic <code>partition_date</code> column rather than the actual <code>event_time</code> timestamp. If a user forgets to include the partition column filter, the engine scans all partitions — an expensive full table scan.</p><p>Iceberg eliminates this requirement. When a table is partitioned by <code>days(event_time)</code>, users simply write <code>WHERE event_time &gt; '2026-01-01'</code> — filtering on the actual data column. Iceberg's query planner applies the <code>days()</code> transform to the filter predicate and uses the result to prune partition files automatically. The user never needs to know that the table is partitioned by day, what the partition column is named, or how the transform is applied.</p><p>This transparency is called 'hidden' partitioning because the partition organization is hidden from the query writer — it exists in the metadata and is used for pruning, but it is not exposed as a visible, queryable column in the table's schema.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Partition Transforms</h2>
+        <p>Hidden partitioning is powered by <strong>partition transforms</strong> — functions that derive a partition value from a data column value:</p><ul><li><strong>identity(col):</strong> Use the column value directly. Equivalent to Hive partitioning. Best for low-cardinality columns like <code>region</code>, <code>status</code>.</li><li><strong>days(col), hours(col), months(col), years(col):</strong> Extract a time unit from a timestamp. The most common transforms for time-series event data.</li><li><strong>bucket(N, col):</strong> Hash the column value and assign to one of N buckets. Used for high-cardinality columns (user_id, product_id) to distribute data evenly without creating millions of tiny partitions.</li><li><strong>truncate(W, col):</strong> Use the first W characters of a string (or W-aligned integer). Useful for prefix partitioning of categorical string columns.</li></ul><p>These transforms are applied by Iceberg at write time to derive partition values and at query time to translate filter predicates into partition pruning expressions. The transform is recorded in the table's partition spec — part of the Iceberg metadata — not in the data files themselves.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-1.png" alt="Iceberg Hidden Partitioning Transforms diagram" loading="lazy"><figcaption>Figure 1: Iceberg applies partition transforms at write and query time — users filter on data columns, pruning happens automatically.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Hive Partitioning vs Hidden Partitioning</h2>
+        <p>The contrast with Hive-style partitioning illustrates why hidden partitioning is a significant usability and correctness improvement:</p><table class="comparison-table"><thead><tr><th>Aspect</th><th>Hive-Style Partitioning</th><th>Iceberg Hidden Partitioning</th></tr></thead><tbody><tr><td>Partition columns</td><td>Explicit, separate columns in schema</td><td>Derived from data columns via transforms</td></tr><tr><td>User query requirement</td><td>Must filter on partition column for pruning</td><td>Filter on data column — pruning is automatic</td></tr><tr><td>Accidental full scans</td><td>Common (forgot partition filter)</td><td>Impossible (pruning from data column filters)</td></tr><tr><td>Partition evolution</td><td>Requires full rewrite</td><td>Metadata-only via partition evolution</td></tr><tr><td>Schema cleanliness</td><td>Synthetic partition columns pollute schema</td><td>Schema reflects only real data columns</td></tr></tbody></table>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Hidden Partitioning and Partition Evolution</h2>
+        <p>Hidden partitioning and <a href="partition-evolution.html">partition evolution</a> work together to create a system that is both flexible and transparent. When partition evolution changes the active partition spec — from <code>days(event_time)</code> to <code>hours(event_time)</code> — users' existing queries are completely unaffected. They continue to write <code>WHERE event_time &gt; '2026-01-01 12:00:00'</code>, and Iceberg applies the appropriate pruning for each file group: day-level pruning for old files, hour-level pruning for new files. The evolution is entirely invisible to query writers.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-2.png" alt="Hidden Partitioning with Partition Evolution diagram" loading="lazy"><figcaption>Figure 2: Partition evolution is hidden from users — query syntax unchanged, pruning improves automatically.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Hidden Partitioning in Practice: Examples</h2>
+        <p>Examples of common hidden partitioning configurations and their query behavior:</p><h3>Daily Event Table</h3><p>Partition spec: <code>days(event_timestamp)</code>. User query: <code>SELECT count(*) FROM events WHERE event_timestamp BETWEEN '2026-01-01' AND '2026-01-31'</code>. Pruning result: Only January data files are read — 31 daily partitions. No January partition column in the schema.</p><h3>User Activity Table with Bucket Partitioning</h3><p>Partition spec: <code>bucket(256, user_id)</code>. User query: <code>SELECT * FROM user_activity WHERE user_id = 'abc123'</code>. Pruning result: Iceberg hashes 'abc123', identifies the relevant bucket (e.g., bucket 47), reads only that bucket's files. One out of 256 files read.</p><h3>Multi-Field Partitioning</h3><p>Partition spec: <code>months(order_date), identity(region)</code>. User query: <code>SELECT sum(revenue) FROM orders WHERE order_date &gt;= '2026-01-01' AND region = 'EMEA'</code>. Pruning: Only 2026 monthly partitions for EMEA region are read.
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Hidden Partitioning with Dremio</h2>
+        <p><a href="dremio.html">Dremio</a> fully implements Iceberg's hidden partitioning model. When users query Iceberg tables through Dremio, the query planner automatically translates WHERE clause predicates into partition pruning expressions based on the table's partition spec. Users never need to know the partition scheme to benefit from pruning.</p><p>Dremio's query planner also handles multi-spec tables correctly — applying the appropriate pruning transform for each file group based on the partition spec under which each file was written. This makes tables that have undergone <a href="partition-evolution.html">partition evolution</a> fully efficient in Dremio without any user awareness.</p><p>Creating a hidden-partitioned Iceberg table in Dremio: <code>CREATE TABLE events (event_id BIGINT, event_time TIMESTAMP, region VARCHAR) PARTITION BY (days(event_time), identity(region))</code>. The partition columns <code>days(event_time)</code> and <code>region</code> are not visible in the table schema — they are used only internally for file organization.
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Best Practices for Hidden Partitioning</h2>
+        <p>Effective hidden partitioning requires choosing transforms that align with dominant query patterns:</p><ul><li><strong>Time-series data:</strong> Use <code>hours()</code> for high-frequency data (millions of events/day) and <code>days()</code> for lower-frequency data. <code>months()</code> is rarely the right choice for query performance — monthly partitions are usually too large for efficient pruning.</li><li><strong>User or entity data:</strong> Use <code>bucket(N, entity_id)</code> where N is sized so each bucket contains 128MB–512MB of data. Bucket partitioning enables efficient point lookups and join optimizations.</li><li><strong>Categorical data:</strong> Use <code>identity(category_col)</code> only for columns with fewer than 1000 distinct values. Higher cardinality creates too many small partitions.</li><li><strong>Monitor partition sizes:</strong> Use Iceberg's metadata queries (<code>SELECT * FROM table.files</code>) to inspect per-partition file counts and sizes. Adjust partition granularity via <a href="partition-evolution.html">partition evolution</a> if partitions become too large or too small.</li></ul>
+        
+      </section>
+
+      <section id="section-8">
+        <h2>Summary</h2>
+        <p>Hidden partitioning is one of the most user-friendly features in <a href="apache-iceberg.html">Apache Iceberg</a>. By applying partition transforms automatically and making partition organization invisible to query writers, Iceberg eliminates the most common source of accidental full table scans in traditional Hive-partitioned data lakes — forgotten partition column filters.</p><p>Combined with <a href="partition-evolution.html">partition evolution</a>, hidden partitioning creates a completely transparent partitioning system: data teams can change partition schemes freely as data volumes and query patterns evolve, without requiring any query changes from downstream users. This flexibility is a core advantage of the <a href="data-lakehouse.html">data lakehouse</a> over traditional partitioned data lakes.
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format implementing hidden partitioning.</span>
+    </a>
+      <a class="related-card" href="partition-evolution.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Partition Evolution</span>
+      <span class="related-desc">Changing partition specs — hidden from query writers.</span>
+    </a>
+      <a class="related-card" href="data-skipping.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Data Skipping</span>
+      <span class="related-desc">File pruning enabled by hidden partitioning transforms.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Implements hidden partitioning pruning automatically.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Maintaining optimal partition file sizes.</span>
+    </a>
+      <a class="related-card" href="schema-evolution.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Schema Evolution</span>
+      <span class="related-desc">The companion feature for evolving column definitions.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture built on efficient hidden partitioning.</span>
+    </a>
+      <a class="related-card" href="iceberg-manifest-files.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg Manifest Files</span>
+      <span class="related-desc">Manifest files store partition values for pruning.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{
+  "slug": "copy-on-write",
+  "term": "Copy-on-Write (CoW)",
+  "category": "Table Formats",
+  "metaTitle": "Copy-on-Write (CoW) in Apache Iceberg: The Definitive Guide",
+  "metaDescription": "Learn what Copy-on-Write means in Apache Iceberg, when to use CoW vs Merge-on-Read, and how CoW updates and deletes work for optimal read performance in the data lakehouse.",
+  "h1": "Copy-on-Write (CoW) in Apache Iceberg: The Definitive Guide",
+  "lede": "Copy-on-Write is the write strategy in Apache Iceberg where UPDATE and DELETE operations rewrite affected data files entirely, producing clean files that are fast to read without any merge overhead. CoW optimizes read performance at the cost of higher write amplification.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Copy-on-Write in Apache Iceberg?",
+      "a": "Copy-on-Write (CoW) is an Iceberg write strategy where UPDATE and DELETE operations rewrite the affected data files entirely. Rows to be updated or deleted are removed from the new file; updated rows are included with new values. The result is clean Parquet files with no delete files to merge at read time."
+    },
+    {
+      "q": "When should I use Copy-on-Write vs Merge-on-Read?",
+      "a": "Use Copy-on-Write for tables with infrequent updates and high read frequency \u2014 like Gold layer tables queried by BI tools. Use Merge-on-Read for tables with frequent updates (CDC pipelines, streaming ingestion) where full file rewrites would be too expensive."
+    },
+    {
+      "q": "Does Copy-on-Write require rewriting the entire table?",
+      "a": "No. Only the specific data files that contain rows to be updated or deleted are rewritten. Other files in the table are not touched. Iceberg's partition pruning identifies exactly which files contain affected rows."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Copy-on-Write?",
+      "content": "<p><strong>Copy-on-Write (CoW)</strong> is the write strategy in <a href=\"apache-iceberg.html\">Apache Iceberg</a> where UPDATE and DELETE operations produce clean, complete data files by rewriting the affected source files with the changes applied. When a DELETE removes rows from a data file, CoW reads the entire source file, filters out the deleted rows, and writes a new file containing only the surviving rows. When an UPDATE modifies rows, CoW reads the source file, applies the updates, and writes a new file with the updated values.</p><p>The key property of CoW is that the resulting data files contain no delete markers, no separate delete files, and no rows that need to be filtered \u2014 they are clean, complete Parquet files. Reading a CoW table never requires merging separate data and delete files. This makes reads fast, with no merge overhead at query time.</p><p>The trade-off is <strong>write amplification</strong>: even a UPDATE that modifies one row in a 500MB file requires reading and rewriting the entire 500MB file. For tables with frequent small updates, this write amplification makes CoW prohibitively expensive."
+    },
+    {
+      "heading": "CoW vs Merge-on-Read",
+      "content": "<p>The choice between CoW and Merge-on-Read (MoR) is fundamentally a read/write trade-off:</p><table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>Copy-on-Write</th><th>Merge-on-Read</th></tr></thead><tbody><tr><td>Write cost</td><td>High (rewrites affected files)</td><td>Low (writes small delete files)</td></tr><tr><td>Read cost</td><td>Low (clean files, no merge)</td><td>Higher (merges delete files at read)</td></tr><tr><td>Concurrency</td><td>Good</td><td>Excellent (minimal write overhead)</td></tr><tr><td>Best for</td><td>Infrequent updates, BI workloads</td><td>Frequent updates, CDC streaming</td></tr><tr><td>Compaction needed</td><td>For small file merging only</td><td>Required (delete file compaction)</td></tr></tbody></table><p>Most production tables use CoW for the <a href=\"gold-layer.html\">Gold layer</a> (where reads dominate) and MoR for <a href=\"silver-layer.html\">Silver</a> (where CDC updates are frequent).",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "Copy-on-Write vs Merge-on-Read",
+      "diagramCaption": "Figure 1: CoW rewrites files for clean reads; MoR writes delete files for fast writes."
+    },
+    {
+      "heading": "How CoW Updates Work in Iceberg",
+      "content": "<p>The CoW UPDATE process in Iceberg follows these steps:</p><ol><li>The query engine applies the WHERE clause to Iceberg metadata, identifying which data files contain rows matching the update predicate</li><li>For each affected file, the engine reads the file, applies the UPDATE expression to matching rows, and writes a new file containing all rows (updated and unchanged)</li><li>The new files and the deletion of the old files are recorded in a new manifest</li><li>The manifest is committed as a new Iceberg snapshot atomically</li></ol><p>The old files are not immediately deleted from object storage \u2014 they remain in historical snapshots for time travel. They become eligible for deletion only after the snapshots referencing them are expired.<br>Non-affected files (those with no rows matching the update predicate) are not read or rewritten \u2014 they are simply referenced in the new snapshot's manifests as unchanged."
+    },
+    {
+      "heading": "CoW for Gold Layer Tables",
+      "content": "<p>CoW is the optimal write strategy for <a href=\"gold-layer.html\">Gold layer</a> Iceberg tables that are queried heavily by BI tools but updated relatively infrequently (daily or weekly batch loads).</p><p>In a typical Gold layer workflow: a nightly dbt or Spark job runs an INSERT OVERWRITE to replace the previous day's partition with updated aggregations. This produces clean new files for the updated partition and leaves all other partitions unchanged. The resulting Gold table has clean Parquet files that <a href=\"dremio.html\">Dremio</a> can read with maximum efficiency \u2014 no delete file merging, no scan overhead.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "CoW Gold Layer Workflow",
+      "diagramCaption": "Figure 2: CoW in the Gold layer \u2014 clean files produced by partition overwrites enable fast BI queries."
+    },
+    {
+      "heading": "CoW and MERGE INTO",
+      "content": "<p>MERGE INTO in CoW mode combines the logic of matched row updates and unmatched row inserts into a single atomic operation, but each matched file is still rewritten entirely. For MERGE INTO on large tables with frequent updates, this can be expensive.</p><p>Best practice for CoW + MERGE INTO: partition the target table so that each MERGE INTO operation touches a small number of partitions. If customer updates are partitioned by <code>bucket(256, customer_id)</code>, a MERGE INTO for a batch of 1000 customer updates typically touches only a few buckets \u2014 rewriting only those bucket files rather than the entire table."
+    },
+    {
+      "heading": "Optimizing CoW Tables",
+      "content": "<p>CoW tables benefit from the following optimizations:</p><ul><li><strong>Right-size partitions:</strong> Smaller partitions mean less data to rewrite per UPDATE. Target partition sizes of 128MB\u2013512MB so that a partition rewrite is fast.</li><li><strong>Batch updates:</strong> Instead of running many small UPDATE statements that each trigger file rewrites, batch changes and run a single MERGE INTO that rewrites each affected file once.</li><li><strong>Regular compaction:</strong> After many small inserts (from streaming micro-batches), compact small files before they accumulate further. Smaller files reduce per-update rewrite cost.</li><li><strong>Dremio Reflections:</strong> For Gold CoW tables, configure <a href=\"dremio-reflections.html\">Reflections</a> on heavily queried aggregations. Reflections absorb the query load, reducing the need for frequent Gold-layer updates by pre-computing common query results.</li></ul>"
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Copy-on-Write is <a href=\"apache-iceberg.html\">Apache Iceberg's</a> write strategy for read-optimized tables. By rewriting affected data files completely on every UPDATE or DELETE, CoW produces clean Parquet files with no merge overhead at read time \u2014 ideal for the <a href=\"gold-layer.html\">Gold layer</a> of the <a href=\"medallion-architecture.html\">Medallion Architecture</a> where BI queries dominate. The trade-off is higher write amplification, which limits CoW's suitability for high-frequency update workloads. For those, <a href=\"merge-on-read.html\">Merge-on-Read</a> is the appropriate strategy."
+    }
+  ],
+  "related": [
+    {
+      "slug": "merge-on-read",
+      "term": "Merge-on-Read",
+      "category": "Table Formats",
+      "desc": "The write-optimized alternative to CoW."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format supporting both CoW and MoR."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Keeps CoW tables optimized over time."
+    },
+    {
+      "slug": "acid-transactions",
+      "term": "ACID Transactions",
+      "category": "Core Concepts",
+      "desc": "CoW implements ACID atomicity via file rewrite + snapshot commit."
+    },
+    {
+      "slug": "gold-layer",
+      "term": "Gold Layer",
+      "category": "Architecture Patterns",
+      "desc": "The primary use case for CoW write strategy."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines",
+      "desc": "Reads CoW tables with maximum efficiency."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Core Concepts",
+      "desc": "CoW for Gold, MoR for Silver."
+    },
+    {
+      "slug": "iceberg-snapshots",
+      "term": "Iceberg Snapshots",
+      "category": "Table Formats",
+      "desc": "CoW commits clean file rewrites as new snapshots."
+    }
+  ]
+}

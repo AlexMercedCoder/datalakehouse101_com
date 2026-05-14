@@ -1,0 +1,110 @@
+{
+  "slug": "merge-on-read",
+  "term": "Merge-on-Read (MoR)",
+  "category": "Table Formats",
+  "metaTitle": "Merge-on-Read (MoR) in Apache Iceberg: The Definitive Guide",
+  "metaDescription": "Learn what Merge-on-Read means in Apache Iceberg, how delete files work, when to use MoR vs Copy-on-Write, and how MoR enables high-frequency CDC updates in the data lakehouse.",
+  "h1": "Merge-on-Read (MoR) in Apache Iceberg: The Definitive Guide",
+  "lede": "Merge-on-Read is the write strategy that makes high-frequency CDC updates practical in Apache Iceberg. Instead of rewriting entire data files on every UPDATE or DELETE, MoR writes small delete files alongside existing data files, merging them at read time. Fast writes, deferred read overhead.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Merge-on-Read in Apache Iceberg?",
+      "a": "Merge-on-Read (MoR) is an Iceberg write strategy where UPDATE and DELETE operations write small delete files alongside existing data files, rather than rewriting the data files. At query time, the engine merges the delete files with the data files to produce the correct result."
+    },
+    {
+      "q": "What types of delete files does Iceberg V2 support?",
+      "a": "Iceberg V2 supports two delete file types: positional delete files (recording the file path and row position of each deleted row \u2014 most efficient for random deletes) and equality delete files (recording column values that identify rows to delete \u2014 most natural for CDC upserts using record keys)."
+    },
+    {
+      "q": "When should I use Merge-on-Read?",
+      "a": "Use MoR for tables with high-frequency updates or streaming CDC ingestion where the write cost of full file rewrites (Copy-on-Write) would be prohibitive. Silver layer tables receiving continuous CDC updates are the classic MoR use case."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Merge-on-Read?",
+      "content": "<p><strong>Merge-on-Read (MoR)</strong> is the write strategy in <a href=\"apache-iceberg.html\">Apache Iceberg</a> (V2+) where UPDATE and DELETE operations write small auxiliary <strong>delete files</strong> alongside existing data files, rather than rewriting the data files. The merge \u2014 reconciling data files with delete files to produce the correct view of the table \u2014 is deferred to query time.</p><p>MoR's fundamental advantage is write efficiency. Deleting one row from a 500MB data file in MoR mode costs the I/O of writing a tiny delete file (a few kilobytes) rather than reading and rewriting the entire 500MB file. For workloads with thousands of record-level changes per minute \u2014 such as CDC pipelines from production databases \u2014 this write efficiency difference is the factor that makes the lakehouse practical.</p><p>The trade-off is increased read overhead: queries must read both data files and their associated delete files, then merge them to filter out deleted rows and apply updated values. For tables with large delete file accumulation, this merge overhead can significantly slow down reads. <a href=\"compaction.html\">Compaction</a> (rewriting MoR data+delete files into clean CoW files) is the maintenance operation that restores read performance."
+    },
+    {
+      "heading": "Iceberg V2 Delete File Types",
+      "content": "<p>Iceberg V2 defines two delete file types, each optimized for different use cases:</p><h3>Positional Delete Files</h3><p>A positional delete file records the exact location (file path + row position) of each deleted row. When a query reads a data file, it checks the positional delete file: rows at the recorded positions are skipped. Positional deletes are efficient for point-in-time snapshot reads and for sparse, random row deletes \u2014 the file path + position record is small and indexable.</p><h3>Equality Delete Files</h3><p>An equality delete file records the column values that identify rows to delete \u2014 for example, <code>customer_id = 'abc123'</code>. When a query reads data files, it applies the equality delete predicates: rows whose column values match any equality delete record are filtered out. Equality deletes are natural for CDC MERGE INTO workloads, where the source system identifies records by a natural key rather than a physical position.",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "MoR Positional and Equality Delete Files",
+      "diagramCaption": "Figure 1: MoR writes delete files alongside data files \u2014 the engine merges them at read time."
+    },
+    {
+      "heading": "MoR Write Flow",
+      "content": "<p>The MoR write flow for a DELETE operation:</p><ol><li>The engine applies the WHERE clause to Iceberg metadata, identifying which data files contain rows matching the delete predicate</li><li>For each affected data file, the engine writes a positional delete file recording the positions of deleted rows within that file</li><li>The new delete files are recorded in a new manifest alongside their associated data files</li><li>A new snapshot is committed referencing the new manifest</li></ol><p>No data files are rewritten. The affected data files remain in storage unchanged; the delete files mark which rows within them should be excluded from query results. The entire write operation touches only a tiny fraction of the data's total size."
+    },
+    {
+      "heading": "MoR Read Overhead and Compaction",
+      "content": "<p>MoR's write efficiency comes at the cost of read overhead. Each query against a MoR table must:</p><ol><li>Read data files</li><li>For each data file, check for associated delete files</li><li>For positional deletes: skip rows at the recorded positions</li><li>For equality deletes: filter rows matching the equality predicates</li></ol><p>As delete files accumulate from many CDC operations, this merge overhead grows. A table that was initially fast to read becomes progressively slower as delete files pile up. Scheduled <a href=\"compaction.html\">compaction</a> (using Iceberg's RewriteDataFiles with delete file handling) merges data and delete files into clean CoW files, restoring read performance. Dremio's automated table optimization handles this transparently.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "MoR Read Merge and Compaction Lifecycle",
+      "diagramCaption": "Figure 2: MoR accumulates delete files over time; compaction merges them into clean files."
+    },
+    {
+      "heading": "MoR for CDC Pipelines",
+      "content": "<p>MoR is the standard write strategy for <a href=\"change-data-capture.html\">CDC</a> pipeline targets in the <a href=\"medallion-architecture.html\">Silver layer</a>. A typical CDC pipeline flow with MoR:</p><ol><li>Source database changes are captured by Debezium as Kafka events</li><li>Flink or Spark Structured Streaming reads Kafka events and writes them to Bronze Iceberg tables (append-only)</li><li>A Silver transformation job runs MERGE INTO against the Silver Iceberg table (MoR mode): inserts new records, updates existing records (writes equality delete + new insert), deletes removed records (writes equality delete)</li><li>Periodic compaction merges accumulated delete files into clean Silver data files</li></ol><p>This pattern delivers near-real-time data freshness in Silver with manageable operational complexity."
+    },
+    {
+      "heading": "Choosing Between MoR and CoW",
+      "content": "<p>The write frequency and read/write ratio should drive the CoW vs MoR decision:</p><ul><li><strong>Gold layer tables:</strong> Use <a href=\"copy-on-write.html\">CoW</a>. Reads dominate; batch partition overwrites are the primary write pattern. Clean files without delete overhead maximize BI query performance.</li><li><strong>Silver layer with frequent CDC updates:</strong> Use MoR. Write frequency is high; write cost of CoW would be prohibitive. Schedule regular compaction to manage delete file accumulation.</li><li><strong>Bronze layer:</strong> Append-only. Neither CoW nor MoR applies \u2014 no UPDATE or DELETE operations at the Bronze layer.</li></ul>"
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Merge-on-Read is <a href=\"apache-iceberg.html\">Apache Iceberg's</a> write strategy for high-frequency update workloads. By writing small delete files instead of rewriting entire data files, MoR makes CDC upsert pipelines practical at scale. The read overhead from delete file accumulation is managed through regular <a href=\"compaction.html\">compaction</a>, which merges delete files into clean data files and restores read performance. Understanding when to use MoR vs <a href=\"copy-on-write.html\">Copy-on-Write</a> is fundamental to designing efficient Iceberg table pipelines."
+    }
+  ],
+  "related": [
+    {
+      "slug": "copy-on-write",
+      "term": "Copy-on-Write",
+      "category": "Table Formats",
+      "desc": "The read-optimized alternative to MoR."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format supporting MoR via V2 delete files."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Essential maintenance for MoR tables \u2014 merges delete files."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "The primary use case for MoR write strategy."
+    },
+    {
+      "slug": "acid-transactions",
+      "term": "ACID Transactions",
+      "category": "Core Concepts",
+      "desc": "MoR implements ACID via delete file commit."
+    },
+    {
+      "slug": "silver-layer",
+      "term": "Silver Layer",
+      "category": "Architecture Patterns",
+      "desc": "The primary MoR use case in the Medallion Architecture."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines",
+      "desc": "Reads MoR tables with automated delete file merging."
+    },
+    {
+      "slug": "positional-delete-files",
+      "term": "Positional Delete Files",
+      "category": "Table Formats",
+      "desc": "The V2 delete file type for efficient random row deletes."
+    }
+  ]
+}

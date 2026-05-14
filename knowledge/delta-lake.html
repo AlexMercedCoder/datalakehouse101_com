@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delta Lake: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Delta Lake is, how it works, how it compares to Apache Iceberg, and when to choose Delta Lake for your data lakehouse in 2025.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/delta-lake.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Delta Lake: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Delta Lake is, how it works, how it compares to Apache Iceberg, and when to choose Delta Lake for your data lakehouse in 2025.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/delta-lake.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Delta Lake: The Definitive Guide",
+      "description": "Learn what Delta Lake is, how it works, how it compares to Apache Iceberg, and when to choose Delta Lake for your data lakehouse in 2025.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/delta-lake.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Delta Lake", "item": "https://datalakehouse101.com/knowledge/delta-lake.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Delta Lake?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Delta Lake is an open-source storage layer that brings ACID transactions, scalable metadata handling, and schema enforcement to Apache Spark and other compute engines. It stores data as Parquet files with a transaction log in a _delta_log folder that records every commit as a JSON file, with periodic Parquet checkpoints for efficiency."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Delta Lake open source?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Delta Lake was open-sourced by Databricks in 2019 and donated to the Linux Foundation in 2023. The open-source specification and core libraries are available at delta.io, though Databricks offers additional proprietary capabilities on top of the open-source core."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I use Delta Lake or Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For Databricks-centric organizations, Delta Lake integrates most seamlessly. For all other situations — especially multi-engine lakehouses, cloud-provider-agnostic deployments, or organizations not using Databricks — Apache Iceberg is the better choice due to its broader engine support, Apache Software Foundation governance, and the Iceberg REST Catalog standard."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Delta Lake</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Table Formats</span>
+      <h1>Delta Lake: The Definitive Guide</h1>
+      <p class="hero-lede">Delta Lake was the first widely adopted open table format to bring ACID transactions and schema enforcement to the data lake. Originally developed by Databricks, it pioneered many patterns now standard across all open table formats — and remains the dominant format for Databricks-centric organizations.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Delta Lake?</a></li>
+        <li><a href="#section-2">How Delta Lake Works: The Transaction Log</a></li>
+        <li><a href="#section-3">Delta Lake Features</a></li>
+        <li><a href="#section-4">Delta Lake and the Databricks Ecosystem</a></li>
+        <li><a href="#section-5">Delta Lake UniForm: Iceberg Compatibility Bridge</a></li>
+        <li><a href="#section-6">Delta Lake vs. Apache Iceberg: When to Choose Which</a></li>
+        <li><a href="#section-7">Delta Lake Performance</a></li>
+        <li><a href="#section-8">Migrating from Delta Lake to Apache Iceberg</a></li>
+        <li><a href="#section-9">Delta Lake Governance and the Linux Foundation</a></li>
+        <li><a href="#section-10">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Delta Lake?</h2>
+        <p><strong>Delta Lake</strong> is an open-source storage layer developed by Databricks that adds ACID transaction support, scalable metadata handling, and schema enforcement to Apache Spark workloads on cloud object storage. Released in 2019, Delta Lake was the first open table format to gain significant production adoption, pioneering many of the patterns — snapshot-based transactions, schema evolution, time travel — that are now standard across all open table formats.</p><p>Delta Lake stores tabular data as <a href="apache-parquet.html">Apache Parquet</a> files in cloud object storage, exactly like <a href="apache-iceberg.html">Apache Iceberg</a> and <a href="apache-hudi.html">Apache Hudi</a>. What distinguishes it is the transaction log mechanism: a folder named <code>_delta_log</code> within the table directory contains JSON commit files, one per transaction, that record every change made to the table. Periodically, the log is condensed into a Parquet checkpoint file for efficient log replay.</p><p>Delta Lake was donated to the Linux Foundation in 2023, transitioning from Databricks-controlled to community-governed open source. The core Delta Lake protocol is now documented as an open specification (Delta Protocol) that any engine can implement, and the Linux Foundation's governance ensures vendor neutrality.</p><p>In the 2025 landscape, Delta Lake is the dominant open table format within the Databricks ecosystem and has significant adoption among organizations that adopted Databricks as their primary data platform. Outside Databricks, <a href="apache-iceberg.html">Apache Iceberg</a> has become the more widely supported format — particularly for multi-engine lakehouses and cloud-provider-neutral deployments.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>How Delta Lake Works: The Transaction Log</h2>
+        <p>Delta Lake's core mechanism is the <strong>Delta transaction log</strong> — a folder named <code>_delta_log</code> that lives alongside the Parquet data files in object storage. Understanding the log is the key to understanding how Delta Lake provides ACID guarantees.</p><h3>JSON Commit Files</h3><p>Every transaction committed to a Delta table produces a new JSON file in the <code>_delta_log</code> folder. Each JSON commit file records the actions of that transaction: which data files were added, which data files were removed, schema changes, metadata updates, and protocol changes. The commit file is numbered sequentially (<code>00000000000000000001.json</code>, <code>00000000000000000002.json</code>, etc.), and the highest numbered commit file represents the current table state.</p><h3>Parquet Checkpoints</h3><p>As the transaction log grows (hundreds or thousands of commit files), replaying the entire log from the beginning to determine the current table state becomes expensive. Delta Lake addresses this with <strong>checkpoints</strong>: every 10 commits (by default), a Parquet checkpoint file is written that consolidates the entire current table state — all active data files, current schema, and current metadata — into a single file. Future log replays start from the most recent checkpoint rather than the beginning of the log.</p><h3>ACID Atomicity in Delta Lake</h3><p>Delta Lake achieves atomicity through the mutual exclusivity of commit file numbers. Two writers cannot both successfully write the same commit number — the object storage service's conditional write semantics (S3's conditional PUT, ADLS's conditional write) ensure that only one writer succeeds. The loser must read the new state and retry. This optimistic concurrency control provides serializable write semantics without a distributed lock manager.</p>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-1.png" alt="Delta Lake vs Apache Iceberg Transaction Log Architecture diagram" loading="lazy"><figcaption>Figure 1: Comparing Delta Lake's _delta_log JSON approach with Apache Iceberg's manifest tree architecture.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Delta Lake Features</h2>
+        <p>Delta Lake provides a comprehensive set of features that make it suitable for production analytical workloads:</p><h3>ACID Transactions</h3><p>Full ACID compliance with serializable isolation for writers and snapshot isolation for readers. Delta's transaction log ensures that readers always see a consistent state, even during concurrent writes.</p><h3>Schema Enforcement and Evolution</h3><p>Schema enforcement prevents data that doesn't match the table's schema from being written, catching data quality issues at ingestion. Schema evolution allows new columns to be added without rewriting data, and incompatible changes (column type narrowing) are rejected by default.</p><h3>Scalable Metadata</h3><p>Delta Lake's Parquet checkpoint mechanism addresses the metadata scalability problem that the Hive Metastore faced — even tables with billions of rows and millions of data files can be efficiently queried because the checkpoint consolidates all file metadata into a single Parquet file that can be read with column pruning.</p><h3>Time Travel</h3><p>Delta Lake supports time travel queries by version number or timestamp: <code>SELECT * FROM table VERSION AS OF 5</code> or <code>SELECT * FROM table TIMESTAMP AS OF '2026-01-01'</code>. The transaction log's version history serves as the time travel index.</p><h3>Liquid Clustering (2024)</h3><p>A newer Delta Lake feature, Liquid Clustering optimizes data layout dynamically based on a set of clustering keys — similar to Iceberg's Z-ordering but with automatic, incremental optimization. It eliminates the need to choose static partition schemes upfront.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Delta Lake and the Databricks Ecosystem</h2>
+        <p>Delta Lake's tightest integration is with the Databricks platform. Within Databricks, Delta Lake is the default table format, and Databricks provides several proprietary enhancements on top of the open-source core:</p><h3>Delta Sharing</h3><p>Delta Sharing is an open protocol for sharing data across organizations. A data provider exposes Delta tables through a sharing server; data recipients connect to the server and query the shared data using their preferred engine — without copying the data. Delta Sharing enables cross-organization data products and marketplace data monetization.</p><h3>Unity Catalog</h3><p>Unity Catalog is Databricks' unified governance layer for Delta tables (and, through UniForm, Iceberg tables). It provides table-level and column-level access control, data lineage tracking, and cross-workspace table sharing. Unity Catalog was open-sourced in 2024, joining Delta Lake as an open protocol.</p><h3>Delta Live Tables</h3><p>Delta Live Tables is Databricks' managed ETL framework that automatically manages data quality, incremental processing, and table optimization for Delta Lake pipelines. It implements the <a href="medallion-architecture.html">Medallion Architecture</a> as a first-class concept within the Databricks UI.</p><h3>Auto Optimize</h3><p>Databricks automatically compacts small Delta files and optimizes file layout through background processes, similar to Dremio's automated table optimization for Iceberg. This reduces the operational burden of managing Delta table file health.</p>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-2.png" alt="Delta Lake Ecosystem Databricks diagram" loading="lazy"><figcaption>Figure 2: The Delta Lake ecosystem within Databricks — Delta Live Tables, Unity Catalog, and Delta Sharing.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Delta Lake UniForm: Iceberg Compatibility Bridge</h2>
+        <p>One of Delta Lake's most significant recent developments is <strong>UniForm</strong> (Universal Format) — a feature that automatically generates <a href="apache-iceberg.html">Apache Iceberg</a> metadata alongside the Delta transaction log, making Delta tables simultaneously readable by Iceberg-compatible query engines.</p><p>With UniForm enabled on a Delta table, any Iceberg-compatible engine — <a href="dremio.html">Dremio</a>, Trino, Apache Spark with Iceberg — can read the table using Iceberg's REST catalog interface, without knowing that the underlying format is Delta. Writers continue to commit using Delta's transaction log protocol; a background process generates the equivalent Iceberg metadata after each commit.</p><p>UniForm is Databricks' pragmatic response to Apache Iceberg's emergence as the catalog interoperability standard. Rather than forcing Iceberg-first engines to implement Delta compatibility, UniForm allows Delta tables to participate in the Iceberg ecosystem without a full format migration. This is a meaningful capability for organizations that are primarily on Databricks but need to share data with teams or tools that are Iceberg-native.</p><p>The limitation of UniForm is that it is a bridge, not native parity: the generated Iceberg metadata lags the Delta log by a background job latency, and some Delta-specific features (Delta Sharing, Delta constraints) do not have Iceberg equivalents. For organizations whose primary ecosystem is Iceberg-native, using Delta tables with UniForm adds operational complexity without the benefits of native Iceberg.
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Delta Lake vs. Apache Iceberg: When to Choose Which</h2>
+        <p>The choice between Delta Lake and Apache Iceberg is primarily organizational, not technical:</p><table class="comparison-table"><thead><tr><th>Scenario</th><th>Recommendation</th><th>Reason</th></tr></thead><tbody><tr><td>Primary platform is Databricks</td><td>Delta Lake</td><td>Native integration, Delta Live Tables, Unity Catalog</td></tr><tr><td>Multi-engine lakehouse (Spark + Dremio + Trino)</td><td>Apache Iceberg</td><td>Native support in all engines without UniForm bridge</td></tr><tr><td>Cloud-native AWS (no Databricks)</td><td>Apache Iceberg</td><td>Native S3 Tables, Athena, Glue support</td></tr><tr><td>Migrating from Databricks to multi-engine</td><td>Apache Iceberg</td><td>Delta UniForm as a bridge during migration</td></tr><tr><td>Need Dremio as query engine</td><td>Apache Iceberg</td><td>Dremio's deepest native format support</td></tr><tr><td>Data sharing across orgs</td><td>Delta Lake (Delta Sharing)</td><td>Delta Sharing protocol is mature and widely supported</td></tr></tbody></table><p>In 2025, most new greenfield lakehouses default to Apache Iceberg. Delta Lake migration to Iceberg is feasible using Spark's <code>CONVERT TO ICEBERG</code> procedure (for CoW tables) or by registering Delta table files directly as Iceberg tables. Organizations already deeply invested in Databricks and Delta Lake can use UniForm to gain Iceberg compatibility without a full migration.</p>
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Delta Lake Performance</h2>
+        <p>Delta Lake performance is optimized primarily for the Apache Spark execution model, with several features designed to maximize Spark query efficiency:</p><h3>Data Skipping with Delta Statistics</h3><p>Delta Lake collects column-level min/max statistics during writes (for the first 32 columns by default). At query time, the Databricks optimizer uses these statistics to skip data files that cannot contain matching rows. On well-organized data, this can reduce the files read by 80–90%.</p><h3>Z-Ordering</h3><p>Delta Lake's <code>OPTIMIZE ZORDER BY</code> command co-locates rows with similar values in the same data files, maximizing the effectiveness of data skipping for multi-column filter predicates. This is particularly effective for exploratory workloads with diverse filter patterns.</p><h3>Liquid Clustering</h3><p>The newer replacement for static Z-ordering, Liquid Clustering incrementally optimizes data layout without requiring full table rewrites. It is more efficient for continuously updated tables where Z-ordering's full rewrites are prohibitively expensive.</p><h3>Photon Engine</h3><p>Databricks' proprietary Photon execution engine, optimized for Delta Lake, provides vectorized, C++-implemented query execution that significantly outperforms standard Spark for analytical queries. Photon is a Databricks-proprietary capability not available on open-source Spark.</p>
+        
+      </section>
+
+      <section id="section-8">
+        <h2>Migrating from Delta Lake to Apache Iceberg</h2>
+        <p>As Apache Iceberg has become the industry standard, many organizations are evaluating or executing migrations from Delta Lake to Iceberg. The migration path depends on the workload:</p><h3>In-Place Migration (Copy-on-Write Tables)</h3><p>For Delta tables using Copy-on-Write semantics only, Apache Spark provides the <code>CONVERT TO ICEBERG</code> procedure that creates an Iceberg table by registering the existing Parquet files as Iceberg data files and generating new Iceberg metadata. No data is copied — this is a metadata-only migration that completes in minutes even for large tables.</p><h3>Rewrite Migration (Merge-on-Read Tables)</h3><p>Tables with Delta delete files (using Merge-on-Read semantics) require a full rewrite to Iceberg format, since Iceberg's delete file format differs from Delta's. This is typically done by reading the Delta table with Spark and writing the result as a new Iceberg table using <code>INSERT INTO iceberg_table SELECT * FROM delta_table</code>.</p><h3>Parallel Migration with UniForm</h3><p>Enable UniForm on existing Delta tables to make them immediately Iceberg-readable, then gradually migrate consumers to use the Iceberg interface. Once all consumers are on Iceberg, decommission the Delta table and create a native Iceberg table as the final step.</p>
+        
+      </section>
+
+      <section id="section-9">
+        <h2>Delta Lake Governance and the Linux Foundation</h2>
+        <p>The 2023 donation of Delta Lake to the Linux Foundation marked a significant shift in governance. Under the Linux Foundation, the Delta Lake project is governed by a Technical Steering Committee with representation from Databricks, Microsoft, Nvidia, and other organizations. The Delta Lake protocol is now a community standard rather than a Databricks product.</p><p>However, the Linux Foundation's governance model differs from the Apache Software Foundation's in important ways. The ASF has stronger vendor-neutrality traditions and a longer track record of successfully managing contentious, multi-stakeholder open-source projects. Databricks, despite no longer being the sole controller, remains by far the largest contributor and most influential voice in Delta Lake development.</p><p>For enterprise organizations, this governance distinction matters for long-term risk assessment. Apache Iceberg's ASF governance provides stronger assurance that no single vendor can steer the format's direction in ways that serve vendor interests over user interests. This is a key reason why cloud providers and infrastructure vendors have coalesced around Iceberg rather than Delta Lake as the common denominator format.</p>
+        
+      </section>
+
+      <section id="section-10">
+        <h2>Summary</h2>
+        <p>Delta Lake pioneered open table format technology — it was the first to prove that ACID transactions, schema enforcement, and time travel were practical on cloud object storage at scale. Its contributions to the data engineering field are significant, and it remains the most mature and feature-rich option for Databricks-centric organizations.</p><p>In the broader market, <a href="apache-iceberg.html">Apache Iceberg</a> has emerged as the more widely supported standard — particularly for multi-engine lakehouses, cloud-neutral deployments, and organizations using <a href="dremio.html">Dremio</a> as their primary query engine. The Iceberg REST Catalog specification, ASF governance, and native support from every major cloud provider give Iceberg a structural advantage as the common denominator for the lakehouse ecosystem.</p><p>For organizations evaluating their table format strategy in 2025, the pragmatic guidance is: use Delta Lake if you are on Databricks; use Apache Iceberg for everything else. UniForm provides a compatibility bridge if you need to transition gradually.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The industry-standard open table format and Delta's primary alternative.</span>
+    </a>
+      <a class="related-card" href="apache-hudi.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Hudi</span>
+      <span class="related-desc">The third major open table format.</span>
+    </a>
+      <a class="related-card" href="open-table-format.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Open Table Format</span>
+      <span class="related-desc">The category Delta Lake belongs to.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The architecture Delta Lake enables.</span>
+    </a>
+      <a class="related-card" href="schema-evolution.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Schema Evolution</span>
+      <span class="related-desc">Changing table structure safely — supported by Delta Lake.</span>
+    </a>
+      <a class="related-card" href="time-travel.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Time Travel</span>
+      <span class="related-desc">Historical snapshot queries — supported by Delta Lake.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">File optimization for Delta and Iceberg tables.</span>
+    </a>
+      <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">Open catalog that can serve Delta UniForm tables via Iceberg API.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

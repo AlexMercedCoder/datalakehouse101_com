@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apache Hudi: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Apache Hudi is, how its incremental processing model works, how it compares to Apache Iceberg and Delta Lake, and when to use Hudi in your data lakehouse.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/apache-hudi.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Apache Hudi: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Apache Hudi is, how its incremental processing model works, how it compares to Apache Iceberg and Delta Lake, and when to use Hudi in your data lakehouse.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/apache-hudi.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Apache Hudi: The Definitive Guide",
+      "description": "Learn what Apache Hudi is, how its incremental processing model works, how it compares to Apache Iceberg and Delta Lake, and when to use Hudi in your data lakehouse.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/apache-hudi.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Apache Hudi", "item": "https://datalakehouse101.com/knowledge/apache-hudi.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Apache Hudi?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Hudi (Hadoop Upserts Deletes and Incrementals) is an open-source table format and framework for managing large analytical datasets with frequent upserts and deletes. It was developed at Uber and donated to the Apache Software Foundation in 2019, optimized for CDC streaming workloads and incremental data processing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Hudi best used for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hudi excels at workloads with high-frequency record-level upserts and deletes — particularly CDC (Change Data Capture) pipelines that continuously sync changes from operational databases (MySQL, Postgres, MongoDB) into the data lake. Hudi's index mechanisms make finding and updating specific records efficient at scale."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Apache Hudi compare to Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hudi has narrower engine support but superior built-in CDC upsert performance through its index mechanisms. Iceberg has broader engine support, better catalog interoperability (REST Catalog standard), and is the more widely adopted general-purpose format. For CDC-heavy workloads, Hudi is a strong specialist choice; for general lakehouses, Iceberg is preferred."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Apache Hudi</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Table Formats</span>
+      <h1>Apache Hudi: The Definitive Guide</h1>
+      <p class="hero-lede">Apache Hudi is the streaming-optimized open table format that pioneered efficient upsert and CDC (Change Data Capture) pipelines on cloud object storage. Built for high-frequency record-level updates, Hudi remains the specialist choice for near-real-time lakehouse ingestion workloads.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Apache Hudi?</a></li>
+        <li><a href="#section-2">Hudi's Key Concepts: Timeline, Table Types, and Index</a></li>
+        <li><a href="#section-3">Hudi vs. Iceberg vs. Delta Lake</a></li>
+        <li><a href="#section-4">Hudi's CDC Ingestion Capability</a></li>
+        <li><a href="#section-5">Hudi Incremental Queries</a></li>
+        <li><a href="#section-6">Hudi Concurrency and Multi-Writer Support</a></li>
+        <li><a href="#section-7">Hudi Table Maintenance: Compaction and Cleaning</a></li>
+        <li><a href="#section-8">Hudi Ecosystem: Engines and Catalogs</a></li>
+        <li><a href="#section-9">Hudi at Uber and Other Large-Scale Deployments</a></li>
+        <li><a href="#section-10">When to Choose Apache Hudi</a></li>
+        <li><a href="#section-11">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Apache Hudi?</h2>
+        <p><strong>Apache Hudi</strong> (Hadoop Upserts Deletes and Incrementals) is an open-source data management framework that provides efficient upsert, delete, and incremental read capabilities on top of cloud object storage. Developed at Uber to solve the challenge of syncing changes from production databases into their data lake at scale, Hudi was donated to the Apache Software Foundation in 2019.</p><p>Hudi's design philosophy differs from <a href="apache-iceberg.html">Apache Iceberg</a> and <a href="delta-lake.html">Delta Lake</a> in a fundamental way: while Iceberg and Delta are primarily table formats optimized for general-purpose ACID analytics, Hudi is a <strong>data management framework</strong> that includes the table format, the write client library, the CDC ingestion framework, and the incremental processing API as an integrated system. This comprehensive approach makes Hudi more opinionated and more tightly coupled to the Spark ecosystem, but also more purpose-built for its target use case: high-frequency, record-level CDC from operational databases.</p><p>At Uber, Hudi's core use case was syncing billions of rows of ride, driver, and payment data from production MySQL databases into a Hadoop-based data lake, with record-level updates applied within minutes of the source change. This CDC-at-scale requirement drove Hudi's design: an index system for efficient record lookup, a timeline model for tracking operations, and two table types optimized for different read/write trade-offs.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Hudi's Key Concepts: Timeline, Table Types, and Index</h2>
+        <p>Three concepts define how Hudi works: the timeline, table types, and the index.</p><h3>The Hudi Timeline</h3><p>Hudi maintains a <strong>timeline</strong> of all operations performed on a table, stored in a <code>.hoodie</code> metadata folder alongside the data. Each timeline entry records an operation (commit, delta commit, compaction, clean, rollback) with its timestamp and status (requested, inflight, completed). This timeline is the equivalent of Iceberg's snapshot log — it provides the transactional history, enables time travel, and coordinates concurrent writes.</p><h3>Copy-on-Write (CoW) Table Type</h3><p>In a <strong>Copy-on-Write</strong> table, all upsert and delete operations rewrite the affected base files during the write operation itself. Reads are always fast because there are no delete files to merge — all files are clean, updated Parquet files. Writes are more expensive because they involve reading and rewriting affected base files. CoW is optimal for tables where reads significantly outnumber writes.</p><h3>Merge-on-Read (MoR) Table Type</h3><p>In a <strong>Merge-on-Read</strong> table, upserts write to small <strong>delta log files</strong> (in Avro format) alongside the base Parquet files rather than rewriting them. Writes are very fast because they only append to the delta log. Reads must merge the delta log with the base files at query time to produce the correct result. MoR is optimal for tables with frequent writes — particularly streaming CDC workloads — where CoW's file rewriting would create too much write amplification. Periodic <strong>compaction</strong> merges the delta log files into updated base Parquet files, restoring read performance.</p><h3>The Hudi Index</h3><p>Hudi's index is the capability that sets it apart from other table formats for CDC workloads. When an upsert arrives (a new version of an existing record), Hudi uses the index to quickly locate which data file contains the existing record, avoiding a full table scan. Index implementations include Bloom filter (in-memory, approximate), HBase-backed (external, exact), and record-level index (in-memory, exact, introduced in Hudi 0.14). The index makes record-level upserts practical at petabyte scale — without it, finding the right file to update would require scanning the entire table.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-1.png" alt="Apache Hudi Table Types CoW and MoR Architecture diagram" loading="lazy"><figcaption>Figure 1: Hudi's two table types — Copy-on-Write for read performance, Merge-on-Read for write performance.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Hudi vs. Iceberg vs. Delta Lake</h2>
+        <p>The three open table formats occupy distinct positions in the ecosystem:</p><table class="comparison-table"><thead><tr><th>Dimension</th><th>Apache Hudi</th><th>Apache Iceberg</th><th>Delta Lake</th></tr></thead><tbody><tr><td>Primary strength</td><td>High-frequency CDC upserts</td><td>General-purpose analytics</td><td>Databricks ecosystem</td></tr><tr><td>Governance</td><td>Apache Software Foundation</td><td>Apache Software Foundation</td><td>Linux Foundation</td></tr><tr><td>Write model</td><td>CoW or MoR with index lookup</td><td>CoW or MoR with delete files</td><td>CoW or MoR with log</td></tr><tr><td>Engine support</td><td>Spark, Flink (primary)</td><td>All major engines</td><td>Spark, Databricks (primary)</td></tr><tr><td>Catalog interop</td><td>Hive Metastore primarily</td><td>Iceberg REST Catalog (standard)</td><td>Unity Catalog / HMS</td></tr><tr><td>Streaming ingestion</td><td>Best-in-class</td><td>Good (improving with V3)</td><td>Good</td></tr><tr><td>Query performance</td><td>Good (with compaction)</td><td>Excellent</td><td>Excellent (Photon)</td></tr><tr><td>Best use case</td><td>CDC streaming to lakehouse</td><td>General lakehouse, multi-engine</td><td>Databricks analytics</td></tr></tbody></table><p><strong>Key takeaway:</strong> If your primary workload is high-frequency CDC from operational databases (thousands of upserts per second), Hudi's index mechanism provides genuine performance advantages over Iceberg. For all other use cases, Apache Iceberg is the preferred choice in 2025.</p>
+        
+      </section>
+
+      <section id="section-4">
+        <h2>Hudi's CDC Ingestion Capability</h2>
+        <p>Hudi's most distinctive capability is its native, optimized support for <a href="change-data-capture.html">Change Data Capture</a> (CDC) ingestion. The Hudi DeltaStreamer (now called HoodieStreamer) is a production-grade streaming ingestion utility that continuously reads CDC events from <a href="apache-kafka.html">Apache Kafka</a> and applies them to Hudi tables with exactly-once semantics.</p><p>The CDC ingestion flow with Hudi works as follows: a CDC connector (Debezium for MySQL, Postgres, MongoDB) publishes change events (insert, update, delete) to Kafka topics. HoodieStreamer reads these Kafka events, applies the Hudi index to resolve existing record locations, and writes the changes to the Hudi table — inserts go to new files, updates patch existing files via MoR delta logs, and deletes are recorded as tombstones. Compaction runs periodically to merge delta logs and restore read performance.</p><p>This end-to-end CDC pipeline, running on Apache Spark with Hudi, can process hundreds of thousands of record-level operations per second and deliver data to the analytical table within minutes of the source change — competitive with dedicated streaming platforms for CDC use cases.</p>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-2.png" alt="Hudi CDC Streaming Pipeline Architecture diagram" loading="lazy"><figcaption>Figure 2: Hudi CDC streaming pipeline — Debezium captures DB changes, Kafka delivers them, HoodieStreamer applies upserts.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Hudi Incremental Queries</h2>
+        <p>One of Hudi's unique capabilities is its <strong>incremental query mode</strong> — the ability to query only the records that changed between two points in time. This is distinct from time travel (which queries the entire table as of a historical point) — incremental queries return only the delta of changes within a specified time range.</p><p>Incremental queries are expressed as: <code>SELECT * FROM hudi_table WHERE _hoodie_commit_time > '20260101000000' AND _hoodie_commit_time <= '20260102000000'</code>. Hudi returns only the records committed during that window — inserts, updates (returning the latest version), and deletes (optionally).</p><p>This capability is particularly powerful for building efficient downstream processing pipelines. Instead of scanning the entire table to find what changed since the last processing run, downstream consumers can efficiently pull only the changed records from Hudi. This "change feed" pattern eliminates the need for watermark-based full scans that are common in Spark incremental pipelines on non-Hudi formats.</p><p>Apache Iceberg is adding comparable incremental read capabilities through its <code>incremental_append_scan</code> and <code>incremental_change_scan</code> APIs, narrowing Hudi's advantage in this area. But Hudi's incremental query maturity is still ahead of Iceberg's as of 2025.
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Hudi Concurrency and Multi-Writer Support</h2>
+        <p>Hudi supports multiple concurrent writers through its <strong>multi-writer protocol</strong>, using optimistic concurrency control similar to Iceberg. Each writer operates on the table independently and commits when done; if two writers committed conflicting changes, Hudi's conflict detection mechanism identifies the conflict and rolls back the losing writer's changes, forcing a retry.</p><p>However, Hudi's multi-writer support is primarily designed for Spark batch writers, not for mixed engine environments (Spark + Trino + Dremio). Hudi's table format is most fully implemented in the Spark ecosystem, and while Hudi provides read support for Trino and Presto, write support from non-Spark engines is limited.</p><p>This ecosystem constraint is Hudi's most significant limitation relative to <a href="apache-iceberg.html">Apache Iceberg</a>: Iceberg's REST Catalog specification and comprehensive multi-engine write support make it genuinely engine-agnostic. Hudi's strength — its deep Spark integration and index mechanism — is inseparable from its constraint: tight Spark coupling limits its utility in multi-engine lakehouses.
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Hudi Table Maintenance: Compaction and Cleaning</h2>
+        <p>Like all <a href="open-table-format.html">open table formats</a>, Hudi tables require regular maintenance to remain performant. The two primary maintenance operations are compaction and cleaning.</p><h3>Compaction</h3><p>Compaction is essential for MoR tables. As delta log files accumulate from frequent upsert writes, read performance degrades — every query must merge the base files with all delta logs. Compaction merges delta logs into new base Parquet files, restoring read performance. Hudi supports both synchronous compaction (blocking writes during compaction) and asynchronous compaction (compacting a previous snapshot while writes continue). Asynchronous compaction is preferred for production pipelines to avoid write latency spikes.</p><h3>Cleaning</h3><p>Hudi's cleaner removes old file versions that are no longer needed for time travel or ongoing queries. The cleaner is configured with a retention policy (keep N commits, keep N hours) and runs automatically after each commit by default. Proper cleaning is essential for preventing storage cost growth from accumulating old file versions.</p><h3>Clustering</h3><p>Hudi's clustering operation (similar to Iceberg's Z-ordering) reorganizes data files to optimize the data layout for common query patterns — co-locating records with similar values in the same files to maximize data skipping effectiveness. Unlike compaction (which merges delta logs), clustering reorganizes base files and is applicable to both CoW and MoR table types.
+        
+      </section>
+
+      <section id="section-8">
+        <h2>Hudi Ecosystem: Engines and Catalogs</h2>
+        <p>Hudi's ecosystem is less broad than Iceberg's but well-established within the Spark and Flink communities:</p><h3>Query Engine Support</h3><ul><li><strong>Apache Spark:</strong> The most complete Hudi support — full read and write, CoW and MoR, all compaction and clustering operations, DeltaStreamer/HoodieStreamer</li><li><strong>Apache Flink:</strong> Strong streaming write support — Flink is increasingly used as the ingestion engine for real-time CDC pipelines into Hudi</li><li><strong>Trino / Presto:</strong> Read support for CoW and MoR tables (with snapshot read for MoR); limited write support</li><li><strong>Hive:</strong> Read support through Hudi's InputFormat</li><li><strong>AWS Athena:</strong> Read support for Hudi tables in S3</li></ul><h3>Catalog Support</h3><p>Hudi primarily uses the Hive Metastore for catalog management, though the Hudi project has been adding Iceberg REST Catalog compatibility through its Hudi Catalog Service project. Full Iceberg REST Catalog compatibility remains a work in progress as of 2025.</p><h3>Cloud Provider Integration</h3><p>AWS is the primary cloud with native Hudi support: EMR includes Hudi libraries, Glue jobs can write Hudi tables, and Athena can query them. Azure and GCP support Hudi on Spark but without the same level of native service integration as AWS.
+        
+      </section>
+
+      <section id="section-9">
+        <h2>Hudi at Uber and Other Large-Scale Deployments</h2>
+        <p>Hudi's production credibility comes from Uber's massive-scale deployment. Uber's data engineering team built and operates one of the largest Hudi deployments in the world: thousands of Hudi tables, petabytes of data, and hundreds of CDC pipelines syncing real-time changes from production databases.</p><p>Key Uber use cases include: syncing the riders table (hundreds of millions of rows) from MySQL to Hudi with record-level updates applied within 5 minutes of the source change; syncing the trips table with complex event merging (multiple updates per trip as status changes); and incremental processing of change data for downstream machine learning feature pipelines.</p><p>Other major Hudi adopters include Robinhood (financial transaction CDC), ByteDance (TikTok's parent, social media event processing), and several large financial institutions with high-frequency trading and customer data synchronization requirements.</p><p>These deployments validate Hudi's technical claims for high-frequency CDC workloads. However, the common thread among Hudi's largest adopters is Spark as the primary compute platform — reinforcing the point that Hudi's strengths are most fully realized in Spark-centric architectures.
+        
+      </section>
+
+      <section id="section-10">
+        <h2>When to Choose Apache Hudi</h2>
+        <p>Given the 2025 landscape where <a href="apache-iceberg.html">Apache Iceberg</a> has emerged as the general-purpose standard, the cases for choosing Hudi are specific:</p><ul><li><strong>Ultra-high-frequency CDC:</strong> If your workload involves syncing thousands of record-level changes per second from operational databases with strict latency requirements (sub-5-minute freshness), Hudi's index mechanism provides genuine performance advantages over Iceberg's current V2 implementation.</li><li><strong>Spark-centric organization:</strong> If Apache Spark is your primary and only compute engine, Hudi's tight Spark integration provides a more optimized experience than Iceberg for write-heavy workloads.</li><li><strong>Incremental processing pipelines:</strong> If your downstream processing relies heavily on incremental change feeds (what changed since the last run?), Hudi's mature incremental query API provides a cleaner developer experience than Iceberg's current incremental scan implementation.</li><li><strong>Existing Hudi investment:</strong> Organizations already running production Hudi deployments should evaluate migration to Iceberg carefully — Hudi's CDC performance advantages may justify staying on Hudi even as Iceberg improves.</li></ul><p>For all other use cases, including new greenfield lakehouses, multi-engine environments, and organizations using <a href="dremio.html">Dremio</a> as their primary query engine, <a href="apache-iceberg.html">Apache Iceberg</a> is the better choice.</p>
+        
+      </section>
+
+      <section id="section-11">
+        <h2>Summary</h2>
+        <p>Apache Hudi was a pioneering open table format that solved the real, production-scale problem of high-frequency CDC ingestion at Uber. Its index-based upsert mechanism, dual table type design, incremental query API, and streaming ingestion framework (HoodieStreamer) represent genuine innovations that influenced the design of subsequent table formats.</p><p>In the 2025 open table format landscape, Hudi occupies a specialist position: the preferred format for workloads with extreme CDC update frequencies where Iceberg's current MoR implementation is insufficient. For general-purpose lakehouse deployments, <a href="apache-iceberg.html">Apache Iceberg's</a> broader engine support, REST Catalog standard, and superior ecosystem make it the default choice.</p><p>Organizations evaluating Hudi should assess whether their specific workload characteristics — CDC update frequency, required freshness, engine ecosystem — genuinely benefit from Hudi's specialty features before accepting the trade-off of narrower engine support and more limited catalog interoperability.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The industry-standard alternative to Hudi for general lakehouses.</span>
+    </a>
+      <a class="related-card" href="delta-lake.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Delta Lake</span>
+      <span class="related-desc">The third major open table format.</span>
+    </a>
+      <a class="related-card" href="open-table-format.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Open Table Format</span>
+      <span class="related-desc">The category Hudi belongs to.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">Hudi's primary and strongest use case.</span>
+    </a>
+      <a class="related-card" href="merge-on-read.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Merge-on-Read</span>
+      <span class="related-desc">Hudi's write-optimized table type.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Essential maintenance for Hudi MoR tables.</span>
+    </a>
+      <a class="related-card" href="apache-flink.html">
+      <span class="related-label">Query Engines</span>
+      <span class="related-term">Apache Flink</span>
+      <span class="related-desc">Primary streaming engine for Hudi ingestion.</span>
+    </a>
+      <a class="related-card" href="apache-kafka.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Apache Kafka</span>
+      <span class="related-desc">Source of CDC events for Hudi streaming pipelines.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{
+  "slug": "compaction",
+  "term": "Compaction",
+  "category": "Table Formats",
+  "metaTitle": "Compaction in Apache Iceberg: The Definitive Guide",
+  "metaDescription": "Learn what compaction is in Apache Iceberg, why it is essential for lakehouse performance, how Copy-on-Write and Merge-on-Read compaction work, and how Dremio automates it.",
+  "h1": "Compaction in Apache Iceberg: The Definitive Guide",
+  "lede": "Compaction is the maintenance operation that keeps Apache Iceberg tables performing at their best. It merges small data files into optimally sized ones, rewrites MoR delete files into clean data files, and clusters data for better query skipping \u2014 all without disrupting concurrent readers.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is compaction in Apache Iceberg?",
+      "a": "Compaction in Apache Iceberg is a maintenance operation that rewrites small or fragmented data files into optimally sized, well-organized files. It addresses the small file problem (many small files slow down metadata reads and I/O), MoR delete file accumulation (delete files that must be merged at read time), and suboptimal data layout (files not sorted for common query patterns)."
+    },
+    {
+      "q": "Does compaction require downtime in Apache Iceberg?",
+      "a": "No. Iceberg compaction runs concurrently with reader and writer queries. Compaction reads the current snapshot's files, writes new optimized files, and commits them as a new snapshot. Concurrent readers continue reading the pre-compaction snapshot; after compaction commits, new readers automatically see the compacted files."
+    },
+    {
+      "q": "Does Dremio automatically compact Iceberg tables?",
+      "a": "Yes. Dremio's Automated Table Optimization feature automatically compacts small files, clusters data, and removes orphaned files and expired snapshots on Iceberg tables without manual scheduling or Spark jobs. This is one of Dremio's key operational advantages for lakehouse management."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Compaction?",
+      "content": "<p><strong>Compaction</strong> is a maintenance operation that rewrites Apache Iceberg table files to improve query performance and reduce storage overhead. Over time, as data is continuously ingested in small batches \u2014 from streaming pipelines, frequent micro-batch ETL jobs, or frequent MERGE INTO operations \u2014 a table accumulates many small Parquet files. Each small file requires a separate I/O request from object storage, making queries that read many files slow and expensive.</p><p>Compaction addresses this by reading many small files and rewriting their contents into fewer, larger, optimally sized files \u2014 typically targeting 128MB to 512MB of compressed Parquet per file. The result is fewer files to open, less metadata to read, and faster sequential reads from object storage.</p><p>Beyond simple file merging, compaction in Iceberg can also: rewrite Merge-on-Read delete files into clean data files (eliminating the merge overhead at query time); apply Z-ordering or sort orders to cluster data for common query patterns (improving data skipping effectiveness); and remove expired snapshot data files that are no longer referenced by any current snapshot.</p><p>Critically, Iceberg compaction is <strong>non-blocking</strong>: it runs concurrently with reader and writer queries without requiring table locks or downtime. It commits its result as a new Iceberg snapshot \u2014 readers see either the pre-compaction or the post-compaction snapshot, never an intermediate state.</p>"
+    },
+    {
+      "heading": "Why Small Files Hurt Performance",
+      "content": "<p>The <strong>small file problem</strong> is one of the most common causes of Iceberg table performance degradation in production. It arises from several common patterns:</p><ul><li><strong>Streaming ingestion:</strong> Apache Flink or Spark Structured Streaming writing micro-batches every 30 seconds produces 2880 files per day \u2014 each containing only a few seconds of data</li><li><strong>Frequent MERGE INTO:</strong> CDC pipelines running MERGE INTO every minute produce small delta files (in MoR mode) or small rewritten data files (in CoW mode)</li><li><strong>High-partition granularity:</strong> A table partitioned by <code>hours(event_time)</code> with sparse data may have only a few rows per hour partition \u2014 each stored in a tiny file</li><li><strong>Frequent schema changes:</strong> Adding columns produces new files; old small files are never merged</li></ul><p>The performance impact is proportional to file count. A query that reads 10,000 small files (each 1MB) requires 10,000 HTTP requests to S3 and 10,000 file metadata reads \u2014 compared to 20 requests for 20 optimally sized 500MB files covering the same data. At scale, this difference translates to minutes vs. seconds of query latency.",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "Small File Problem and Compaction",
+      "diagramCaption": "Figure 1: Compaction merges many small files into optimally sized files, reducing I/O requests and metadata overhead."
+    },
+    {
+      "heading": "Compaction Types in Apache Iceberg",
+      "content": "<p>Iceberg supports several distinct compaction operations:</p><h3>Bin-Packing (Simple File Merge)</h3><p>The most basic compaction: reads small files and groups them into target-sized output files (128MB\u2013512MB). Uses a bin-packing algorithm to optimize the number of output files. Primarily addresses the small file problem without changing data ordering.</p><h3>Sort-Based Compaction</h3><p>Reads files, sorts all rows by specified sort columns, and writes sorted output files. Sorting enables aggressive data skipping for queries that filter on the sort columns \u2014 after sorting by <code>customer_id</code>, files contain contiguous ranges of customer IDs, and a query for a specific customer ID can skip all files whose customer_id range does not overlap.</p><h3>Z-Order Compaction</h3><p><a href=\"z-ordering.html\">Z-ordering</a> (also called multi-dimensional clustering) interleaves the sort keys of multiple columns to optimize data layout for queries filtering on multiple dimensions simultaneously. A table Z-ordered by <code>(region, product_category)</code> allows efficient pruning for queries filtering on either or both dimensions.</p><h3>MoR Delete File Compaction</h3><p>For Merge-on-Read tables, compaction reads data files and their associated positional/equality delete files, applies the deletes, and writes new clean data files without the delete files. After this compaction, reads no longer need to apply delete files at query time, restoring CoW-equivalent read performance."
+    },
+    {
+      "heading": "Compaction and Snapshot Lifecycle",
+      "content": "<p>Compaction interacts with Iceberg's snapshot lifecycle in an important way: after compaction produces new, optimized data files and commits them as a new snapshot, the old small files are no longer referenced by the current snapshot. However, they are still referenced by historical snapshots (for time travel purposes).</p><p>Old files become eligible for deletion only after the snapshots referencing them are expired. The typical maintenance sequence is: (1) run compaction to create new optimized files, (2) wait for the time travel retention window, (3) run <code>expireSnapshots</code> to remove old snapshots, (4) run <code>remove_orphan_files</code> to delete the old small files from object storage.</p><p>Skipping step 4 means old small files accumulate in storage indefinitely \u2014 a common operational mistake that leads to unbounded storage cost growth. Proper automated maintenance must include all four steps in sequence.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "Compaction Snapshot Lifecycle",
+      "diagramCaption": "Figure 2: Compaction creates a new snapshot; old files remain until snapshot expiration and orphan cleanup."
+    },
+    {
+      "heading": "Dremio Automated Table Optimization",
+      "content": "<p><a href=\"dremio.html\">Dremio's</a> <strong>Automated Table Optimization</strong> (ATO) is Dremio's built-in, zero-configuration compaction and maintenance system for Apache Iceberg tables. ATO continuously monitors Iceberg tables for maintenance needs and automatically performs compaction, Z-ordering, and orphan file cleanup \u2014 without requiring manual DBA intervention or scheduled Spark jobs.</p><p>ATO makes the following decisions autonomously: which tables need compaction (based on file count and size distribution), what target file size to use, whether to apply sort ordering or Z-ordering, and when to expire old snapshots and remove orphan files. The results are committed as new Iceberg snapshots \u2014 non-blocking and safe for concurrent queries.</p><p>This is one of Dremio's most significant operational advantages over Spark-based lakehouse setups, where compaction requires explicitly scheduling and monitoring Spark compaction jobs, tuning their configuration, and ensuring they complete before query performance degrades."
+    },
+    {
+      "heading": "Compaction in Spark",
+      "content": "<p>For Spark-based lakehouses without Dremio's automated optimization, Iceberg provides the <code>RewriteDataFiles</code> action for programmatic compaction:</p><pre><code>from pyiceberg.expressions import always_true\ntable.rewrite_data_files(\n    strategy='binpack',  # or 'sort' or 'zorder'\n    sort_order=[SortField('customer_id')],\n    options={'target-file-size-bytes': str(512 * 1024 * 1024)}\n)</code></pre><p>In Spark SQL: <code>CALL catalog.system.rewrite_data_files(table => 'db.table', strategy => 'binpack')</code>. These operations must be explicitly scheduled \u2014 typically as nightly or weekly Spark jobs in Apache Airflow \u2014 and monitored to ensure they complete successfully before the next write cycle accumulates new small files."
+    },
+    {
+      "heading": "Compaction Best Practices",
+      "content": "<p>Effective compaction strategy requires tuning for specific workload patterns:</p><ul><li><strong>Target file size:</strong> 256MB\u2013512MB compressed Parquet is optimal for most analytical workloads. Smaller files increase metadata overhead; larger files reduce parallelism for fine-grained queries.</li><li><strong>Frequency:</strong> For streaming tables, compact at least daily (more frequently for very high-write-frequency tables). For batch tables, compact after each major load.</li><li><strong>Sort order:</strong> Apply sort-based compaction aligned with the most common query filter columns. A table frequently queried by <code>customer_id</code> benefits enormously from sort compaction on <code>customer_id</code>.</li><li><strong>Z-order for multi-dimensional queries:</strong> Use Z-ordering for tables queried with variable filter combinations across 2\u20134 high-cardinality columns.</li><li><strong>Automate everything:</strong> Manual compaction is operationally fragile. Use Dremio's ATO, or implement automated scheduling via Airflow with proper monitoring and alerting on compaction job failures.</li></ul>"
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Compaction is an essential operational practice for any production <a href=\"data-lakehouse.html\">data lakehouse</a> built on <a href=\"apache-iceberg.html\">Apache Iceberg</a>. Without regular compaction, tables accumulate small files that progressively degrade query performance and inflate storage costs. With proper compaction \u2014 combining file merging, sort ordering, and lifecycle cleanup \u2014 Iceberg tables maintain optimal performance indefinitely as data accumulates.</p><p><a href=\"dremio.html\">Dremio's</a> Automated Table Optimization handles all aspects of compaction automatically, making Dremio-managed lakehouse tables self-maintaining. For Spark-based pipelines, compaction must be explicitly scheduled and monitored \u2014 but Iceberg's non-blocking compaction model ensures that maintenance never disrupts concurrent analytical workloads.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format requiring compaction maintenance."
+    },
+    {
+      "slug": "iceberg-snapshots",
+      "term": "Iceberg Snapshots",
+      "category": "Table Formats",
+      "desc": "Compaction commits new snapshots non-destructively."
+    },
+    {
+      "slug": "merge-on-read",
+      "term": "Merge-on-Read",
+      "category": "Table Formats",
+      "desc": "MoR tables accumulate delete files that compaction cleans."
+    },
+    {
+      "slug": "z-ordering",
+      "term": "Z-Ordering",
+      "category": "Table Formats",
+      "desc": "Multi-dimensional clustering applied during compaction."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines",
+      "desc": "Automated Table Optimization handles compaction automatically."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture requiring regular compaction maintenance."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Core Concepts",
+      "desc": "Gold tables especially benefit from regular compaction."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines",
+      "desc": "Spark rewrite_data_files for manual compaction."
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "slug": "time-travel",
+  "term": "Time Travel",
+  "category": "Table Formats",
+  "metaTitle": "Time Travel in Apache Iceberg: The Definitive Guide",
+  "metaDescription": "Learn how Apache Iceberg time travel works, how to query historical snapshots by timestamp or snapshot ID, and practical use cases for time travel in the data lakehouse.",
+  "h1": "Time Travel in Apache Iceberg: The Definitive Guide",
+  "lede": "Time travel is the ability to query an Apache Iceberg table as it existed at any point in the past \u2014 by snapshot ID or timestamp. It enables data debugging, audit compliance, ML reproducibility, and accidental delete recovery without maintaining separate data copies.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is time travel in Apache Iceberg?",
+      "a": "Time travel in Apache Iceberg is the ability to query historical table states by referencing a specific snapshot ID or timestamp. Because every transaction creates a new immutable snapshot, the full table history is preserved and queryable. No separate data copies are needed."
+    },
+    {
+      "q": "How do I run a time travel query in Dremio?",
+      "a": "In Dremio: SELECT * FROM my_table AT SNAPSHOT '5234567890' \u2014 or \u2014 SELECT * FROM my_table AT TIMESTAMP '2026-01-01 00:00:00'. These queries return the table's data as it existed at that snapshot or at that point in time."
+    },
+    {
+      "q": "How long does Iceberg retain historical snapshots for time travel?",
+      "a": "By default indefinitely, but most production deployments configure snapshot expiration to retain 7\u201330 days of history. After expiration, older snapshots are removed and time travel to those points is no longer possible. Dremio automates this cleanup."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Time Travel?",
+      "content": "<p><strong>Time travel</strong> is the capability to query a table as it existed at a specific point in the past \u2014 returning exactly the rows, columns, and values that were present at that historical moment. Apache Iceberg provides time travel natively through its <a href=\"iceberg-snapshots.html\">snapshot model</a>: because every transaction creates a new immutable snapshot rather than overwriting the previous state, all historical snapshots remain accessible for querying.</p><p>Time travel is not a special-purpose feature built on top of Iceberg \u2014 it is a natural consequence of the snapshot architecture. The history exists because every write is atomic and non-destructive. Enabling time travel requires no additional configuration or storage beyond the standard Iceberg snapshot retention.</p><p>Compare this to traditional databases and data warehouses, where point-in-time recovery requires either continuous backup snapshots (expensive), log shipping (complex), or a separate audit table (application-level, fragile). In Iceberg, the historical record is built into the table format itself \u2014 no additional infrastructure required.</p>"
+    },
+    {
+      "heading": "Time Travel Query Syntax",
+      "content": "<p>Apache Iceberg defines two time travel query mechanisms, both supported natively in <a href=\"dremio.html\">Dremio</a>, Apache Spark, and Trino:</p><h3>By Snapshot ID</h3><p><code>SELECT * FROM my_table AT SNAPSHOT '5234567890123456'</code> \u2014 queries the table exactly as it existed in the specified snapshot. The snapshot ID is a 64-bit integer assigned at commit time. Snapshot IDs can be found in the table's history: <code>SELECT * FROM my_table$history</code> (Spark syntax) or via the catalog's metadata API.</p><h3>By Timestamp</h3><p><code>SELECT * FROM my_table AT TIMESTAMP '2026-01-01 00:00:00'</code> \u2014 queries the table as it existed at or before the specified timestamp. Iceberg selects the most recent snapshot committed at or before the specified time. This is the most commonly used form because timestamps are human-readable and don't require knowing specific snapshot IDs.</p><h3>Rollback</h3><p>Beyond querying, Iceberg also supports rollback \u2014 reverting the table's current snapshot to a historical one, effectively undoing all transactions after that point. In Dremio: <code>ALTER TABLE my_table ROLLBACK TO SNAPSHOT '5234567890'</code>. This is useful for recovering from an accidental DELETE or incorrect batch load.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "Iceberg Time Travel Query by Snapshot Timestamp",
+      "diagramCaption": "Figure 1: Iceberg time travel \u2014 query any historical snapshot by ID or timestamp with a single SQL clause."
+    },
+    {
+      "heading": "Time Travel Use Cases",
+      "content": "<p>Time travel enables a wide range of operational and analytical use cases:</p><h3>Data Quality Debugging</h3><p>When analysts report incorrect dashboard values after a pipeline run, time travel allows engineers to compare the table before and after the run: <code>SELECT count(*) FROM orders AT TIMESTAMP 'before_pipeline'</code> vs <code>SELECT count(*) FROM orders AT TIMESTAMP 'after_pipeline'</code>. This pinpoints exactly which records were added, changed, or deleted by the pipeline.</p><h3>Regulatory Audit</h3><p>Financial and healthcare regulations require the ability to reproduce exactly what data was used to generate a report on a specific date. With Iceberg time travel, a compliance engineer can query <code>SELECT * FROM customer_data AT TIMESTAMP '2026-03-31 23:59:59'</code> to see exactly what the customer table contained at quarter-end \u2014 without maintaining a separate audit copy.</p><h3>ML Experiment Reproducibility</h3><p>Recording the snapshot ID used for ML model training ensures that future retraining runs use exactly the same dataset. <code>SELECT * FROM features AT SNAPSHOT '...'</code> returns an identical dataset regardless of when it is run \u2014 essential for reproducible ML experiments.</p><h3>Accidental Delete Recovery</h3><p>If a DELETE statement removes important records accidentally, recovery is straightforward: query the pre-deletion snapshot to identify the deleted rows, then INSERT them back into the current table. <code>INSERT INTO my_table SELECT * FROM my_table AT TIMESTAMP 'before_delete' WHERE id IN (deleted_ids)</code>.</p>"
+    },
+    {
+      "heading": "Time Travel and Snapshot Retention",
+      "content": "<p>Time travel is only available for snapshots that have not been expired. The snapshot retention policy determines how far back time travel can go. Most production deployments configure a retention window of 7\u201330 days.</p><p>Iceberg's <code>expireSnapshots</code> operation removes snapshots older than a specified timestamp or older than N most recent snapshots, along with their associated orphaned data files. After expiration, querying the removed snapshots returns an error.</p><p>When setting retention policies, consider: how far back users need time travel (typically 7 days covers most debugging needs), how far back regulatory auditors may need to query (may require 90 days or longer), and storage cost (each historical snapshot retains any data files that are not referenced by current snapshots \u2014 old deleted data accumulates storage cost until expiry). <a href=\"dremio.html\">Dremio's</a> automated table optimization manages snapshot expiration based on configured retention policies.",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "Snapshot Retention and Time Travel Window",
+      "diagramCaption": "Figure 2: Snapshot retention policy defines the time travel window \u2014 expired snapshots are no longer queryable."
+    },
+    {
+      "heading": "Time Travel and the Medallion Architecture",
+      "content": "<p>Time travel is valuable at every layer of the <a href=\"medallion-architecture.html\">Medallion Architecture</a>:</p><ul><li><strong>Bronze:</strong> Query raw ingested data as of a specific date to debug source system changes. Reproduce the exact raw data used in a historical pipeline run.</li><li><strong>Silver:</strong> Compare the Silver table before and after a pipeline logic change to validate the new transformation. Recover individual records deleted during GDPR processing by querying a pre-deletion Silver snapshot.</li><li><strong>Gold:</strong> Reproduce the exact Gold data used for a quarterly report. Debug why a KPI changed by querying Gold as of two different dates and comparing the result.</li></ul>"
+    },
+    {
+      "heading": "Time Travel with Project Nessie Branches",
+      "content": "<p><a href=\"project-nessie.html\">Project Nessie</a> extends Iceberg's linear time travel model with branching semantics. In Nessie, each branch has its own independent snapshot history. Time travel within a Nessie branch queries historical snapshots on that branch specifically, not the main production branch.</p><p>This enables powerful data engineering workflows: creating an experiment branch, running a transformation, querying the experiment branch's history to validate results, and then merging to main if the results are correct. The experiment's history (and its time travel capability) is preserved on the branch indefinitely.</p>"
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Time travel is one of <a href=\"apache-iceberg.html\">Apache Iceberg's</a> most valuable operational features. As a natural consequence of the snapshot architecture, it provides the ability to query any historical table state \u2014 without separate data copies, backup infrastructure, or application-level audit tables. This capability transforms data debugging from a guessing game into a precise, reproducible operation, and makes regulatory compliance straightforward.</p><p><a href=\"dremio.html\">Dremio's</a> AT SNAPSHOT and AT TIMESTAMP SQL syntax makes time travel accessible to every analyst and data engineer \u2014 no Spark expertise required. Combined with Dremio's automated snapshot retention management, time travel in the data lakehouse is both powerful and operationally simple.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "iceberg-snapshots",
+      "term": "Iceberg Snapshots",
+      "category": "Table Formats",
+      "desc": "The mechanism enabling time travel in Apache Iceberg."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format providing time travel natively."
+    },
+    {
+      "slug": "acid-transactions",
+      "term": "ACID Transactions",
+      "category": "Core Concepts",
+      "desc": "Atomicity that makes every snapshot a valid time travel point."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines",
+      "desc": "SQL interface for AT SNAPSHOT and AT TIMESTAMP queries."
+    },
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs",
+      "desc": "Git-like branching extending Iceberg time travel."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Snapshot expiration during compaction affects time travel window."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Core Concepts",
+      "desc": "Time travel is valuable at every Medallion layer."
+    },
+    {
+      "slug": "data-quality",
+      "term": "Data Quality",
+      "category": "Governance",
+      "desc": "Time travel enables before/after data quality debugging."
+    }
+  ]
+}

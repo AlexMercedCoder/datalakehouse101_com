@@ -1,0 +1,73 @@
+{
+  "slug": "schema-evolution",
+  "term": "Schema Evolution",
+  "category": "Table Formats",
+  "metaTitle": "Schema Evolution in Apache Iceberg: The Definitive Guide",
+  "metaDescription": "Learn how Apache Iceberg schema evolution works, what changes are safe vs breaking, and how to evolve table schemas without data rewrites in your data lakehouse.",
+  "h1": "Schema Evolution in Apache Iceberg: The Definitive Guide",
+  "lede": "Schema evolution is Apache Iceberg's ability to safely change a table's structure — adding, dropping, or renaming columns — without rewriting data files or breaking existing queries. It is one of Iceberg's most practically valuable features for production data engineering.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    { "q": "What is schema evolution in Apache Iceberg?", "a": "Schema evolution in Apache Iceberg is the ability to modify a table's schema — adding, dropping, renaming, or widening column types — without rewriting existing data files. Iceberg tracks columns by stable integer IDs rather than names, ensuring backward compatibility even when columns are renamed or reordered." },
+    { "q": "Which schema changes are safe in Apache Iceberg?", "a": "Safe Iceberg schema changes include: adding a new nullable column, dropping a column, renaming a column, reordering columns, and widening numeric types (int to long, float to double). Breaking changes — type narrowing or adding NOT NULL to existing columns — are rejected." },
+    { "q": "Does schema evolution require rewriting data files?", "a": "No. Schema evolution in Apache Iceberg is a metadata-only operation. Only the table metadata JSON is updated; existing Parquet data files remain unchanged and are read correctly using the stable column ID system." }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Schema Evolution?",
+      "content": "<p><strong>Schema evolution</strong> is the ability to change a table's column definitions over time as business requirements change — adding new fields, dropping obsolete ones, renaming columns to align with updated terminology, or widening numeric types to accommodate larger values.</p><p>Without schema evolution support, every structural change to a table requires a complete data rewrite: reading all existing data and writing it in the new format. At petabyte scale, this is prohibitively expensive and introduces hours of pipeline downtime. <a href=\"apache-iceberg.html\">Apache Iceberg's</a> schema evolution model eliminates this cost entirely — schema changes are <strong>metadata-only operations</strong> that complete in milliseconds regardless of table size.</p><p>The foundation of Iceberg's schema evolution is <strong>column IDs</strong>: each column is assigned a unique, stable integer ID when first created. This ID never changes — not when the column is renamed, not when it is reordered. Data files store column data alongside these IDs. When a query engine reads an old file after a schema change, it matches columns by ID, not name, correctly interpreting data even if column names or positions have changed.</p><p>This makes Iceberg schema evolution genuinely safe: renaming a column in an Iceberg table does not risk misinterpreting old data as new column data — a failure mode common in simpler Hive-style name-based column tracking.</p>"
+    },
+    {
+      "heading": "Safe Schema Changes",
+      "content": "<p>Apache Iceberg supports the following backward-compatible schema changes without data rewrites:</p><h3>Add Column</h3><p>Adding a new nullable column. Old data files return null (or a specified default) for the new column. New files write the actual values. Executed with: <code>ALTER TABLE tbl ADD COLUMN col_name data_type</code>.</p><h3>Drop Column</h3><p>Removing a column from the schema. The column's ID is retired — data remains in old files but is invisible to queries. No rewrite needed. Storage is reclaimed only when old files are replaced during compaction.</p><h3>Rename Column</h3><p>Changing a column's name. The ID is unchanged; old files continue to work. Queries must use the new name after renaming. Executed with: <code>ALTER TABLE tbl ALTER COLUMN old_name RENAME TO new_name</code>.</p><h3>Reorder Columns</h3><p>Changing the display order of columns in the schema. The engine uses IDs to read columns from files regardless of order in the schema definition.</p><h3>Widen Column Type</h3><p>Expanding a numeric type — INT to LONG, FLOAT to DOUBLE — is safe because all existing values fit in the wider type. Type narrowing (LONG to INT) is rejected because it risks data loss.",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "Iceberg Schema Evolution Column IDs",
+      "diagramCaption": "Figure 1: Iceberg uses stable column IDs — renames only update metadata, leaving data files unchanged."
+    },
+    {
+      "heading": "Breaking Schema Changes",
+      "content": "<p>Some schema changes are not backward-compatible and are rejected by Iceberg:</p><h3>Type Narrowing</h3><p>Changing LONG to INT is rejected because existing long values may exceed int range. The correct approach: add a new column with the narrower type and backfill it from the old column.</p><h3>Changing Nullability to NOT NULL</h3><p>Existing data files may contain null values. Iceberg cannot retroactively enforce NOT NULL on historical files without a rewrite.</p><h3>Partition Column Changes</h3><p>Changing partition expressions requires <a href=\"partition-evolution.html\">partition evolution</a>, which is a separate Iceberg operation with its own semantics — not a schema change."
+    },
+    {
+      "heading": "Schema Evolution in the Medallion Architecture",
+      "content": "<p>Schema evolution is most frequently needed at the Bronze layer, where source system changes propagate into the lakehouse. When a production database adds a new column, the Bronze <a href=\"apache-iceberg.html\">Iceberg</a> table can be updated with a simple <code>ALTER TABLE</code> statement — no pipeline downtime, no data rewrite.</p><p>For example, when a CRM system adds a <code>customer_segment</code> field, the data engineer runs: <code>ALTER TABLE bronze.customers ADD COLUMN customer_segment STRING</code>. Historical Bronze records return null for this column; new records include the value. The Silver transformation handles the null for historical rows, and the Gold aggregation can conditionally include or exclude the new field.</p><p>This graceful handling of source schema changes is one of the most practical day-to-day benefits of Iceberg over the Hive Metastore model, where a new source column often required a full table recreation with a blocking pipeline downtime window.</p>"
+    },
+    {
+      "heading": "Schema Evolution in Dremio",
+      "content": "<p><a href=\"dremio.html\">Dremio</a> exposes Iceberg schema evolution through standard SQL DDL statements executed against any Iceberg table in the catalog:</p><ul><li><code>ALTER TABLE tbl ADD COLUMN col STRING</code></li><li><code>ALTER TABLE tbl DROP COLUMN col</code></li><li><code>ALTER TABLE tbl ALTER COLUMN old RENAME TO new</code></li><li><code>ALTER TABLE tbl ALTER COLUMN col TYPE BIGINT</code></li></ul><p>All operations are metadata-only and ACID-compliant — committed as new <a href=\"iceberg-snapshots.html\">Iceberg snapshots</a>. Other engines connected to the same catalog see the schema change immediately after the commit, without any cache invalidation required. Dremio's query planner correctly handles mixed-schema files — reading null for new columns from old files and actual values from new files — transparently.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "Schema Evolution Dremio SQL DDL",
+      "diagramCaption": "Figure 2: Schema evolution executed via SQL DDL in Dremio — committed as an Iceberg metadata snapshot."
+    },
+    {
+      "heading": "Schema Evolution with dbt",
+      "content": "<p><a href=\"dbt.html\">dbt</a> supports Iceberg schema evolution through its <code>on_schema_change</code> configuration on incremental models:</p><ul><li><code>ignore</code>: Do not modify the target table when schema changes</li><li><code>fail</code>: Fail the run on schema changes — for environments requiring review</li><li><code>append_new_columns</code>: Add new columns to the Iceberg target using ADD COLUMN (recommended for most cases)</li><li><code>sync_all_columns</code>: Add new and drop removed columns on each run</li></ul><p><code>append_new_columns</code> is the recommended production setting. When a dbt model's SELECT adds a new column, dbt issues a single <code>ALTER TABLE ADD COLUMN</code> DDL statement against the Iceberg table — triggering a metadata-only schema evolution — then runs the incremental query to populate the new column for new records only. Historical records return null for the new column, consistent with Iceberg's backward-compatible add column semantics."
+    },
+    {
+      "heading": "Multi-Engine Schema Evolution",
+      "content": "<p>One of Iceberg's key advantages is that schema evolution is consistent across all engines. When Dremio renames a column, Spark, Trino, and Flink immediately see the rename through the catalog. No engine-specific cache invalidation or configuration change is required.</p><p>This is because all engines share the same catalog and read the same table metadata file. The catalog serves as the single source of truth for the current schema. All engines read the current schema version from the metadata before planning queries — ensuring that after a schema change, every subsequent query from any engine sees the new schema.</p><p>Compare this to schema management in the Hive Metastore, where each engine might cache schema definitions locally and cache invalidation across multiple engines required manual coordination. Iceberg's centralized, catalog-driven schema management is a significant operational simplification for multi-engine lakehouse deployments."
+    },
+    {
+      "heading": "Nested Type Schema Evolution",
+      "content": "<p>Schema evolution in Apache Iceberg applies not just to top-level columns but also to nested types: structs, maps, and lists. This capability is important for tables that store semi-structured data as nested columns.</p><h3>Struct Evolution</h3><p>Columns with struct types can have their sub-fields added, dropped, or renamed using the same column ID mechanism. Sub-fields within a struct are also assigned unique IDs. This means a deeply nested struct field can be renamed without any data rewrite.</p><h3>Map Evolution</h3><p>The value type of a map column can be widened. Adding fields to a map value struct follows the same rules as top-level struct evolution.</p><h3>List Evolution</h3><p>The element type of a list column can be widened. For lists of structs, the struct's fields can be evolved following struct evolution rules.</p><p>Nested type evolution is particularly valuable for tables ingesting JSON or Avro data with deeply nested schemas — a common pattern in event-driven architectures where event payloads evolve frequently."
+    },
+    {
+      "heading": "Schema Evolution Best Practices",
+      "content": "<p>Managing schema evolution in production requires both technical correctness and organizational process:</p><ul><li><strong>Never reference columns by position.</strong> Always use column names (which map to stable IDs) in queries and application code. Positional column references break when columns are reordered.</li><li><strong>Communicate renames in advance.</strong> A column rename is a breaking change for existing queries referencing the old name. Provide 30 days notice to downstream query owners, or use a dual-column transition (add new, deprecate old, then drop old).</li><li><strong>Keep a schema change log.</strong> Document every schema change with the date, justification, and approver. This log is essential for debugging historical data issues.</li><li><strong>Test schema changes on a branch.</strong> Use <a href=\"project-nessie.html\">Nessie branches</a> to apply schema changes to a staging branch and validate downstream pipelines before promoting to the main production branch.</li><li><strong>Prefer adding over modifying.</strong> Adding a new column is always safer than modifying an existing one. When business logic changes how a field should be computed, add a new column rather than changing the semantics of the existing one.</li></ul>"
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Schema evolution is one of <a href=\"apache-iceberg.html\">Apache Iceberg's</a> most practically valuable features. By tracking columns with stable integer IDs and implementing schema changes as metadata-only operations, Iceberg allows data teams to evolve their schemas freely — in response to source system changes, business requirement updates, or organizational terminology shifts — without the operational disruption and cost of data file rewrites.</p><p>The combination of schema evolution, <a href=\"partition-evolution.html\">partition evolution</a>, and <a href=\"time-travel.html\">time travel</a> makes the <a href=\"data-lakehouse.html\">data lakehouse</a> a genuinely adaptive platform that can evolve with real-world data engineering needs. <a href=\"dremio.html\">Dremio's</a> SQL DDL interface makes schema evolution accessible to any data practitioner without requiring Spark or deep Iceberg expertise.</p>"
+    }
+  ],
+  "related": [
+    { "slug": "apache-iceberg", "term": "Apache Iceberg", "category": "Table Formats", "desc": "The table format providing safe schema evolution." },
+    { "slug": "partition-evolution", "term": "Partition Evolution", "category": "Table Formats", "desc": "Changing partitioning without data rewrites." },
+    { "slug": "iceberg-snapshots", "term": "Iceberg Snapshots", "category": "Table Formats", "desc": "Schema changes committed as Iceberg snapshots." },
+    { "slug": "dremio", "term": "Dremio", "category": "Query Engines", "desc": "SQL DDL interface for Iceberg schema evolution." },
+    { "slug": "dbt", "term": "dbt", "category": "Ingestion & Streaming", "desc": "on_schema_change behavior for evolving dbt Iceberg models." },
+    { "slug": "project-nessie", "term": "Project Nessie", "category": "Catalogs", "desc": "Branching for safe schema change testing." },
+    { "slug": "data-quality", "term": "Data Quality", "category": "Governance", "desc": "Schema drift and its impact on data quality." },
+    { "slug": "medallion-architecture", "term": "Medallion Architecture", "category": "Core Concepts", "desc": "Where schema evolution is most frequently exercised." }
+  ]
+}

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iceberg Manifest Files: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Apache Iceberg manifest files are, how they store file-level statistics for data skipping, and how the manifest tree enables efficient query planning at petabyte scale.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/iceberg-manifest-files.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Iceberg Manifest Files: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Apache Iceberg manifest files are, how they store file-level statistics for data skipping, and how the manifest tree enables efficient query planning at petabyte scale.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/iceberg-manifest-files.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Iceberg Manifest Files: The Definitive Guide",
+      "description": "Learn what Apache Iceberg manifest files are, how they store file-level statistics for data skipping, and how the manifest tree enables efficient query planning at petabyte scale.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/iceberg-manifest-files.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Iceberg Manifest Files", "item": "https://datalakehouse101.com/knowledge/iceberg-manifest-files.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is an Iceberg manifest file?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An Iceberg manifest file is an Avro file that lists the data files (or delete files) belonging to a specific table snapshot, along with each file's partition values and column-level statistics (min/max per column, null count, row count). Manifest files are the primary mechanism for partition pruning and data skipping in Apache Iceberg."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between a manifest file and a manifest list?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A manifest file lists individual data files and their statistics. A manifest list (snapshot file) groups together all the manifest files belonging to a specific snapshot. The hierarchy is: Snapshot → Manifest List → Manifest Files → Data Files."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do manifest files enable data skipping?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each manifest file records per-file statistics: the min and max value for each column in each data file. At query time, the engine reads manifest files and skips any data file whose min-max range for a queried column does not overlap with the query's filter predicate — avoiding all I/O for those files."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Iceberg Manifest Files</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Table Formats</span>
+      <h1>Iceberg Manifest Files: The Definitive Guide</h1>
+      <p class="hero-lede">Iceberg manifest files are the metadata layer between table snapshots and actual data files. Each manifest file tracks thousands of data files, their partition values, and their column-level statistics — enabling query engines to skip irrelevant files before reading a single byte of data.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Are Iceberg Manifest Files?</a></li>
+        <li><a href="#section-2">Manifest File Structure</a></li>
+        <li><a href="#section-3">Manifest Lists vs. Manifest Files</a></li>
+        <li><a href="#section-4">How Iceberg Reuses Manifests</a></li>
+        <li><a href="#section-5">Manifest File Compaction</a></li>
+        <li><a href="#section-6">Manifest Files and Data Skipping Effectiveness</a></li>
+        <li><a href="#section-7">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Are Iceberg Manifest Files?</h2>
+        <p><strong>Iceberg manifest files</strong> are Avro files that form the middle layer of Apache Iceberg's three-level metadata tree, sitting between the manifest list (snapshot) at the top and the actual data files at the bottom. Each manifest file tracks a subset of the table's data files — listing their storage locations, partition values, and per-column statistics.</p><p>Manifest files are the primary mechanism for two of Iceberg's most important query optimization capabilities: <strong>partition pruning</strong> (skipping entire groups of data files based on partition values) and <strong>data skipping</strong> (skipping individual data files based on column-level min/max statistics).</p><p>At query time, the engine reads the manifest list to get the list of all manifests, then reads the manifests to get the list of data files — but it applies pruning at both levels: first eliminating manifests whose partition summary statistics show no relevant data, then eliminating individual data files within remaining manifests whose per-file statistics show no relevant rows. Only after this two-level pruning does the engine read actual data files.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Manifest File Structure</h2>
+        <p>Each record in a manifest file represents one data file or delete file and contains:</p><ul><li><strong>file_path:</strong> The full S3/ADLS/GCS URL of the data file</li><li><strong>file_format:</strong> The format of the data file (PARQUET, ORC, AVRO)</li><li><strong>partition:</strong> The partition values for this file, encoded according to the table's partition spec</li><li><strong>record_count:</strong> The number of rows in the file</li><li><strong>file_size_in_bytes:</strong> The file's size in bytes</li><li><strong>column_sizes:</strong> Per-column storage sizes (for projection optimization)</li><li><strong>value_counts:</strong> Per-column non-null value counts</li><li><strong>null_value_counts:</strong> Per-column null value counts</li><li><strong>lower_bounds:</strong> Per-column minimum values (encoded in binary format)</li><li><strong>upper_bounds:</strong> Per-column maximum values (encoded in binary format)</li></ul><p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields — the per-column min/max statistics — are the data that enables aggressive data skipping. A file whose <code>upper_bounds[customer_id]</code> is less than the filter predicate's value can be skipped entirely. A file whose <code>lower_bounds[event_date]</code> is after the query's date range can be skipped. These binary-encoded statistics are evaluated extremely quickly — the engine eliminates irrelevant files without touching their contents.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-1.png" alt="Iceberg Manifest File Structure diagram" loading="lazy"><figcaption>Figure 1: Manifest file contents — file location, partition values, and column-level statistics for data skipping.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Manifest Lists vs. Manifest Files</h2>
+        <p>The distinction between manifest lists and manifest files is a frequent source of confusion:</p><table class="comparison-table"><thead><tr><th>Attribute</th><th>Manifest List</th><th>Manifest File</th></tr></thead><tbody><tr><td>Also called</td><td>Snapshot file</td><td>Manifest</td></tr><tr><td>Format</td><td>Avro</td><td>Avro</td></tr><tr><td>Lists</td><td>Manifest files (one per entry)</td><td>Data/delete files (thousands per file)</td></tr><tr><td>Statistics</td><td>Partition-level summaries across all manifests</td><td>Per-file column statistics</td></tr><tr><td>Created by</td><td>Each committed transaction</td><td>Each batch of new data files</td></tr><tr><td>Reused across snapshots?</td><td>No (new manifest list per snapshot)</td><td>Yes (unchanged manifests reused)</td></tr></tbody></table><p>The manifest list contains partition-level summary statistics for each manifest it references — these are used for the first level of pruning (eliminating entire manifests). The manifest files contain per-file statistics — used for the second level of pruning within a manifest.
+        
+      </section>
+
+      <section id="section-4">
+        <h2>How Iceberg Reuses Manifests</h2>
+        <p>One of Iceberg's most important performance optimizations is <strong>manifest reuse</strong>: when a transaction adds data to only some partitions, the manifests for unchanged partitions are reused in the new snapshot — not copied or rewritten.</p><p>For example: a table with 1000 manifest files covering 1 million data files. A new INSERT adds 100 new files to 5 partitions. Iceberg creates 5 new small manifest files (one per new partition batch) and commits a new snapshot that references those 5 new manifests PLUS the 995 unchanged old manifests. The 995 unchanged manifests are not touched — they are simply referenced by the new snapshot's manifest list.</p><p>This reuse property makes Iceberg's snapshot commits fast and cheap even for very large tables: committing a new snapshot requires writing only the new manifests (for the changed partitions) and a new manifest list — not reading or writing all existing manifests.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/apache-iceberg-diagram-2.png" alt="Manifest Reuse Across Snapshots diagram" loading="lazy"><figcaption>Figure 2: Unchanged manifests are reused across snapshots — only new manifests are written per transaction.</figcaption></figure>
+      </section>
+
+      <section id="section-5">
+        <h2>Manifest File Compaction</h2>
+        <p>Over time, a table accumulates many small manifest files — particularly if data is added in many small batches. Many small manifests slow down query planning (the engine must read each manifest separately) and metadata management.</p><p>Iceberg's <code>rewriteManifests</code> operation consolidates small manifest files into fewer, larger manifests while preserving all the file-level statistics. After rewriting, the engine reads fewer manifest files per query, reducing query planning latency. In Dremio, manifest rewriting is part of the automated table optimization — it runs automatically when manifest count exceeds configured thresholds.
+        
+      </section>
+
+      <section id="section-6">
+        <h2>Manifest Files and Data Skipping Effectiveness</h2>
+        <p>The effectiveness of manifest file-based data skipping depends on the correlation between the queried columns and the physical data layout. When rows with similar column values are co-located in the same files (via <a href="z-ordering.html">Z-ordering</a> or sort ordering), the per-file min-max statistics are narrow — the engine can skip most files. When rows are randomly distributed across files, min-max statistics span wide ranges, and few files can be skipped.</p><p>This is why <a href="compaction.html">compaction</a> with sort ordering or Z-ordering is so important: it creates data files with narrow, well-targeted min-max statistics. Manifest files faithfully record these statistics, enabling query engines to leverage the sorted layout for aggressive pruning.
+        
+      </section>
+
+      <section id="section-7">
+        <h2>Summary</h2>
+        <p>Iceberg manifest files are the metadata layer that makes petabyte-scale query performance possible in the <a href="data-lakehouse.html">data lakehouse</a>. By recording per-file column statistics for millions of data files, manifests enable a two-level pruning hierarchy that eliminates the vast majority of storage reads before any data is accessed. Manifest reuse across snapshots makes transaction commits fast; manifest compaction keeps query planning efficient as tables grow. Understanding manifest files is key to understanding why well-maintained Iceberg tables can answer queries in seconds over petabytes of data.
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format using manifest files for metadata.</span>
+    </a>
+      <a class="related-card" href="iceberg-snapshots.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg Snapshots</span>
+      <span class="related-desc">Snapshots reference manifest lists which reference manifests.</span>
+    </a>
+      <a class="related-card" href="data-skipping.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Data Skipping</span>
+      <span class="related-desc">The query optimization enabled by manifest file statistics.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Manifest rewriting as part of table maintenance.</span>
+    </a>
+      <a class="related-card" href="z-ordering.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Z-Ordering</span>
+      <span class="related-desc">Makes manifest file statistics narrow and effective.</span>
+    </a>
+      <a class="related-card" href="hidden-partitioning.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Hidden Partitioning</span>
+      <span class="related-desc">Partition values stored in manifests for pruning.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Reads manifest files for aggressive query optimization.</span>
+    </a>
+      <a class="related-card" href="apache-parquet.html">
+      <span class="related-label">Storage</span>
+      <span class="related-term">Apache Parquet</span>
+      <span class="related-desc">The data files referenced by manifest file entries.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

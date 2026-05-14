@@ -1,0 +1,110 @@
+{
+  "slug": "iceberg-rest-catalog",
+  "term": "Iceberg REST Catalog",
+  "category": "Table Formats",
+  "metaTitle": "Iceberg REST Catalog: The Definitive Guide",
+  "metaDescription": "Learn what the Apache Iceberg REST Catalog specification is, how it enables multi-engine catalog interoperability, and which implementations power modern data lakehouses.",
+  "h1": "Iceberg REST Catalog: The Definitive Guide",
+  "lede": "The Iceberg REST Catalog specification defines a standard HTTP API for catalog operations \u2014 table discovery, metadata loading, and transaction commits. Any engine implementing the client and any catalog implementing the server can interoperate seamlessly, making it the foundation of the open lakehouse ecosystem.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the Iceberg REST Catalog?",
+      "a": "The Iceberg REST Catalog is an open HTTP API specification that defines standard endpoints for catalog operations: creating namespaces and tables, loading table metadata, committing transactions, and managing access tokens. Any query engine implementing the REST catalog client can connect to any catalog implementing the REST catalog server."
+    },
+    {
+      "q": "Which catalogs implement the Iceberg REST Catalog spec?",
+      "a": "Major implementations include Apache Polaris (donated by Snowflake, now ASF), Project Nessie (Dremio's Git-like catalog), AWS Glue (native REST API), Tabular (acquired by Databricks), and several cloud providers' managed catalog services."
+    },
+    {
+      "q": "Why is the Iceberg REST Catalog important for the data lakehouse?",
+      "a": "The REST Catalog specification creates a true plug-and-play catalog ecosystem: organizations can switch catalog backends without changing query engine configuration, and query engines can connect to any compliant catalog without engine-specific plugins. This interoperability reduces vendor lock-in at the catalog layer."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the Iceberg REST Catalog?",
+      "content": "<p>The <strong>Iceberg REST Catalog</strong> (officially the Apache Iceberg REST Catalog API) is an open HTTP API specification published by the Apache Iceberg project that defines the standard interface between query engines and catalog services. It specifies the exact HTTP endpoints, request/response schemas, and authentication flows that catalog implementations must provide and that query engine clients must consume.</p><p>Before the REST catalog specification, each query engine had its own catalog integration layer: Spark used the HiveCatalog or its own SparkCatalog, Trino used its own MetaStore connector, Presto had its own implementations. Connecting a new engine to a new catalog required writing and maintaining an engine-specific catalog plugin \u2014 a significant engineering burden that slowed ecosystem growth and created fragmentation.</p><p>The REST catalog eliminates this fragmentation. Any engine that implements the REST catalog client can connect to any catalog that implements the REST catalog server \u2014 with no engine-specific plugins required. The catalog API becomes a commodity interface, and competition shifts from catalog protocols to catalog features (governance, performance, durability, multi-tenancy)."
+    },
+    {
+      "heading": "REST Catalog API Endpoints",
+      "content": "<p>The Iceberg REST Catalog specification defines endpoints across three functional areas:</p><h3>Namespace Management</h3><ul><li><code>GET /v1/namespaces</code> \u2014 list all namespaces (schemas)</li><li><code>POST /v1/namespaces</code> \u2014 create a new namespace</li><li><code>GET /v1/namespaces/{namespace}</code> \u2014 get namespace metadata</li><li><code>DELETE /v1/namespaces/{namespace}</code> \u2014 drop a namespace</li></ul><h3>Table Management</h3><ul><li><code>GET /v1/namespaces/{namespace}/tables</code> \u2014 list tables in a namespace</li><li><code>POST /v1/namespaces/{namespace}/tables</code> \u2014 create a table</li><li><code>GET /v1/namespaces/{namespace}/tables/{table}</code> \u2014 load table metadata (returns current metadata file location)</li><li><code>DELETE /v1/namespaces/{namespace}/tables/{table}</code> \u2014 drop a table</li><li><code>POST /v1/namespaces/{namespace}/tables/{table}/rename</code> \u2014 rename a table</li></ul><h3>Transaction Commits</h3><ul><li><code>POST /v1/namespaces/{namespace}/tables/{table}/metrics</code> \u2014 report query metrics</li><li><code>POST /v1/transactions/commit</code> \u2014 atomic multi-table transaction commit</li></ul><p>The load table endpoint is the most critical: it returns the current metadata file location and storage credentials for the table, which the engine uses to read the complete Iceberg metadata tree and then access the actual data files.",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "Iceberg REST Catalog API Architecture",
+      "diagramCaption": "Figure 1: The REST Catalog API \u2014 any compliant engine connects to any compliant catalog via standard HTTP."
+    },
+    {
+      "heading": "Authentication and Authorization",
+      "content": "<p>The Iceberg REST Catalog specification includes an OAuth2-based authentication flow. Clients obtain bearer tokens from the catalog's token endpoint and include them in all subsequent API requests. The catalog authenticates the token and enforces authorization policies \u2014 determining which namespaces and tables the authenticated identity can access.</p><p>This standardized auth model enables fine-grained, catalog-enforced access control: only principals with the appropriate grants can create tables, load metadata, or commit transactions against specific namespaces. The security model is enforced at the catalog API layer \u2014 not in the query engine \u2014 ensuring consistent enforcement regardless of which engine is connecting."
+    },
+    {
+      "heading": "Major REST Catalog Implementations",
+      "content": "<p>The REST catalog spec has attracted implementations from across the ecosystem:</p><h3>Apache Polaris</h3><p>Donated to the Apache Software Foundation by Snowflake in 2024, <a href=\"apache-polaris.html\">Apache Polaris</a> is the community-governed reference implementation of the REST catalog spec. It provides namespace management, table registration, RBAC access control, and credential vending for S3/ADLS/GCS. Polaris is the primary catalog for organizations seeking a fully open, vendor-neutral catalog.</p><h3>Project Nessie</h3><p><a href=\"project-nessie.html\">Project Nessie</a>, developed by Dremio, extends the REST catalog spec with Git-like branching and tagging semantics. It powers Dremio's Open Catalog and enables advanced data engineering workflows: isolated branches for experimentation, tagged releases for reproducible ML training, and atomic cross-table commits via branches.</p><h3>AWS Glue</h3><p>AWS Glue Data Catalog now exposes a REST catalog API, making it a drop-in catalog for any Iceberg-compatible engine running on AWS. Glue's catalog is serverless and integrates natively with S3, IAM, Lake Formation, and Athena.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "Iceberg REST Catalog Implementations Ecosystem",
+      "diagramCaption": "Figure 2: Major REST Catalog implementations \u2014 Polaris, Nessie, Glue, and others all implementing the same API."
+    },
+    {
+      "heading": "Credential Vending",
+      "content": "<p>A critical feature of the REST catalog that distinguishes it from the Hive Metastore model is <strong>credential vending</strong>: the catalog returns temporary, short-lived cloud storage credentials alongside table metadata when an engine loads a table. These credentials scope the engine's storage access to only the files needed for the requested operation.</p><p>Without credential vending, engines need broad, long-lived storage credentials to access all data in the lake \u2014 a significant security risk. With vended credentials, the catalog can enforce fine-grained, per-request storage access control: engines get temporary S3 credentials scoped to the specific S3 prefix of the table they requested, expiring after a short window. This makes the REST catalog a security enforcement point, not just a metadata directory."
+    },
+    {
+      "heading": "REST Catalog and Multi-Engine Lakehouses",
+      "content": "<p>The REST catalog specification is the technical foundation of the multi-engine lakehouse. When <a href=\"dremio.html\">Dremio</a>, Apache Spark, Trino, and Apache Flink all connect to the same REST catalog (e.g., Apache Polaris), they share a single metadata namespace: table schemas, partition specs, snapshot history, and access control policies are defined once and enforced consistently across all engines. A table created by Spark is immediately queryable by Dremio; a schema change committed by Dremio is immediately visible to Trino \u2014 all through the shared REST catalog."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The Iceberg REST Catalog specification is the catalog interoperability standard for the open lakehouse ecosystem. By defining a common HTTP API for catalog operations, it eliminates engine-specific catalog integrations, creates plug-and-play interoperability between catalog implementations and query engines, and enables fine-grained security through credential vending. Together with <a href=\"apache-iceberg.html\">Apache Iceberg's</a> table format specification, the REST Catalog spec forms the two-layer standard that makes the truly open, multi-engine <a href=\"data-lakehouse.html\">data lakehouse</a> a reality."
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs",
+      "desc": "The ASF-governed REST Catalog reference implementation."
+    },
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs",
+      "desc": "Git-like REST Catalog with branching semantics."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format the REST Catalog was designed for."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines",
+      "desc": "Provides REST Catalog via Dremio Open Catalog."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The architecture enabled by REST Catalog interoperability."
+    },
+    {
+      "slug": "multi-engine-interoperability",
+      "term": "Multi-Engine Interoperability",
+      "category": "Analytics & BI",
+      "desc": "The benefit the REST Catalog enables."
+    },
+    {
+      "slug": "rbac",
+      "term": "Role-Based Access Control",
+      "category": "Governance",
+      "desc": "Security enforced via the REST Catalog auth layer."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "REST Catalog coordinates access in decoupled architectures."
+    }
+  ]
+}

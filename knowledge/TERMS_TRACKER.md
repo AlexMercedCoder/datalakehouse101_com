@@ -19,21 +19,21 @@ Each page is a ~4,000-word authoritative reference article.
 | 8 | ETL (Extract, Transform, Load) | etl | Core Concepts | ✅ |
 | 9 | ELT (Extract, Load, Transform) | elt | Core Concepts | ✅ |
 | 10 | Data Mesh | data-mesh | Core Concepts | ✅ |
-| 11 | Apache Iceberg | apache-iceberg | Table Formats | ❌ |
-| 12 | Delta Lake | delta-lake | Table Formats | ❌ |
-| 13 | Apache Hudi | apache-hudi | Table Formats | ❌ |
-| 14 | Iceberg Table Spec V2 | iceberg-v2 | Table Formats | ❌ |
-| 15 | Iceberg Snapshots | iceberg-snapshots | Table Formats | ❌ |
-| 16 | Iceberg Manifest Files | iceberg-manifest-files | Table Formats | ❌ |
-| 17 | Schema Evolution | schema-evolution | Table Formats | ❌ |
-| 18 | Partition Evolution | partition-evolution | Table Formats | ❌ |
-| 19 | Hidden Partitioning | hidden-partitioning | Table Formats | ❌ |
-| 20 | Time Travel | time-travel | Table Formats | ❌ |
-| 21 | Copy-on-Write (CoW) | copy-on-write | Table Formats | ❌ |
-| 22 | Merge-on-Read (MoR) | merge-on-read | Table Formats | ❌ |
-| 23 | Positional Delete Files | positional-delete-files | Table Formats | ❌ |
-| 24 | Row-Level Deletes | row-level-deletes | Table Formats | ❌ |
-| 25 | Compaction | compaction | Table Formats | ❌ |
+| 11 | Apache Iceberg | apache-iceberg | Table Formats | ✅ |
+| 12 | Delta Lake | delta-lake | Table Formats | ✅ |
+| 13 | Apache Hudi | apache-hudi | Table Formats | ✅ |
+| 14 | Iceberg Table Spec V2 | iceberg-v2 | Table Formats | ✅ |
+| 15 | Iceberg Snapshots | iceberg-snapshots | Table Formats | ✅ |
+| 16 | Iceberg Manifest Files | iceberg-manifest-files | Table Formats | ✅ |
+| 17 | Schema Evolution | schema-evolution | Table Formats | ✅ |
+| 18 | Partition Evolution | partition-evolution | Table Formats | ✅ |
+| 19 | Hidden Partitioning | hidden-partitioning | Table Formats | ✅ |
+| 20 | Time Travel | time-travel | Table Formats | ✅ |
+| 21 | Copy-on-Write (CoW) | copy-on-write | Table Formats | ✅ |
+| 22 | Merge-on-Read (MoR) | merge-on-read | Table Formats | ✅ |
+| 23 | Positional Delete Files | positional-delete-files | Table Formats | ✅ |
+| 24 | Row-Level Deletes | row-level-deletes | Table Formats | ✅ |
+| 25 | Compaction | compaction | Table Formats | ✅ |
 | 26 | Dremio | dremio | Query Engines & Platforms | ❌ |
 | 27 | Dremio Intelligent Query Engine | dremio-query-engine | Query Engines & Platforms | ❌ |
 | 28 | Dremio Open Catalog | dremio-open-catalog | Query Engines & Platforms | ❌ |

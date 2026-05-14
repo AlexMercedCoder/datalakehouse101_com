@@ -1,0 +1,110 @@
+{
+  "slug": "row-level-deletes",
+  "term": "Row-Level Deletes",
+  "category": "Table Formats",
+  "metaTitle": "Row-Level Deletes in Apache Iceberg: The Definitive Guide",
+  "metaDescription": "Learn how row-level deletes work in Apache Iceberg V2, the difference between positional and equality delete files, and practical use cases like GDPR erasure and CDC upserts.",
+  "h1": "Row-Level Deletes in Apache Iceberg: The Definitive Guide",
+  "lede": "Row-level deletes in Apache Iceberg V2 enable precise, targeted record removal without rewriting entire data partitions. Using positional and equality delete files, Iceberg supports efficient GDPR erasure, CDC upsert pipelines, and SCD type 2 implementations at lakehouse scale.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "How does Apache Iceberg implement row-level deletes?",
+      "a": "Apache Iceberg V2 implements row-level deletes using delete files \u2014 auxiliary Avro files that identify rows to be excluded from query results. Positional delete files identify rows by file path and row position; equality delete files identify rows by column value matches. The query engine applies delete files at read time to filter out deleted rows."
+    },
+    {
+      "q": "What is the difference between positional and equality delete files?",
+      "a": "Positional delete files record the exact file path and row offset position of each deleted row. Equality delete files record the column values (like a primary key) that identify rows to delete. Positional deletes are more precise and efficient for sparse random deletes; equality deletes are more natural for CDC upserts using natural keys."
+    },
+    {
+      "q": "Can I use row-level deletes for GDPR right-to-erasure?",
+      "a": "Yes. Iceberg's row-level delete capability is the recommended approach for GDPR right-to-erasure in the lakehouse. An equality delete file targeting a customer's identifier removes their records from all query results immediately. Full physical deletion requires also expiring historical snapshots and removing orphaned files, but query-visible deletion is immediate."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Are Row-Level Deletes?",
+      "content": "<p><strong>Row-level deletes</strong> in <a href=\"apache-iceberg.html\">Apache Iceberg</a> are the capability to remove specific rows from a table without rewriting entire data files. Introduced in the Iceberg V2 specification, row-level deletes use <strong>delete files</strong> \u2014 auxiliary Avro files that identify rows to be excluded from query results \u2014 to implement DELETE and UPDATE operations with minimal write amplification.</p><p>Before Iceberg V2 (and in Copy-on-Write mode), deleting rows required reading the entire affected partition file and rewriting it without the deleted rows \u2014 expensive for large files with few deletions. With V2 delete files, a DELETE that removes 100 rows from a 500MB file requires writing only a tiny delete file (a few kilobytes) rather than rewriting 500MB of data. The actual data file remains unchanged; the delete file tells the query engine which rows to exclude at read time.</p><p>Row-level deletes are essential for several critical data engineering use cases: GDPR and CCPA right-to-erasure, CDC upsert pipelines, SCD type 2 (Slowly Changing Dimensions) implementations, and data correction workflows where specific erroneous records must be removed."
+    },
+    {
+      "heading": "Positional Delete Files",
+      "content": "<p><strong>Positional delete files</strong> are Avro files where each record specifies the exact location of a deleted row: a file path (the S3 URL of the data file containing the deleted row) and a row position offset (the zero-indexed row number within that file).</p><p>When a query engine reads a data file, it checks for associated positional delete files. For each row read, it checks whether that row's file path + position appears in any delete file. If it does, the row is skipped. If not, the row is included in the result.</p><p>Positional deletes are created by the query engine during UPDATE and DELETE operations when the Merge-on-Read write mode is active. Because they identify rows by physical position in a specific file, they are tightly coupled to the current data file layout \u2014 if the data file is rewritten (by compaction), the positional delete file becomes stale and must be discarded (or the compaction must apply the deletes as part of the rewrite).",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "Positional Delete Files Row Level Deletes",
+      "diagramCaption": "Figure 1: Positional delete files record file path + row position, filtering deleted rows at query time."
+    },
+    {
+      "heading": "Equality Delete Files",
+      "content": "<p><strong>Equality delete files</strong> are Avro files where each record specifies column values that identify rows to delete. For example, an equality delete file for a customer GDPR erasure might contain: <code>{customer_id: 'abc123'}</code>. Any row in any data file where <code>customer_id = 'abc123'</code> is excluded from query results.</p><p>Equality deletes are more flexible than positional deletes because they are not tied to the physical file layout \u2014 they work correctly even if data files are rewritten by compaction. However, evaluating equality deletes requires comparing each queried row's column values against the delete file's predicates, which is more computationally expensive than checking a position index.</p><p>Equality deletes are the natural mechanism for CDC MERGE INTO operations: when a source system deletes a customer record, the CDC event carries the customer's primary key. An equality delete file records this key, and all historical appearances of that customer record across all data files are immediately excluded from queries."
+    },
+    {
+      "heading": "GDPR Right-to-Erasure with Iceberg Row-Level Deletes",
+      "content": "<p>GDPR Article 17 requires the ability to erase all data relating to an individual upon their request. In a traditional data lake without row-level deletes, GDPR erasure requires identifying every file containing the customer's data and rewriting each one without their records \u2014 a full-table scan and rewrite operation that can take hours for large tables.</p><p>With Iceberg V2 equality delete files, GDPR erasure is a two-step process:</p><ol><li><strong>Logical deletion (immediate):</strong> Write an equality delete file specifying <code>{customer_id: 'erased_customer_id'}</code>. From this moment, no query against the table will return any records for that customer \u2014 the equality delete applies across all historical data files instantaneously.</li><li><strong>Physical deletion (scheduled):</strong> Over the next retention window, scheduled compaction rewrites all data files, applying the equality delete and physically removing the customer's rows from the Parquet files. After snapshot expiration and orphan file cleanup, no physical trace of the customer's data remains in storage.</li></ol><p>This two-phase approach allows immediate GDPR compliance (query-visible deletion) while deferring the expensive physical rewrite to a scheduled background process.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "GDPR Erasure with Iceberg Row Level Deletes",
+      "diagramCaption": "Figure 2: GDPR erasure \u2014 equality delete files provide immediate query-visible deletion, compaction provides physical removal."
+    },
+    {
+      "heading": "Row-Level Deletes in CDC Pipelines",
+      "content": "<p>Row-level deletes are the foundation of <a href=\"change-data-capture.html\">CDC</a> upsert pipelines in the Iceberg lakehouse. A MERGE INTO operation \u2014 the SQL expression of a CDC upsert \u2014 produces different write operations depending on the match condition:</p><ul><li><strong>WHEN MATCHED THEN UPDATE:</strong> Writes an equality delete file for the matched rows (removing the old version) + a new data file with the updated row (inserting the new version)</li><li><strong>WHEN MATCHED THEN DELETE:</strong> Writes an equality delete file for the matched rows</li><li><strong>WHEN NOT MATCHED THEN INSERT:</strong> Writes a new data file with the inserted row (no delete file needed)</li></ul><p>The combination of equality delete files (removing old versions) and new data file appends (adding new versions) provides the full MERGE INTO semantics with minimal write amplification. For <a href=\"dremio.html\">Dremio</a>, MERGE INTO against Iceberg tables in MoR mode is the standard pattern for CDC Silver layer implementations."
+    },
+    {
+      "heading": "Managing Delete File Accumulation",
+      "content": "<p>Delete files accumulate over time as UPDATE and DELETE operations are performed. Query performance degrades as more delete files must be merged at read time. Three maintenance operations manage delete file accumulation:</p><ul><li><strong>Data file compaction (MoR to CoW):</strong> Reads data files and their associated delete files, applies all deletes, and writes new clean data files without any delete files. After compaction, queries no longer need to apply delete files for the compacted partition.</li><li><strong>Snapshot expiration:</strong> After compaction, old snapshots referencing the pre-compaction data files + delete files can be expired. This releases the delete files for garbage collection.</li><li><strong>Orphan file cleanup:</strong> After snapshot expiration, the original data files (pre-compaction) and their delete files are removed from storage.</li></ul><p><a href=\"dremio.html\">Dremio's</a> automated table optimization handles all three operations, maintaining optimal read performance without manual intervention."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Row-level deletes are one of the most important practical capabilities in <a href=\"apache-iceberg.html\">Apache Iceberg</a> V2. By writing small delete files instead of rewriting entire data files, they make GDPR erasure, CDC upserts, and data correction workflows practical at lakehouse scale \u2014 operations that were prohibitively expensive in the data lake era. Understanding positional vs equality delete files, and managing delete file accumulation through scheduled compaction, is fundamental to operating a production Iceberg lakehouse with frequent DML operations."
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format implementing row-level deletes in V2."
+    },
+    {
+      "slug": "merge-on-read",
+      "term": "Merge-on-Read",
+      "category": "Table Formats",
+      "desc": "The write mode that uses delete files."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Merges delete files into clean data files."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC MERGE INTO uses row-level deletes."
+    },
+    {
+      "slug": "acid-transactions",
+      "term": "ACID Transactions",
+      "category": "Core Concepts",
+      "desc": "Delete files committed as ACID snapshots."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines",
+      "desc": "Full MERGE INTO with row-level deletes via SQL."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "GDPR right-to-erasure implemented via equality deletes."
+    },
+    {
+      "slug": "iceberg-manifest-files",
+      "term": "Iceberg Manifest Files",
+      "category": "Table Formats",
+      "desc": "Delete files are tracked in manifest files."
+    }
+  ]
+}

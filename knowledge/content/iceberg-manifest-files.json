@@ -1,0 +1,110 @@
+{
+  "slug": "iceberg-manifest-files",
+  "term": "Iceberg Manifest Files",
+  "category": "Table Formats",
+  "metaTitle": "Iceberg Manifest Files: The Definitive Guide",
+  "metaDescription": "Learn what Apache Iceberg manifest files are, how they store file-level statistics for data skipping, and how the manifest tree enables efficient query planning at petabyte scale.",
+  "h1": "Iceberg Manifest Files: The Definitive Guide",
+  "lede": "Iceberg manifest files are the metadata layer between table snapshots and actual data files. Each manifest file tracks thousands of data files, their partition values, and their column-level statistics \u2014 enabling query engines to skip irrelevant files before reading a single byte of data.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is an Iceberg manifest file?",
+      "a": "An Iceberg manifest file is an Avro file that lists the data files (or delete files) belonging to a specific table snapshot, along with each file's partition values and column-level statistics (min/max per column, null count, row count). Manifest files are the primary mechanism for partition pruning and data skipping in Apache Iceberg."
+    },
+    {
+      "q": "What is the difference between a manifest file and a manifest list?",
+      "a": "A manifest file lists individual data files and their statistics. A manifest list (snapshot file) groups together all the manifest files belonging to a specific snapshot. The hierarchy is: Snapshot \u2192 Manifest List \u2192 Manifest Files \u2192 Data Files."
+    },
+    {
+      "q": "How do manifest files enable data skipping?",
+      "a": "Each manifest file records per-file statistics: the min and max value for each column in each data file. At query time, the engine reads manifest files and skips any data file whose min-max range for a queried column does not overlap with the query's filter predicate \u2014 avoiding all I/O for those files."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Are Iceberg Manifest Files?",
+      "content": "<p><strong>Iceberg manifest files</strong> are Avro files that form the middle layer of Apache Iceberg's three-level metadata tree, sitting between the manifest list (snapshot) at the top and the actual data files at the bottom. Each manifest file tracks a subset of the table's data files \u2014 listing their storage locations, partition values, and per-column statistics.</p><p>Manifest files are the primary mechanism for two of Iceberg's most important query optimization capabilities: <strong>partition pruning</strong> (skipping entire groups of data files based on partition values) and <strong>data skipping</strong> (skipping individual data files based on column-level min/max statistics).</p><p>At query time, the engine reads the manifest list to get the list of all manifests, then reads the manifests to get the list of data files \u2014 but it applies pruning at both levels: first eliminating manifests whose partition summary statistics show no relevant data, then eliminating individual data files within remaining manifests whose per-file statistics show no relevant rows. Only after this two-level pruning does the engine read actual data files."
+    },
+    {
+      "heading": "Manifest File Structure",
+      "content": "<p>Each record in a manifest file represents one data file or delete file and contains:</p><ul><li><strong>file_path:</strong> The full S3/ADLS/GCS URL of the data file</li><li><strong>file_format:</strong> The format of the data file (PARQUET, ORC, AVRO)</li><li><strong>partition:</strong> The partition values for this file, encoded according to the table's partition spec</li><li><strong>record_count:</strong> The number of rows in the file</li><li><strong>file_size_in_bytes:</strong> The file's size in bytes</li><li><strong>column_sizes:</strong> Per-column storage sizes (for projection optimization)</li><li><strong>value_counts:</strong> Per-column non-null value counts</li><li><strong>null_value_counts:</strong> Per-column null value counts</li><li><strong>lower_bounds:</strong> Per-column minimum values (encoded in binary format)</li><li><strong>upper_bounds:</strong> Per-column maximum values (encoded in binary format)</li></ul><p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields \u2014 the per-column min/max statistics \u2014 are the data that enables aggressive data skipping. A file whose <code>upper_bounds[customer_id]</code> is less than the filter predicate's value can be skipped entirely. A file whose <code>lower_bounds[event_date]</code> is after the query's date range can be skipped. These binary-encoded statistics are evaluated extremely quickly \u2014 the engine eliminates irrelevant files without touching their contents.",
+      "diagram": "apache-iceberg-diagram-1.png",
+      "diagramAlt": "Iceberg Manifest File Structure",
+      "diagramCaption": "Figure 1: Manifest file contents \u2014 file location, partition values, and column-level statistics for data skipping."
+    },
+    {
+      "heading": "Manifest Lists vs. Manifest Files",
+      "content": "<p>The distinction between manifest lists and manifest files is a frequent source of confusion:</p><table class=\"comparison-table\"><thead><tr><th>Attribute</th><th>Manifest List</th><th>Manifest File</th></tr></thead><tbody><tr><td>Also called</td><td>Snapshot file</td><td>Manifest</td></tr><tr><td>Format</td><td>Avro</td><td>Avro</td></tr><tr><td>Lists</td><td>Manifest files (one per entry)</td><td>Data/delete files (thousands per file)</td></tr><tr><td>Statistics</td><td>Partition-level summaries across all manifests</td><td>Per-file column statistics</td></tr><tr><td>Created by</td><td>Each committed transaction</td><td>Each batch of new data files</td></tr><tr><td>Reused across snapshots?</td><td>No (new manifest list per snapshot)</td><td>Yes (unchanged manifests reused)</td></tr></tbody></table><p>The manifest list contains partition-level summary statistics for each manifest it references \u2014 these are used for the first level of pruning (eliminating entire manifests). The manifest files contain per-file statistics \u2014 used for the second level of pruning within a manifest."
+    },
+    {
+      "heading": "How Iceberg Reuses Manifests",
+      "content": "<p>One of Iceberg's most important performance optimizations is <strong>manifest reuse</strong>: when a transaction adds data to only some partitions, the manifests for unchanged partitions are reused in the new snapshot \u2014 not copied or rewritten.</p><p>For example: a table with 1000 manifest files covering 1 million data files. A new INSERT adds 100 new files to 5 partitions. Iceberg creates 5 new small manifest files (one per new partition batch) and commits a new snapshot that references those 5 new manifests PLUS the 995 unchanged old manifests. The 995 unchanged manifests are not touched \u2014 they are simply referenced by the new snapshot's manifest list.</p><p>This reuse property makes Iceberg's snapshot commits fast and cheap even for very large tables: committing a new snapshot requires writing only the new manifests (for the changed partitions) and a new manifest list \u2014 not reading or writing all existing manifests.",
+      "diagram": "apache-iceberg-diagram-2.png",
+      "diagramAlt": "Manifest Reuse Across Snapshots",
+      "diagramCaption": "Figure 2: Unchanged manifests are reused across snapshots \u2014 only new manifests are written per transaction."
+    },
+    {
+      "heading": "Manifest File Compaction",
+      "content": "<p>Over time, a table accumulates many small manifest files \u2014 particularly if data is added in many small batches. Many small manifests slow down query planning (the engine must read each manifest separately) and metadata management.</p><p>Iceberg's <code>rewriteManifests</code> operation consolidates small manifest files into fewer, larger manifests while preserving all the file-level statistics. After rewriting, the engine reads fewer manifest files per query, reducing query planning latency. In Dremio, manifest rewriting is part of the automated table optimization \u2014 it runs automatically when manifest count exceeds configured thresholds."
+    },
+    {
+      "heading": "Manifest Files and Data Skipping Effectiveness",
+      "content": "<p>The effectiveness of manifest file-based data skipping depends on the correlation between the queried columns and the physical data layout. When rows with similar column values are co-located in the same files (via <a href=\"z-ordering.html\">Z-ordering</a> or sort ordering), the per-file min-max statistics are narrow \u2014 the engine can skip most files. When rows are randomly distributed across files, min-max statistics span wide ranges, and few files can be skipped.</p><p>This is why <a href=\"compaction.html\">compaction</a> with sort ordering or Z-ordering is so important: it creates data files with narrow, well-targeted min-max statistics. Manifest files faithfully record these statistics, enabling query engines to leverage the sorted layout for aggressive pruning."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Iceberg manifest files are the metadata layer that makes petabyte-scale query performance possible in the <a href=\"data-lakehouse.html\">data lakehouse</a>. By recording per-file column statistics for millions of data files, manifests enable a two-level pruning hierarchy that eliminates the vast majority of storage reads before any data is accessed. Manifest reuse across snapshots makes transaction commits fast; manifest compaction keeps query planning efficient as tables grow. Understanding manifest files is key to understanding why well-maintained Iceberg tables can answer queries in seconds over petabytes of data."
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format using manifest files for metadata."
+    },
+    {
+      "slug": "iceberg-snapshots",
+      "term": "Iceberg Snapshots",
+      "category": "Table Formats",
+      "desc": "Snapshots reference manifest lists which reference manifests."
+    },
+    {
+      "slug": "data-skipping",
+      "term": "Data Skipping",
+      "category": "Analytics & BI",
+      "desc": "The query optimization enabled by manifest file statistics."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Manifest rewriting as part of table maintenance."
+    },
+    {
+      "slug": "z-ordering",
+      "term": "Z-Ordering",
+      "category": "Table Formats",
+      "desc": "Makes manifest file statistics narrow and effective."
+    },
+    {
+      "slug": "hidden-partitioning",
+      "term": "Hidden Partitioning",
+      "category": "Table Formats",
+      "desc": "Partition values stored in manifests for pruning."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines",
+      "desc": "Reads manifest files for aggressive query optimization."
+    },
+    {
+      "slug": "apache-parquet",
+      "term": "Apache Parquet",
+      "category": "Storage",
+      "desc": "The data files referenced by manifest file entries."
+    }
+  ]
+}
