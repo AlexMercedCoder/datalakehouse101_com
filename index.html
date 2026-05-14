@@ -35,6 +35,144 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <style>
+      /* ── Site Nav ── */
+      .site-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(10, 20, 40, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .site-nav .nav-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 58px;
+      }
+      .site-nav .nav-brand {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #fff;
+        text-decoration: none;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+      }
+      .site-nav .nav-brand span { color: #38bdf8; }
+      .site-nav .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+      .site-nav .nav-links a {
+        color: rgba(255,255,255,0.78);
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+      }
+      .site-nav .nav-links a:hover {
+        background: rgba(56,189,248,0.15);
+        color: #38bdf8;
+      }
+      .site-nav .nav-links a.nav-kb {
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        color: #fff;
+        font-weight: 600;
+        padding: 0.35rem 1rem;
+      }
+      .site-nav .nav-links a.nav-kb:hover {
+        opacity: 0.9;
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        color: #fff;
+      }
+      @media (max-width: 600px) {
+        .site-nav .nav-inner { height: auto; padding: 0.5rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+        .site-nav .nav-links { gap: 0.2rem; }
+        .site-nav .nav-links a { font-size: 0.75rem; padding: 0.3rem 0.55rem; }
+      }
+
+      /* ── Knowledge Base Section ── */
+      .kb-section {
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+      .kb-section .kb-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        text-align: center;
+      }
+      .kb-section h2 {
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.75rem;
+      }
+      .kb-section p {
+        color: rgba(255,255,255,0.68);
+        font-size: 1.05rem;
+        max-width: 640px;
+        margin: 0 auto 2rem;
+        line-height: 1.7;
+      }
+      .kb-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+      .kb-chip {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        padding: 0.9rem 1rem;
+        color: rgba(255,255,255,0.82);
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.2s, border-color 0.2s, transform 0.15s;
+        display: block;
+        text-align: left;
+      }
+      .kb-chip:hover {
+        background: rgba(56,189,248,0.12);
+        border-color: rgba(56,189,248,0.4);
+        transform: translateY(-2px);
+        color: #38bdf8;
+      }
+      .kb-chip .kb-cat {
+        display: block;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(255,255,255,0.4);
+        margin-bottom: 0.3rem;
+      }
+      .kb-cta {
+        display: inline-block;
+        padding: 0.85rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        color: #fff;
+        box-shadow: 0 4px 24px rgba(99,102,241,0.35);
+        transition: opacity 0.2s, transform 0.15s;
+      }
+      .kb-cta:hover { opacity: 0.9; transform: translateY(-2px); }
+    </style>
+
     <!-- JSON-LD -->
     <script type="application/ld+json">
     [
@@ -79,6 +217,19 @@
 
 <body>
 
+    <!-- ─── Site Navigation ─── -->
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <div class="nav-inner">
+        <a href="/" class="nav-brand">Data<span>Lakehouse</span>101</a>
+        <div class="nav-links">
+          <a href="knowledge/" class="nav-kb" id="nav-kb-link">📚 Knowledge Base</a>
+          <a href="https://alexmerced.com" target="_blank" rel="noopener" id="nav-alexmerced">alexmerced.com</a>
+          <a href="https://datalakehousehub.com" target="_blank" rel="noopener" id="nav-dlhub">DataLakehouseHub</a>
+          <a href="https://iceberglakehouse.com" target="_blank" rel="noopener" id="nav-iceberg">IcebergLakehouse</a>
+        </div>
+      </div>
+    </nav>
+
     <main>
         <section class="hero">
             <div class="container hero-content">
@@ -86,12 +237,11 @@
                 <p class="hero-description">Learn the architecture that combines the flexibility of data lakes with the
                     performance and governance of data warehouses.</p>
                 <div class="hero-ctas">
+                    <a href="knowledge/" class="btn btn-primary" id="hero-kb-btn">📚 Browse the Knowledge Base</a>
                     <a href="https://youtube.com/shorts/JDqCJUQXWYk?si=w6MYqZzaZkVoZlek" target="_blank"
-                        class="btn btn-secondary">What is a Data Lakehouse?</a>
-                    <a href="https://datalakehousehub.com/blog/2024-10-hands-on-with-iceberg-dremio-laptop/?utm_source=datalakehouse101&utm_medium=influencer&utm_campaign=iceberg&utm_term=datalakehouse101_com-01-23-2026&utm_content=alexmerced"
-                        target="_blank" class="btn btn-primary">Build a Lakehouse on Your Laptop</a>
+                        class="btn btn-secondary" id="hero-video-btn">What is a Data Lakehouse?</a>
                     <a href="https://www.dremio.com/get-started?utm_source=datalakehouse101&utm_medium=influencer&utm_campaign=iceberg&utm_term=datalakehouse101_com-01-23-2026&utm_content=alexmerced"
-                        target="_blank" class="btn btn-accent">Free Trial of a Cloud Data Lakehouse</a>
+                        target="_blank" class="btn btn-accent" id="hero-trial-btn">Free Trial of a Cloud Data Lakehouse</a>
                 </div>
             </div>
         </section>
@@ -193,6 +343,47 @@
             </div>
         </section>
 
+
+        <!-- ─── Knowledge Base Section ─── -->
+        <section class="kb-section" id="knowledge-base-section">
+          <div class="kb-inner">
+            <h2>📚 The Data Lakehouse Knowledge Base</h2>
+            <p>100 definitive guides on every data lakehouse term — from Apache Iceberg internals to Dremio architecture, ETL patterns, and agentic AI.</p>
+            <div class="kb-grid">
+              <a href="knowledge/data-lakehouse.html" class="kb-chip" id="kb-data-lakehouse">
+                <span class="kb-cat">Core Concepts</span>Data Lakehouse
+              </a>
+              <a href="knowledge/apache-iceberg.html" class="kb-chip" id="kb-apache-iceberg">
+                <span class="kb-cat">Table Formats</span>Apache Iceberg
+              </a>
+              <a href="knowledge/medallion-architecture.html" class="kb-chip" id="kb-medallion">
+                <span class="kb-cat">Core Concepts</span>Medallion Architecture
+              </a>
+              <a href="knowledge/decoupled-storage-compute.html" class="kb-chip" id="kb-decoupled">
+                <span class="kb-cat">Core Concepts</span>Decoupled Storage &amp; Compute
+              </a>
+              <a href="knowledge/open-table-format.html" class="kb-chip" id="kb-otf">
+                <span class="kb-cat">Core Concepts</span>Open Table Format
+              </a>
+              <a href="knowledge/acid-transactions.html" class="kb-chip" id="kb-acid">
+                <span class="kb-cat">Core Concepts</span>ACID Transactions
+              </a>
+              <a href="knowledge/schema-evolution.html" class="kb-chip" id="kb-schema">
+                <span class="kb-cat">Table Formats</span>Schema Evolution
+              </a>
+              <a href="knowledge/time-travel.html" class="kb-chip" id="kb-time-travel">
+                <span class="kb-cat">Table Formats</span>Time Travel
+              </a>
+              <a href="knowledge/etl.html" class="kb-chip" id="kb-etl">
+                <span class="kb-cat">Core Concepts</span>ETL
+              </a>
+              <a href="knowledge/data-mesh.html" class="kb-chip" id="kb-data-mesh">
+                <span class="kb-cat">Core Concepts</span>Data Mesh
+              </a>
+            </div>
+            <a href="knowledge/" class="kb-cta" id="kb-browse-all">Browse All 100 Topics →</a>
+          </div>
+        </section>
 
     </main>
 
