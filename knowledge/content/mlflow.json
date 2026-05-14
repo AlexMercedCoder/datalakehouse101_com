@@ -1,0 +1,98 @@
+{
+  "slug": "mlflow",
+  "term": "MLflow",
+  "category": "Architecture Patterns",
+  "metaTitle": "MLflow: The Definitive Guide for Data Lakehouse ML",
+  "metaDescription": "Learn what MLflow is, how it tracks ML experiments on Apache Iceberg features, and why it is the standard open-source ML lifecycle management platform for lakehouse data science.",
+  "h1": "MLflow: The Definitive Guide",
+  "lede": "MLflow is the open-source ML lifecycle management platform \u2014 tracking experiments, versioning models, managing deployments, and providing a model registry. Combined with Apache Iceberg for feature storage and Nessie for data versioning, MLflow completes the production ML stack on the open data lakehouse.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is MLflow?",
+      "a": "MLflow is an open-source platform for managing the ML lifecycle \u2014 including experiment tracking (logging parameters, metrics, and artifacts for each training run), model registry (versioning and promoting models through staging and production), model serving, and project reproducibility. It is the most widely adopted open-source ML lifecycle management tool."
+    },
+    {
+      "q": "How does MLflow integrate with the data lakehouse?",
+      "a": "MLflow integrates with the lakehouse through its experiment tracking API: data scientists log the Iceberg table version (snapshot ID or Nessie tag) used for training as an MLflow artifact alongside model parameters and metrics. This creates a complete lineage link between each MLflow experiment and the exact data state that produced it. MLflow artifacts (model files) can also be stored in S3 alongside Iceberg data."
+    },
+    {
+      "q": "What is the MLflow Model Registry?",
+      "a": "The MLflow Model Registry is a centralized store for managing model versions \u2014 tracking model stage transitions (Development \u2192 Staging \u2192 Production), storing model artifacts, and annotating model versions with descriptions, tags, and lineage. It serves as the governance layer for ML models, analogous to a data catalog for ML artifacts."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is MLflow?",
+      "content": "<p><strong>MLflow</strong> is an open-source platform for managing the end-to-end machine learning lifecycle. Originally developed at Databricks and now a Linux Foundation project, MLflow provides four core capabilities: Tracking (logging parameters, metrics, and artifacts for each experiment run), Projects (packaging ML code for reproducibility), Models (packaging models in a standardized format for deployment), and Registry (managing model versions and stage transitions from development to production).</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a> context, MLflow is the ML governance layer that sits alongside Iceberg's data governance \u2014 while <a href=\"apache-iceberg.html\">Apache Iceberg</a> governs the data assets (tables, schemas, versions), MLflow governs the ML artifacts (experiments, model versions, deployment stages) that are produced from that data."
+    },
+    {
+      "heading": "MLflow Experiment Tracking with Iceberg",
+      "content": "<p>The MLflow + Iceberg integration pattern for reproducible ML experiments:</p><pre><code>import mlflow\nfrom pyiceberg.catalog import load_catalog\n\nwith mlflow.start_run(run_name='customer-churn-v3'):\n    # Log the Iceberg data version used for training\n    catalog = load_catalog('polaris', uri='...')\n    table = catalog.load_table('gold.customer_features')\n    snapshot_id = table.current_snapshot().snapshot_id\n    \n    mlflow.log_param('training_snapshot_id', snapshot_id)\n    mlflow.log_param('training_date', '2026-05-14')\n    \n    # Train model...\n    mlflow.log_metric('auc', 0.89)\n    mlflow.sklearn.log_model(model, 'churn_model')</code></pre><p>By logging the Iceberg snapshot_id alongside model parameters, each MLflow run creates a complete lineage link between the model and the exact data version used for training \u2014 enabling perfect reproducibility.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "MLflow Iceberg Experiment Tracking",
+      "diagramCaption": "Figure 1: MLflow + Iceberg experiment tracking \u2014 logging data version alongside model parameters."
+    },
+    {
+      "heading": "MLflow Model Registry",
+      "content": "<p>The MLflow Model Registry provides governance for production ML deployments:</p><ul><li><strong>Version management:</strong> Each model artifact (sklearn, PyTorch, Spark ML) is versioned in the registry with a unique version number</li><li><strong>Stage transitions:</strong> Models progress through stages: None \u2192 Staging \u2192 Production \u2192 Archived. Stage promotion requires explicit API calls \u2014 preventing accidental production promotion</li><li><strong>Annotations:</strong> Model versions are annotated with descriptions, data lineage (which Iceberg snapshot trained the model), validation metrics, and approval status</li><li><strong>Deployment integration:</strong> MLflow Models can be served as REST APIs using mlflow models serve, or deployed to cloud ML serving platforms (SageMaker, Azure ML, Databricks serving)</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "MLflow Model Registry Governance",
+      "diagramCaption": "Figure 2: MLflow Model Registry \u2014 versioning, stage promotion, and deployment governance."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>MLflow is the ML governance companion to Apache Iceberg in the open lakehouse ML stack. While Iceberg governs data assets, MLflow governs ML artifacts \u2014 tracking experiments, versioning models, and managing production deployments. The combination of Iceberg feature tables + <a href=\"nessie-branching-tagging.html\">Nessie tags</a> for data versioning + MLflow for experiment tracking creates a complete, reproducible, governed ML platform on the open lakehouse \u2014 without requiring proprietary ML platforms that create additional vendor dependencies alongside the data platform.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "data-science-lakehouse",
+      "term": "Data Science on the Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "MLflow is a core tool in the lakehouse data science stack."
+    },
+    {
+      "slug": "feature-store",
+      "term": "Feature Store",
+      "category": "Architecture Patterns",
+      "desc": "Feature store provides the training data MLflow tracks."
+    },
+    {
+      "slug": "nessie-branching-tagging",
+      "term": "Nessie Branching and Tagging",
+      "category": "Architecture Patterns",
+      "desc": "Nessie tags complement MLflow for data versioning."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg feature tables are the training data MLflow references."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Spark ML models tracked and registered in MLflow."
+    },
+    {
+      "slug": "data-science-lakehouse",
+      "term": "Data Science on the Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "Data science workflows use MLflow for experiment governance."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "MLflow extends governance to ML artifacts and models."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The lakehouse provides the data foundation for MLflow experiments."
+    }
+  ]
+}

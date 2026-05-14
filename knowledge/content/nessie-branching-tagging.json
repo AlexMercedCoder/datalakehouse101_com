@@ -1,0 +1,98 @@
+{
+  "slug": "nessie-branching-tagging",
+  "term": "Nessie Branching and Tagging",
+  "category": "Architecture Patterns",
+  "metaTitle": "Nessie Branching and Tagging: The Definitive Guide",
+  "metaDescription": "Learn how Project Nessie's Git-like branching and tagging enables isolated data experimentation, reproducible ML experiments, and zero-risk schema migrations on Apache Iceberg tables.",
+  "h1": "Nessie Branching and Tagging: The Definitive Guide",
+  "lede": "Project Nessie brings Git-like branching and tagging to Apache Iceberg tables \u2014 enabling data engineers to experiment with transformations on isolated branches, tag specific versions for ML reproducibility, and deploy schema migrations with zero risk to production data. It is version control for the data lakehouse.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Nessie branching?",
+      "a": "Nessie branching is a catalog-level feature that creates an isolated copy of the table namespace \u2014 new commits on the branch don't affect the main branch. Data engineers can run experimental transformations, test schema changes, or debug data quality issues on a branch without any impact on production queries running against main."
+    },
+    {
+      "q": "How does Nessie tagging work?",
+      "a": "Nessie tags mark a specific point in the catalog's commit history with a named label \u2014 like a Git tag. A tag records the exact state of all tables at a specific moment. For ML experiments, tagging the data state used for training ensures that the exact same dataset can be reproduced months later by checking out the tag \u2014 enabling perfect experiment reproducibility."
+    },
+    {
+      "q": "Can all engines use Nessie branches?",
+      "a": "Yes. Engines connect to Nessie specifying a branch or tag name as part of their catalog configuration (or per-query). Spark, Trino, Dremio, and Flink can all be configured to read/write against a specific Nessie branch \u2014 enabling branch-isolated pipelines where the same ETL job logic runs against both a development branch and the production main branch."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Nessie Branching and Tagging?",
+      "content": "<p><a href=\"project-nessie.html\">Project Nessie</a> implements a Git-inspired version control model for the Iceberg catalog \u2014 introducing <strong>branches</strong> (isolated parallel namespaces for experimentation and development) and <strong>tags</strong> (named snapshots of the catalog at a specific point in time) to the data lakehouse.</p><p>The core insight behind Nessie branching is that data teams face the same challenges that software teams faced before version control: how to develop and test changes to production data assets without risking data corruption, how to maintain reproducible experiments, and how to deploy changes safely. Git solved these problems for code; Nessie applies the same concepts to data tables.</p>"
+    },
+    {
+      "heading": "Branching for Safe Experimentation",
+      "content": "<p>The Nessie branching workflow for safe data experimentation:</p><ol><li><strong>Create a branch:</strong> <code>nessie branch experiment-branch main</code> \u2014 creates a new branch starting from main's current state</li><li><strong>Work on the branch:</strong> Configure Spark to write to <code>experiment-branch</code> and run the experimental transformation. All writes are isolated to the branch.</li><li><strong>Validate:</strong> Query the branch (with Dremio or Trino pointing to <code>experiment-branch</code>) to verify the transformation produced correct results</li><li><strong>Merge or discard:</strong> If the experiment is successful, merge to main. If unsuccessful, simply delete the branch \u2014 no rollback needed, main was never touched</li></ol>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Nessie Branching Workflow",
+      "diagramCaption": "Figure 1: Nessie branching workflow \u2014 isolated experimentation, validation, and safe merge to production."
+    },
+    {
+      "heading": "Tagging for ML Reproducibility",
+      "content": "<p>ML experiment reproducibility requires that the exact dataset used for training can be reconstructed at any future point. Nessie tags provide this capability:</p><pre><code># Tag the data state when training begins\nnessie tag create ml-experiment-2026-05-14 main\n\n# Train model using the tagged data state\nspark = SparkSession.builder\\\n  .config('spark.sql.catalog.nessie.ref', 'ml-experiment-2026-05-14')\\\n  .getOrCreate()\n\n# Six months later, reproduce exactly the same training dataset\n# by checking out the same tag</code></pre><p>This eliminates the 'training data drift' problem where re-running a training pipeline months later produces different results because the underlying Silver tables have been updated.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Nessie Tagging ML Reproducibility",
+      "diagramCaption": "Figure 2: Nessie tags for ML reproducibility \u2014 exact data state preserved for future experiment reproduction."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p><a href=\"project-nessie.html\">Project Nessie's</a> branching and tagging brings the software engineering discipline of version control to the <a href=\"data-lakehouse.html\">data lakehouse</a>. Branches enable safe, isolated experimentation and zero-risk schema migrations without production impact. Tags enable ML experiment reproducibility and point-in-time data audits. For data teams that have experienced the pain of experimental transformations corrupting production data or ML experiments that cannot be reproduced, Nessie branching is a transformative operational capability \u2014 bringing Git-like confidence to data engineering workflows on <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "project-nessie",
+      "term": "Project Nessie",
+      "category": "Catalogs & Metadata",
+      "desc": "The catalog implementing branching and tagging."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg tables managed by Nessie with branches."
+    },
+    {
+      "slug": "time-travel",
+      "term": "Time Travel",
+      "category": "Table Formats",
+      "desc": "Tags enable time travel to specific catalog states."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Branching and tagging improve lakehouse development safety."
+    },
+    {
+      "slug": "mlflow",
+      "term": "MLflow",
+      "category": "Architecture Patterns",
+      "desc": "MLflow tracks experiments; Nessie tags track data states."
+    },
+    {
+      "slug": "data-science-lakehouse",
+      "term": "Data Science on the Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "Data science benefits from Nessie reproducibility."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Branch-based governance isolates changes from production."
+    },
+    {
+      "slug": "open-lakehouse",
+      "term": "Open Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "Nessie is part of the open lakehouse ecosystem."
+    }
+  ]
+}

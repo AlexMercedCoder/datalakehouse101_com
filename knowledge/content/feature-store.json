@@ -1,0 +1,98 @@
+{
+  "slug": "feature-store",
+  "term": "Feature Store",
+  "category": "Architecture Patterns",
+  "metaTitle": "Feature Store: The Definitive Guide for Data Lakehouse ML",
+  "metaDescription": "Learn what a feature store is, how Apache Iceberg tables serve as open feature stores, and how feature stores bridge ML engineering and data lakehouse pipelines.",
+  "h1": "Feature Store: The Definitive Guide",
+  "lede": "A feature store is the shared repository of ML features \u2014 pre-computed, versioned, and accessible for both model training (historical features) and serving (real-time features). Apache Iceberg Gold tables serve as open feature stores, providing governed, versioned, shareable features without requiring a separate proprietary feature store platform.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is a feature store?",
+      "a": "A feature store is a centralized repository that stores pre-computed ML features \u2014 making them discoverable, reusable, versioned, and accessible for both offline training (historical feature values by time period) and online serving (current feature values for real-time inference). It prevents the common problem of data scientists duplicating feature computation across teams."
+    },
+    {
+      "q": "Can Apache Iceberg serve as a feature store?",
+      "a": "Yes. Apache Iceberg Gold tables work as an effective offline feature store: they provide versioned feature history (time travel), efficient point-in-time feature retrieval for training datasets (historical joins using event timestamps), governed access through RBAC, and discoverability through data catalog integration. For real-time online serving, Iceberg is typically paired with a low-latency serving layer (Redis, DynamoDB)."
+    },
+    {
+      "q": "What is the difference between offline and online feature store?",
+      "a": "Offline feature store provides historical feature values for model training \u2014 query features for any past time period for batch training jobs. Online feature store provides current (latest) feature values for real-time inference \u2014 low-latency key-value lookup for serving predictions on live traffic. Iceberg handles the offline store; real-time databases (Redis, DynamoDB) handle the online store."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is a Feature Store?",
+      "content": "<p>A <strong>feature store</strong> is a data infrastructure component that manages the lifecycle of ML features \u2014 the engineered inputs to machine learning models. It serves two distinct use cases: the <em>offline store</em> provides historical feature values for model training (a data scientist needs the last 30 days of customer purchase frequency, computed daily, for each customer in the training dataset), and the <em>online store</em> provides current feature values for real-time model serving (a recommendation system needs the customer's current browsing history feature, updated in real time).</p><p>Without a shared feature store, each data science team computes features independently \u2014 duplicating computation, creating inconsistencies between training and serving (the 'training-serving skew' problem), and making features invisible to other teams that could reuse them. The feature store centralizes feature computation once, serves it consistently, and makes features discoverable across the entire ML organization.</p>"
+    },
+    {
+      "heading": "Apache Iceberg as an Offline Feature Store",
+      "content": "<p><a href=\"apache-iceberg.html\">Apache Iceberg</a> Gold tables are an effective offline feature store because they provide:</p><ul><li><strong>Feature history:</strong> Append-only feature tables partition by date preserve complete historical feature values for point-in-time training dataset construction</li><li><strong>Point-in-time correctness:</strong> Iceberg time travel enables 'as-of' feature retrieval \u2014 query feature values as they existed at each training event's timestamp, preventing label leakage</li><li><strong>Versioning:</strong> Iceberg snapshots + <a href=\"nessie-branching-tagging.html\">Nessie tags</a> mark the exact feature table version used for each model training run</li><li><strong>Governance:</strong> RBAC ensures only authorized teams can access sensitive feature data (e.g., customer financial features)</li><li><strong>Discoverability:</strong> Feature tables registered in the data catalog with rich descriptions enable ML teams to find and reuse existing features</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Iceberg as Offline Feature Store",
+      "diagramCaption": "Figure 1: Apache Iceberg as offline feature store \u2014 versioned, governed, point-in-time feature history."
+    },
+    {
+      "heading": "Feature Store Architecture in the Lakehouse",
+      "content": "<p>The complete feature store architecture on the lakehouse:</p><ol><li><strong>Feature computation:</strong> Spark batch jobs or dbt models compute features from Silver Iceberg tables and write them to Gold feature tables (e.g., <code>gold.customer_features</code>, <code>gold.product_features</code>)</li><li><strong>Offline store:</strong> Gold Iceberg feature tables \u2014 queried by <a href=\"mlflow.html\">MLflow</a>-tracked training jobs using PyIceberg or PySpark for historical feature retrieval</li><li><strong>Online store sync:</strong> A materialization job (Spark or Flink) reads the latest feature values from Iceberg and writes them to a low-latency online store (Redis, DynamoDB, BigTable)</li><li><strong>Serving:</strong> ML inference services query Redis/DynamoDB for current feature values in milliseconds during real-time serving</li></ol>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Feature Store Lakehouse Architecture",
+      "diagramCaption": "Figure 2: Feature store architecture \u2014 Iceberg offline store + Redis online store for training and serving."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The feature store is the ML engineering complement to the data lakehouse \u2014 providing organized, governed, versioned, and reusable ML features that eliminate the duplicated computation and training-serving skew that plague unorganized ML organizations. For the offline feature store, <a href=\"apache-iceberg.html\">Apache Iceberg</a> Gold tables provide an excellent foundation: versioned history, point-in-time queries, RBAC governance, and data catalog discoverability \u2014 all the properties a production offline feature store requires, without needing a proprietary feature store platform. Combined with a real-time online store and <a href=\"mlflow.html\">MLflow</a> for experiment tracking, Iceberg-based feature stores provide a complete, open ML platform on the lakehouse.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "data-science-lakehouse",
+      "term": "Data Science on the Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "Feature store is a core component of lakehouse data science."
+    },
+    {
+      "slug": "mlflow",
+      "term": "MLflow",
+      "category": "Architecture Patterns",
+      "desc": "MLflow tracks experiments using feature store data."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg Gold tables serve as the offline feature store."
+    },
+    {
+      "slug": "nessie-branching-tagging",
+      "term": "Nessie Branching and Tagging",
+      "category": "Architecture Patterns",
+      "desc": "Nessie tags version feature tables for ML reproducibility."
+    },
+    {
+      "slug": "gold-layer",
+      "term": "Gold Layer",
+      "category": "Architecture Patterns",
+      "desc": "Feature tables are Gold layer Iceberg assets."
+    },
+    {
+      "slug": "time-travel",
+      "term": "Time Travel",
+      "category": "Table Formats",
+      "desc": "Time travel enables point-in-time feature retrieval."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Spark computes features and materializes to online stores."
+    },
+    {
+      "slug": "agentic-lakehouse",
+      "term": "Agentic Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "AI agents use feature stores for ML-powered decisions."
+    }
+  ]
+}

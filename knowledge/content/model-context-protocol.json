@@ -1,0 +1,98 @@
+{
+  "slug": "model-context-protocol",
+  "term": "MCP (Model Context Protocol)",
+  "category": "Architecture Patterns",
+  "metaTitle": "MCP (Model Context Protocol): The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what the Model Context Protocol (MCP) is, how Dremio's MCP server enables AI agents to autonomously query the lakehouse, and why MCP is the standard for AI tool integration.",
+  "h1": "MCP (Model Context Protocol): The Definitive Guide",
+  "lede": "The Model Context Protocol (MCP) is the open standard for connecting AI language models to external tools and data sources. Dremio's MCP server exposes the AI Semantic Layer as MCP tools \u2014 enabling Claude, GPT-4, and other AI models to autonomously discover and query Apache Iceberg lakehouse data without human SQL assistance.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the Model Context Protocol (MCP)?",
+      "a": "The Model Context Protocol (MCP) is an open standard (developed by Anthropic) for defining how AI language models interact with external tools and data sources. It provides a standardized interface (tool definitions with schemas and descriptions) that any LLM supporting MCP can call to interact with external systems \u2014 databases, APIs, file systems, and data platforms like Dremio."
+    },
+    {
+      "q": "How does Dremio's MCP server work?",
+      "a": "Dremio's MCP server exposes the AI Semantic Layer as a set of MCP-callable tools: list_datasets (discover available data), get_schema (understand table structure and metric definitions), execute_sql (run a SQL query against Dremio), and get_query_results (retrieve query output). An AI model with access to these tools can autonomously perform multi-step data analysis on lakehouse data."
+    },
+    {
+      "q": "Which AI models support MCP?",
+      "a": "MCP is supported by Claude (Anthropic), Claude.ai desktop, and any AI framework that implements the MCP client specification. The MCP ecosystem is growing rapidly \u2014 LangChain, LlamaIndex, and many AI agent frameworks provide MCP client adapters, allowing agents built on any underlying LLM to access MCP-exposed tools including Dremio's data access tools."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the Model Context Protocol?",
+      "content": "<p>The <strong>Model Context Protocol (MCP)</strong> is an open standard for defining how AI language models interact with external tools, data sources, and services. Developed by Anthropic and rapidly adopted across the AI ecosystem, MCP provides a standardized way to expose capabilities (called <em>tools</em>) to AI models \u2014 each tool has a name, a description (in natural language that the AI model reads to understand what the tool does), and a parameter schema (defining what inputs the tool accepts).</p><p>When an AI model with MCP access is given a task, it can autonomously decide which tools to call, with which parameters, and in which sequence \u2014 forming a multi-step agentic workflow without human guidance for each step. MCP transforms AI models from conversation assistants into autonomous agents that can take real actions on external systems.</p><p>For the <a href=\"data-lakehouse.html\">data lakehouse</a>, MCP means that AI models can be given direct, autonomous access to governed enterprise data \u2014 discovering datasets, understanding their business meaning, formulating SQL queries, and returning business-contextualized answers \u2014 all without a human writing SQL or navigating the data catalog manually."
+    },
+    {
+      "heading": "Dremio's MCP Tool Set",
+      "content": "<p><a href=\"dremio.html\">Dremio's</a> MCP server exposes the <a href=\"ai-semantic-layer.html\">AI Semantic Layer</a> as the following MCP tools:</p><ul><li><strong>list_datasets:</strong> Returns all datasets accessible to the agent principal, with their business names, descriptions, and domain tags. The AI model reads descriptions to identify relevant datasets for the user's question.</li><li><strong>get_dataset_schema:</strong> Returns the full schema of a specified dataset \u2014 column names, types, and AI-readable descriptions of what each column represents. Helps the AI model understand how to write correct SQL.</li><li><strong>get_metric_definitions:</strong> Returns formal metric definitions \u2014 the exact SQL formula, valid dimensions, and business description for named business metrics (LTV, Churn Rate, Conversion Rate).</li><li><strong>execute_sql:</strong> Executes a SQL query against Dremio's engine and returns results. The AI model formulates the SQL based on schema knowledge and the user's question.</li><li><strong>get_query_status:</strong> Polls the status of a running query \u2014 enabling asynchronous execution of long-running analytical queries.</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Dremio MCP Tool Architecture",
+      "diagramCaption": "Figure 1: Dremio MCP tool set \u2014 the AI agent toolkit for autonomous lakehouse data access."
+    },
+    {
+      "heading": "MCP in Multi-Agent Architectures",
+      "content": "<p>MCP's most powerful application is in multi-agent architectures where specialized agents collaborate:</p><ul><li><strong>Orchestrator agent:</strong> Receives user question, decomposes into sub-tasks, delegates to specialist agents</li><li><strong>Data analyst agent:</strong> Uses Dremio MCP tools to retrieve data and perform SQL analysis</li><li><strong>ML inference agent:</strong> Calls a <a href=\"feature-store.html\">feature store</a> API and a model serving endpoint to generate ML predictions</li><li><strong>Report agent:</strong> Combines data analysis and ML predictions into a formatted business report</li></ul><p>Each agent uses MCP to access its specialized external systems. The orchestrator coordinates them without needing to know the details of each system's API \u2014 MCP's standardized tool interface provides the abstraction layer that makes multi-agent orchestration tractable.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Multi-Agent MCP Lakehouse Architecture",
+      "diagramCaption": "Figure 2: Multi-agent MCP architecture \u2014 orchestrator delegating to data, ML, and reporting agents."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The Model Context Protocol is the infrastructure standard that makes the <a href=\"agentic-lakehouse.html\">Agentic Lakehouse</a> possible \u2014 providing a standardized, open interface for AI models to autonomously access enterprise data platforms. <a href=\"dremio.html\">Dremio's</a> MCP server, exposing the <a href=\"ai-semantic-layer.html\">AI Semantic Layer</a> as structured, AI-interpretable tools, is the practical implementation of this vision: connecting the world's most capable AI language models to the world's most sophisticated open lakehouse platform \u2014 with full governance, access control, and audit trail \u2014 for a new era of autonomous enterprise analytics. Every organization investing in the open <a href=\"data-lakehouse.html\">data lakehouse</a> today is laying the foundation for the agentic analytics capabilities that MCP and AI agents will deliver tomorrow.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "agentic-lakehouse",
+      "term": "Agentic Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "The Agentic Lakehouse is powered by MCP."
+    },
+    {
+      "slug": "ai-semantic-layer",
+      "term": "AI Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "AI Semantic Layer exposed as MCP tools by Dremio."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio provides the MCP server for lakehouse data access."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "Semantic layer provides the context MCP tools expose."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Governance enforced for AI agents via MCP-authenticated access."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg tables are the data AI agents access via MCP."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "MCP makes the lakehouse accessible to AI agents."
+    },
+    {
+      "slug": "self-service-analytics",
+      "term": "Self-Service Analytics",
+      "category": "Analytics & BI",
+      "desc": "MCP extends self-service to AI-autonomous analytics."
+    }
+  ]
+}

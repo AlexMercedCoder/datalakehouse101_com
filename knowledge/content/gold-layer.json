@@ -1,0 +1,98 @@
+{
+  "slug": "gold-layer",
+  "term": "Gold Layer",
+  "category": "Architecture Patterns",
+  "metaTitle": "Gold Layer: The Definitive Guide for Apache Iceberg Lakehouse",
+  "metaDescription": "Learn what the Gold Layer is in the Medallion Architecture, how it delivers pre-aggregated business metrics on Apache Iceberg, and best practices for Gold table design and optimization.",
+  "h1": "Gold Layer: The Definitive Guide",
+  "lede": "The Gold Layer is the business-ready analytical tier of the Medallion Architecture \u2014 pre-aggregated metrics, dimensional models, and domain-specific datasets optimized for each business team's analytics needs. Gold tables sit directly beneath the semantic layer, with Dremio Reflections accelerating BI queries to sub-second performance.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the Gold Layer?",
+      "a": "The Gold Layer is the third and final tier of the Medallion Architecture. It contains business-ready, domain-specific datasets \u2014 pre-aggregated metrics (daily revenue by region, weekly retention rates), dimensional models (fact tables + dimension tables), and curated analytical datasets tailored to specific business team needs. Gold data is clean, trusted, and optimized for analytical query performance."
+    },
+    {
+      "q": "Who accesses Gold Layer tables?",
+      "a": "Gold Layer tables are the primary data source for: BI tools (Tableau, Power BI, Looker connected via Dremio), self-service analysts (accessing via Dremio's semantic layer VDSs), data scientists (feature engineering for ML models), and AI agents (querying via Dremio's AI Semantic Layer MCP server). Gold tables are designed for analytical read performance, not for ETL write patterns."
+    },
+    {
+      "q": "How are Gold Layer tables optimized for performance?",
+      "a": "Gold tables are optimized through: Z-Ordering by common filter dimensions (order_date, region, product_category), compaction to right-sized files, Dremio Reflections that pre-compute aggregations, and partition design that aligns with query patterns (monthly partitions for trend analysis, daily for operational dashboards). The combination of good physical layout + Reflections delivers sub-second BI performance on Gold tables."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the Gold Layer?",
+      "content": "<p>The <strong>Gold Layer</strong> is the final, business-ready tier of the <a href=\"medallion-architecture.html\">Medallion Architecture</a> \u2014 the layer where data engineering work culminates in curated, trusted, analytically optimized datasets that business teams use for decision-making. Gold tables are designed around business team needs rather than source system structure: they speak the language of the business, not the language of the database schema.</p><p>Unlike Bronze (raw) and Silver (clean but source-structured), Gold tables are purpose-built for specific analytical domains: a Sales Gold layer has revenue metrics pre-computed by region, segment, and time; a Marketing Gold layer has campaign attribution and funnel metrics; an Operations Gold layer has order fulfillment KPIs and SLA metrics. Each Gold dataset is shaped for the access patterns of its consuming business team."
+    },
+    {
+      "heading": "Gold Table Design Principles",
+      "content": "<p>Five design principles for effective Gold tables:</p><ol><li><strong>Domain alignment:</strong> Design Gold tables around business team domains and their specific analytical questions \u2014 not around source system tables or technical schema conventions</li><li><strong>Pre-aggregation:</strong> Pre-compute common aggregations (daily, weekly, monthly rollups by key dimensions) that would otherwise require expensive GROUP BY operations at query time</li><li><strong>Star schema:</strong> Fact tables (metrics, events) joined with dimension tables (customers, products, time, geography) following the Kimball dimensional model \u2014 optimized for BI tool query patterns</li><li><strong>Query-optimized layout:</strong> Z-Order by the most common filter dimensions; partition by date at the grain analysts most commonly use (daily for operational, monthly for trend)</li><li><strong>Reflection-ready:</strong> Define Dremio Aggregation Reflections on the most common Gold aggregation patterns for sub-second BI performance</li></ol>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Gold Layer Design Star Schema",
+      "diagramCaption": "Figure 1: Gold layer design \u2014 star schema, pre-aggregations, Z-ordering, and Reflection definitions."
+    },
+    {
+      "heading": "Gold Layer and the Semantic Layer",
+      "content": "<p>The Gold Layer and <a href=\"semantic-layer.html\">semantic layer</a> work together in <a href=\"dremio.html\">Dremio</a>:</p><ul><li>Gold Iceberg tables provide the physical data foundation \u2014 pre-aggregated, Z-ordered, compacted for read performance</li><li>Dremio <a href=\"virtual-datasets.html\">Virtual Datasets</a> (VDSs) provide the semantic layer on top of Gold \u2014 adding business-friendly names, column descriptions, and business context</li><li>Dremio <a href=\"dremio-reflections.html\">Reflections</a> defined on Gold tables (or Gold VDSs) pre-compute the most common aggregations for sub-second BI performance</li><li>BI tools (Tableau, Power BI, Looker) connect to Dremio and query Gold VDSs \u2014 getting pre-computed results from Reflections without knowing the physical Gold table structure</li></ul><p>This architecture delivers sub-second analytical performance on trusted, governed, business-ready Gold data to every BI tool and analyst in the organization.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Gold Layer Semantic Layer Dremio",
+      "diagramCaption": "Figure 2: Gold layer + semantic layer \u2014 Iceberg Gold tables beneath Dremio VDSs and Reflections for BI."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The Gold Layer is the analytical crown of the <a href=\"medallion-architecture.html\">Medallion Architecture</a> \u2014 where raw Bronze data, transformed into trusted Silver, is further aggregated and curated into the business-ready datasets that drive organizational decision-making. Designed around domain-specific analytical patterns, optimized with <a href=\"z-ordering.html\">Z-ordering</a> and <a href=\"compaction.html\">compaction</a>, and accelerated with <a href=\"dremio-reflections.html\">Dremio Reflections</a>, Gold tables are the foundation of the <a href=\"semantic-layer.html\">semantic layer</a> and the ultimate product of the lakehouse pipeline \u2014 delivering sub-second, trusted analytics to every business user in the organization.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "The three-tier framework containing the Gold layer."
+    },
+    {
+      "slug": "silver-layer",
+      "term": "Silver Layer",
+      "category": "Architecture Patterns",
+      "desc": "Trusted Silver data that Gold aggregations build on."
+    },
+    {
+      "slug": "bronze-layer",
+      "term": "Bronze Layer",
+      "category": "Architecture Patterns",
+      "desc": "Raw foundation layer that feeds the full Medallion pipeline."
+    },
+    {
+      "slug": "dremio-reflections",
+      "term": "Dremio Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "Reflections accelerate Gold table BI queries to sub-second."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "Semantic layer sits on top of Gold tables."
+    },
+    {
+      "slug": "z-ordering",
+      "term": "Z-Ordering",
+      "category": "Table Formats",
+      "desc": "Z-ordering optimizes Gold tables for analytical queries."
+    },
+    {
+      "slug": "self-service-analytics",
+      "term": "Self-Service Analytics",
+      "category": "Analytics & BI",
+      "desc": "Gold tables enable self-service BI analytics."
+    },
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "VDSs provide the business interface on Gold tables."
+    }
+  ]
+}

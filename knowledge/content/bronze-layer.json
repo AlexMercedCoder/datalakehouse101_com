@@ -1,0 +1,98 @@
+{
+  "slug": "bronze-layer",
+  "term": "Bronze Layer",
+  "category": "Architecture Patterns",
+  "metaTitle": "Bronze Layer: The Definitive Guide for Apache Iceberg Lakehouse",
+  "metaDescription": "Learn what the Bronze Layer is in the Medallion Architecture, how it stores raw ingested data in Apache Iceberg, and best practices for Bronze table design.",
+  "h1": "Bronze Layer: The Definitive Guide",
+  "lede": "The Bronze Layer is the raw data landing zone of the Medallion Architecture \u2014 storing every record exactly as received from source systems in append-only Apache Iceberg tables. It is the immutable audit trail that enables re-processing, debugging, and compliance, and the foundation every Silver transformation builds from.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the Bronze Layer?",
+      "a": "The Bronze Layer (also called the raw layer or ingestion layer) is the first tier of the Medallion Architecture. It stores raw data exactly as received from source systems \u2014 no cleaning, no deduplication, no transformation. Bronze tables are typically append-only Apache Iceberg tables partitioned by ingestion date, preserving a complete historical record of all source data received."
+    },
+    {
+      "q": "Why should Bronze tables be append-only?",
+      "a": "Append-only Bronze tables preserve the complete historical record of all received data \u2014 including duplicates, errors, and schema variations that may need to be investigated or re-processed. Immutability makes Bronze the reliable audit trail: if a Silver transformation has a bug, you can always re-process from Bronze without re-extracting from the source. Updates would destroy this audit capability."
+    },
+    {
+      "q": "How should Bronze tables be partitioned?",
+      "a": "Bronze tables are typically partitioned by ingestion_date or ingestion_timestamp_hour \u2014 the time the data arrived in the lakehouse, not the event time. This enables efficient querying of 'what was ingested today?' for pipeline monitoring, and allows Silver transformations to efficiently read only the new Bronze partitions since the last run."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the Bronze Layer?",
+      "content": "<p>The <strong>Bronze Layer</strong> is the first tier of the <a href=\"medallion-architecture.html\">Medallion Architecture</a> \u2014 the raw data landing zone where every record from every source system is stored exactly as received, without any transformation, cleaning, or deduplication. Bronze tables are the lakehouse's permanent, immutable record of all data ever ingested.</p><p>The Bronze Layer's design principle is: <strong>preserve everything, transform nothing</strong>. This immutability serves critical purposes: it creates a complete audit trail for compliance (proving exactly what data was received and when), enables re-processing (if a Silver transformation has a bug, Bronze data can be re-processed without re-extracting from the source), and preserves the ability to fix historical errors by reprocessing Bronze records with corrected transformation logic.</p>"
+    },
+    {
+      "heading": "Bronze Table Design",
+      "content": "<p>Bronze tables are designed for ingestion performance and auditability, not analytical query performance:</p><ul><li><strong>Partition by ingestion date:</strong> Partition on <code>_ingest_date</code> (the date the record arrived, not the event date) \u2014 enables efficient 'show me today's new records' queries by Silver jobs without scanning historical partitions</li><li><strong>Append-only:</strong> Only INSERT operations; no UPDATE or DELETE. New records are appended; even CDC DELETE events are appended as records with op_type='D'</li><li><strong>Full source fidelity:</strong> All source columns preserved, including columns that may seem redundant or erroneous \u2014 data engineering is not responsible for source quality at this layer</li><li><strong>Metadata columns added:</strong> <code>_ingest_timestamp</code>, <code>_source_system</code>, <code>_pipeline_run_id</code> \u2014 operational metadata for monitoring and debugging</li><li><strong>Avro or Parquet:</strong> Typically Parquet for schema enforcement, though some teams use Avro for schema flexibility at the Bronze layer</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Bronze Layer Design Pattern",
+      "diagramCaption": "Figure 1: Bronze table design \u2014 append-only, ingestion-date partitioned, full-fidelity source records."
+    },
+    {
+      "heading": "Bronze Layer Monitoring",
+      "content": "<p>The Bronze Layer requires specific monitoring to ensure ingestion pipeline health:</p><ul><li><strong>Freshness monitoring:</strong> How old is the newest record in each Bronze table? A 2-hour gap when freshness should be 5 minutes indicates a pipeline failure.</li><li><strong>Volume monitoring:</strong> Are row counts per ingestion batch within expected ranges? A batch loading 1,000 rows when it typically loads 100,000 indicates a source issue or pipeline filter bug.</li><li><strong>Schema drift detection:</strong> Have source columns changed type or disappeared? Bronze schema changes can break Silver transformations that reference specific columns.</li></ul><p>These Bronze-layer monitoring checks are implemented by <a href=\"data-observability.html\">data observability</a> platforms (Monte Carlo, Elementary) as freshness and volume checks on the Bronze Iceberg tables.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Bronze Layer Monitoring",
+      "diagramCaption": "Figure 2: Bronze layer monitoring \u2014 freshness, volume, and schema drift checks for ingestion health."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The Bronze Layer is the bedrock of the <a href=\"medallion-architecture.html\">Medallion Architecture</a> \u2014 the immutable, complete record of all data the lakehouse has ever received. By designing Bronze tables as append-only, ingestion-date-partitioned <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables with full source fidelity, data teams create a reliable foundation that enables safe re-processing, complete audit trails, and the debugging capability to trace any Silver or Gold data quality issue back to the exact source records that caused it. The Bronze Layer's value is proportional to its faithfulness to the source \u2014 the closer to raw, the more valuable for downstream re-processing and compliance.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "The three-tier architecture containing the Bronze layer."
+    },
+    {
+      "slug": "silver-layer",
+      "term": "Silver Layer",
+      "category": "Architecture Patterns",
+      "desc": "The transformation layer built on Bronze data."
+    },
+    {
+      "slug": "data-ingestion",
+      "term": "Data Ingestion",
+      "category": "Ingestion & Streaming",
+      "desc": "Ingestion pipelines populate Bronze tables."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format implementing Bronze tables."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC events land in Bronze tables as raw change records."
+    },
+    {
+      "slug": "data-observability",
+      "term": "Data Observability",
+      "category": "Governance & Quality",
+      "desc": "Observability monitors Bronze layer freshness and volume."
+    },
+    {
+      "slug": "stream-processing",
+      "term": "Stream Processing",
+      "category": "Ingestion & Streaming",
+      "desc": "Streaming ingestion writes continuously to Bronze tables."
+    },
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "Bronze Iceberg tables are stored in object storage."
+    }
+  ]
+}

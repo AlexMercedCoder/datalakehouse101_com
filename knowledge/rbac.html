@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Role-Based Access Control (RBAC): The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what RBAC is in the data lakehouse, how it is implemented in Apache Polaris and Dremio, and why role-based access is the governance standard for enterprise Iceberg deployments.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/rbac.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Role-Based Access Control (RBAC): The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what RBAC is in the data lakehouse, how it is implemented in Apache Polaris and Dremio, and why role-based access is the governance standard for enterprise Iceberg deployments.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/rbac.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Role-Based Access Control (RBAC): The Definitive Guide",
+      "description": "Learn what RBAC is in the data lakehouse, how it is implemented in Apache Polaris and Dremio, and why role-based access is the governance standard for enterprise Iceberg deployments.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/rbac.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Role-Based Access Control (RBAC)", "item": "https://datalakehouse101.com/knowledge/rbac.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is RBAC in the data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Role-Based Access Control (RBAC) in the data lakehouse is a permission model where access rights (read, write, manage) to data assets (catalogs, namespaces, tables, columns) are assigned to named roles, and users or service accounts are then assigned to those roles. RBAC is more manageable than user-level permissions at scale — adding a new analyst means assigning them to existing roles rather than granting individual permissions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does RBAC work in Apache Polaris?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Polaris implements RBAC through a hierarchy: Principals (users or service accounts) are assigned Principal Roles. Catalog Roles are defined with specific privileges (TABLE_READ, TABLE_WRITE, NAMESPACE_CREATE, etc.) on specific catalog resources. Catalog Roles are granted to Principal Roles. This two-tier model allows flexible, granular permission assignment across catalog resources."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is catalog-level RBAC better than storage-level RBAC?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Catalog-level RBAC (enforced in Polaris or Dremio Open Catalog) is engine-agnostic — permissions apply regardless of which engine queries the data. Storage-level RBAC (IAM + S3 bucket policies) is unaware of table structure and cannot enforce table or column-level access. Catalog RBAC enables fine-grained, table-level governance while credential vending ensures engines receive only the storage permissions needed for authorized tables."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Role-Based Access Control (RBAC)</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance & Quality</span>
+      <h1>Role-Based Access Control (RBAC): The Definitive Guide</h1>
+      <p class="hero-lede">Role-Based Access Control (RBAC) is the governance standard for managing who can access what data in the lakehouse — assigning permissions to roles rather than individuals, then assigning roles to users. In Apache Polaris and Dremio, RBAC controls access to catalogs, namespaces, tables, and columns through a principled permission model.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is RBAC?</a></li>
+        <li><a href="#section-2">RBAC in Apache Polaris</a></li>
+        <li><a href="#section-3">RBAC in Dremio</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is RBAC?</h2>
+        <p><strong>Role-Based Access Control (RBAC)</strong> is the governance model where permissions to access resources are assigned to named <em>roles</em>, and users or service accounts are then assigned to roles — rather than granting permissions directly to individual users. RBAC scales gracefully: adding a new analyst means assigning them to the 'analyst' role (which already has all appropriate permissions), rather than granting 50 individual table permissions. Changing the permissions of all analysts means updating the 'analyst' role, which automatically applies to all role members.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a>, RBAC is implemented at the <a href="iceberg-rest-catalog.html">Iceberg catalog</a> level — where all engines connect before accessing table data. Catalog-level RBAC is the engine-agnostic governance standard: regardless of whether a query comes from <a href="dremio.html">Dremio</a>, <a href="apache-spark.html">Spark</a>, or <a href="trino.html">Trino</a>, the catalog enforces the same access policies.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>RBAC in Apache Polaris</h2>
+        <p><a href="apache-polaris.html">Apache Polaris</a> implements a two-tier RBAC model:</p><h3>Principals and Principal Roles</h3><p>A <em>Principal</em> is a user or service account that authenticates with Polaris. <em>Principal Roles</em> are named collections that principals are assigned to — 'data-engineers', 'analysts', 'ml-team', 'bi-service-accounts'.</p><h3>Catalog Roles and Privileges</h3><p>A <em>Catalog Role</em> is a named set of privileges on specific catalog resources — namespaces and tables. Privileges include: <code>TABLE_READ_DATA</code>, <code>TABLE_WRITE_DATA</code>, <code>TABLE_FULL_METADATA</code>, <code>NAMESPACE_CREATE</code>, <code>CATALOG_MANAGE_METADATA</code>. Catalog Roles are granted to Principal Roles — connecting user groups to their permitted catalog resources.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="RBAC Model Apache Polaris diagram" loading="lazy"><figcaption>Figure 1: Apache Polaris RBAC — principals, principal roles, catalog roles, and privileges.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>RBAC in Dremio</h2>
+        <p><a href="dremio.html">Dremio</a> implements RBAC across its full resource hierarchy:</p><ul><li><strong>System-level roles:</strong> ADMIN (full system access), PUBLIC (default minimum access for all users)</li><li><strong>Custom roles:</strong> Named roles with specific permissions on specific Dremio resources</li><li><strong>Resource-level permissions:</strong> Each Dremio object (source, space, VDS, folder) has its own access control list — permissions can be set at the source level (all tables in a source), the schema level (all tables in a namespace), or the individual VDS level</li><li><strong>Column-level masking:</strong> Data masking policies that replace sensitive column values with masked equivalents for specific roles</li></ul><p>Dremio's RBAC controls both the <a href="semantic-layer.html">semantic layer</a> (which VDSs a role can see) and the underlying data access (which physical sources a role can query through).
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="RBAC in Dremio Lakehouse diagram" loading="lazy"><figcaption>Figure 2: Dremio RBAC — role hierarchy from system roles to resource-level column masking policies.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Role-Based Access Control is the governance backbone of the enterprise <a href="data-lakehouse.html">data lakehouse</a>. Implemented at the catalog layer (<a href="apache-polaris.html">Apache Polaris</a>, <a href="dremio-open-catalog.html">Dremio Open Catalog</a>), RBAC provides engine-agnostic, principled access control that scales from a handful of users to thousands without per-user permission management overhead. Combined with <a href="column-level-security.html">column-level security</a> for fine-grained data masking, RBAC gives organizations the governance framework to make the open lakehouse both openly accessible and securely governed — enabling self-service analytics without sacrificing compliance.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">Implements the two-tier RBAC model for Iceberg.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Dremio RBAC spans semantic layer and data access.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">RBAC is the access control pillar of governance.</span>
+    </a>
+      <a class="related-card" href="column-level-security.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Column-Level Security</span>
+      <span class="related-desc">Fine-grained security complementing table-level RBAC.</span>
+    </a>
+      <a class="related-card" href="iceberg-rest-catalog.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Iceberg REST Catalog</span>
+      <span class="related-desc">The catalog layer where RBAC is enforced.</span>
+    </a>
+      <a class="related-card" href="dremio-open-catalog.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Open Catalog</span>
+      <span class="related-desc">Dremio's governed REST catalog with RBAC.</span>
+    </a>
+      <a class="related-card" href="self-service-analytics.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Self-Service Analytics</span>
+      <span class="related-desc">RBAC enables governed self-service data access.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">RBAC makes the open lakehouse enterprise-governed.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

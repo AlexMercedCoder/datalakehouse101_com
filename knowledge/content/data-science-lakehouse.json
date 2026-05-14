@@ -1,0 +1,98 @@
+{
+  "slug": "data-science-lakehouse",
+  "term": "Data Science on the Lakehouse",
+  "category": "Architecture Patterns",
+  "metaTitle": "Data Science on the Data Lakehouse: The Definitive Guide",
+  "metaDescription": "Learn how data scientists use Apache Iceberg tables, PyIceberg, and Dremio's AI Semantic Layer for ML feature engineering, model training, and AI-ready data access.",
+  "h1": "Data Science on the Lakehouse: The Definitive Guide",
+  "lede": "The data lakehouse is the ideal platform for data science \u2014 providing ACID-safe historical data, time travel for experiment reproducibility, open Parquet files for direct Python access, and the Dremio AI Semantic Layer for AI agent data access. Data scientists get governed, current, feature-rich data without waiting for data engineering tickets.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "How do data scientists access Apache Iceberg data?",
+      "a": "Data scientists access Iceberg data through multiple interfaces: PyIceberg (Python library for direct Iceberg table access without Spark \u2014 returns Arrow tables for Pandas), PySpark (Spark Iceberg integration for large-scale feature engineering), Dremio SQL via Arrow Flight SQL + PyArrow (high-throughput query results into Pandas), and dbt (for defining feature tables as SQL models on Silver/Gold data)."
+    },
+    {
+      "q": "How does time travel help with ML reproducibility?",
+      "a": "Iceberg time travel allows data scientists to reconstruct the exact dataset state used for any historical model training run \u2014 query the Silver table as it existed on the date training occurred. Combined with Nessie branch tagging, this ensures that any model training run can be exactly reproduced months later, solving the training data drift problem."
+    },
+    {
+      "q": "What is the role of the AI Semantic Layer in data science?",
+      "a": "The AI Semantic Layer (Dremio's MCP-exposed metric and dataset definitions) allows AI agents to autonomously discover, understand, and query enterprise lakehouse data for ML feature retrieval, dataset exploration, and model input preparation \u2014 without requiring data scientists to write custom SQL for each feature extraction task."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "The Lakehouse as a Data Science Platform",
+      "content": "<p>The <a href=\"data-lakehouse.html\">data lakehouse</a> solves the most frustrating problem in data science: access to good data. Traditional data science workflows were bottlenecked on data engineering: data scientists submitted tickets to get data extracted from warehouses, waited days, received stale dumps in CSV files, and then realized they needed different columns and started over. The lakehouse eliminates this bottleneck by giving data scientists direct, governed, self-service access to curated Gold and Silver <a href=\"apache-iceberg.html\">Iceberg</a> tables through Python interfaces they already know.</p>"
+    },
+    {
+      "heading": "Python Access to Iceberg Data",
+      "content": "<p>Data scientists access Iceberg data through several Python interfaces:</p><h3>PyIceberg: Direct Iceberg Access</h3><pre><code>from pyiceberg.catalog import load_catalog\ncatalog = load_catalog('polaris', uri='https://polaris.example.com/api/catalog')\ntable = catalog.load_table('gold.customer_features')\ndf = table.scan(row_filter=\"region = 'US-WEST'\").to_arrow().to_pandas()</code></pre><h3>Dremio + Arrow Flight SQL</h3><pre><code>from pyarrow import flight\nclient = flight.FlightClient('grpc+tls://dremio.example.com:32010')\ndf = client.do_get(...).read_all().to_pandas()\n# Sub-second for Reflection-accelerated queries</code></pre><h3>PySpark + Iceberg for Large-Scale Feature Engineering</h3><pre><code>df = spark.table('catalog.gold.customer_features')\nfeatures = df.groupBy('customer_id').agg(F.sum('ltv'), F.count('orders'))</code></pre>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Python Data Science Access to Iceberg",
+      "diagramCaption": "Figure 1: Python data science access to lakehouse data \u2014 PyIceberg, Arrow Flight SQL, and PySpark."
+    },
+    {
+      "heading": "Feature Engineering on the Lakehouse",
+      "content": "<p>The lakehouse is the ideal platform for ML feature engineering:</p><ul><li><strong>Historical features:</strong> Time travel queries recreate exact historical feature values \u2014 essential for training models on point-in-time correct features (no label leakage)</li><li><strong>Fresh features:</strong> Streaming-ingested Iceberg tables provide near-real-time feature values for online inference</li><li><strong>Feature sharing:</strong> Gold Iceberg feature tables serve as a shared <a href=\"feature-store.html\">feature store</a> \u2014 data scientists publish computed features as Iceberg tables that other teams can reuse</li><li><strong>Version control:</strong> <a href=\"nessie-branching-tagging.html\">Nessie tags</a> snapshot the exact data state used for each training run \u2014 enabling perfect ML reproducibility</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "ML Feature Engineering on Iceberg",
+      "diagramCaption": "Figure 2: ML feature engineering on Iceberg \u2014 historical, fresh, shared, and version-controlled features."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The <a href=\"data-lakehouse.html\">data lakehouse</a> is transforming data science from a bottlenecked, ticket-driven, CSV-file workflow into a governed, self-service, feature-rich analytical platform. With PyIceberg for direct Python access, Dremio Arrow Flight SQL for high-throughput query results, PySpark for large-scale feature engineering, Nessie tagging for experiment reproducibility, and the AI Semantic Layer for autonomous agent data access, the lakehouse provides everything data scientists need \u2014 on trusted, governed, current data \u2014 without waiting for data engineering support on every feature extraction task.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format providing Python-accessible lakehouse data."
+    },
+    {
+      "slug": "feature-store",
+      "term": "Feature Store",
+      "category": "Architecture Patterns",
+      "desc": "Gold Iceberg tables as a shared feature store."
+    },
+    {
+      "slug": "mlflow",
+      "term": "MLflow",
+      "category": "Architecture Patterns",
+      "desc": "MLflow tracks model experiments on lakehouse features."
+    },
+    {
+      "slug": "ai-semantic-layer",
+      "term": "AI Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "AI Semantic Layer enables autonomous data science access."
+    },
+    {
+      "slug": "nessie-branching-tagging",
+      "term": "Nessie Branching and Tagging",
+      "category": "Architecture Patterns",
+      "desc": "Nessie tags ensure ML experiment reproducibility."
+    },
+    {
+      "slug": "time-travel",
+      "term": "Time Travel",
+      "category": "Table Formats",
+      "desc": "Time travel reconstructs historical feature values."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "PySpark for large-scale ML feature engineering on Iceberg."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio Arrow Flight SQL for Python data science access."
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "slug": "silver-layer",
+  "term": "Silver Layer",
+  "category": "Architecture Patterns",
+  "metaTitle": "Silver Layer: The Definitive Guide for Apache Iceberg Lakehouse",
+  "metaDescription": "Learn what the Silver Layer is in the Medallion Architecture, how it cleanses and conforms Bronze data in Apache Iceberg, and best practices for Silver table design and maintenance.",
+  "h1": "Silver Layer: The Definitive Guide",
+  "lede": "The Silver Layer is the cleansed, validated, and conformed tier of the Medallion Architecture \u2014 transforming raw Bronze records into trusted, business-ready data through deduplication, schema standardization, CDC MERGE INTO, and quality validation. Silver tables are the trusted foundation that all Gold aggregations and business analytics build from.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the Silver Layer?",
+      "a": "The Silver Layer is the second tier of the Medallion Architecture. It stores cleansed, validated, and conformed data derived from Bronze raw records. Silver transformations include: deduplication (removing duplicate records), type standardization (parsing dates and normalizing strings), null handling (rejecting or imputing missing critical values), business rule validation, and CDC MERGE INTO (maintaining current-state records from change event streams)."
+    },
+    {
+      "q": "What transformations happen in the Silver Layer?",
+      "a": "Key Silver transformations: (1) Deduplication \u2014 removing duplicate events from Bronze using ROW_NUMBER window functions; (2) Schema conforming \u2014 standardizing column names, types, and formats across sources; (3) Null handling \u2014 imputing defaults or rejecting records with null primary keys; (4) CDC MERGE INTO \u2014 applying INSERT/UPDATE/DELETE events to maintain current-state tables; (5) Reference data enrichment \u2014 joining with dimension tables to add business context."
+    },
+    {
+      "q": "How should Silver tables be maintained?",
+      "a": "Silver tables require regular compaction (frequent MERGE INTO operations generate many small files), periodic Z-ordering (to improve query performance for common filter patterns), and snapshot expiry (to prevent metadata bloat from accumulated snapshots). These maintenance operations are best automated via scheduled Airflow DAGs or Dremio's automatic table optimization."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the Silver Layer?",
+      "content": "<p>The <strong>Silver Layer</strong> is the second tier of the <a href=\"medallion-architecture.html\">Medallion Architecture</a> \u2014 the transformation layer that converts raw Bronze records into clean, validated, business-conforming data that downstream Gold transformations and analytics can trust. Silver is where data quality enforcement happens: records that don't meet quality standards are rejected (written to a quarantine table for investigation) rather than propagated to Gold where they would corrupt business metrics.</p><p>Unlike the Bronze Layer (which preserves data exactly as received), the Silver Layer applies business-defined transformation logic: deduplication of duplicate events, schema standardization (consistent column names and types across sources), null handling, and \u2014 most importantly \u2014 CDC state management (maintaining the current state of source operational database tables from a stream of INSERT/UPDATE/DELETE events)."
+    },
+    {
+      "heading": "Silver Layer: CDC Current-State Pattern",
+      "content": "<p>The most important Silver Layer pattern for operational data is the <strong>CDC current-state table</strong>: a Silver Iceberg table that maintains the present state of a source operational database table by applying CDC change events via MERGE INTO.</p><p>Implementation:</p><ol><li>Bronze table contains a log of all CDC events (INSERT, UPDATE, DELETE) with operation type and full row image</li><li>Scheduled Spark or dbt job reads new Bronze CDC events since the last run</li><li>MERGE INTO applies events to Silver current-state table: INSERTs become new rows, UPDATEs replace existing rows, DELETEs remove rows</li><li>Silver table always reflects the current state of the source \u2014 analysts can query 'what is the current status of order #12345?' against Silver, not Bronze</li></ol>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Silver Layer CDC Current State Pattern",
+      "diagramCaption": "Figure 1: Silver CDC current-state pattern \u2014 MERGE INTO transforms CDC events into current-state Iceberg tables."
+    },
+    {
+      "heading": "Silver Layer Maintenance",
+      "content": "<p>Silver tables require consistent maintenance because frequent MERGE INTO operations accumulate many small files and delete files:</p><ul><li><strong>Compaction:</strong> Merge small data files and delete files created by MERGE INTO operations. Run daily or after large batch MERGE operations.</li><li><strong>Z-Ordering:</strong> Sort data by common query filter columns (customer_id, region, order_date) for improved data skipping. Run weekly for heavily queried tables.</li><li><strong>Snapshot expiry:</strong> Remove snapshots older than the retention window (typically 7 days for Silver). Each MERGE INTO creates a new snapshot; retaining thousands accumulates metadata overhead.</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Silver Layer Maintenance Schedule",
+      "diagramCaption": "Figure 2: Silver layer maintenance \u2014 compaction, Z-ordering, and snapshot expiry cadences."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The Silver Layer is the trust-building tier of the <a href=\"medallion-architecture.html\">Medallion Architecture</a> \u2014 the transformation stage where raw Bronze data is transformed into the clean, validated, business-conforming datasets that Gold aggregations and analyst queries depend on. Implemented as <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables with regular MERGE INTO for CDC current-state maintenance and compaction for read performance, Silver tables are the reliable middle tier that separates raw ingestion complexity from business analytics simplicity. High-quality Silver tables are the most important investment a data engineering team can make for downstream analytical trust.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Three-tier framework containing the Silver layer."
+    },
+    {
+      "slug": "bronze-layer",
+      "term": "Bronze Layer",
+      "category": "Architecture Patterns",
+      "desc": "Raw layer that Silver cleansing transforms."
+    },
+    {
+      "slug": "gold-layer",
+      "term": "Gold Layer",
+      "category": "Architecture Patterns",
+      "desc": "Business analytics layer built on Silver data."
+    },
+    {
+      "slug": "upsert",
+      "term": "Upsert",
+      "category": "Ingestion & Streaming",
+      "desc": "MERGE INTO upsert maintains Silver current-state tables."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC events are processed by Silver MERGE INTO."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Compaction essential for Silver tables with frequent MERGEs."
+    },
+    {
+      "slug": "data-quality",
+      "term": "Data Quality",
+      "category": "Governance & Quality",
+      "desc": "Quality gates enforced between Bronze and Silver."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg MERGE INTO implements Silver CDC maintenance."
+    }
+  ]
+}

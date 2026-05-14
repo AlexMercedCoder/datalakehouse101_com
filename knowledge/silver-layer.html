@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silver Layer: The Definitive Guide for Apache Iceberg Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what the Silver Layer is in the Medallion Architecture, how it cleanses and conforms Bronze data in Apache Iceberg, and best practices for Silver table design and maintenance.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/silver-layer.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Silver Layer: The Definitive Guide for Apache Iceberg Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what the Silver Layer is in the Medallion Architecture, how it cleanses and conforms Bronze data in Apache Iceberg, and best practices for Silver table design and maintenance.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/silver-layer.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Silver Layer: The Definitive Guide",
+      "description": "Learn what the Silver Layer is in the Medallion Architecture, how it cleanses and conforms Bronze data in Apache Iceberg, and best practices for Silver table design and maintenance.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/silver-layer.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Silver Layer", "item": "https://datalakehouse101.com/knowledge/silver-layer.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the Silver Layer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Silver Layer is the second tier of the Medallion Architecture. It stores cleansed, validated, and conformed data derived from Bronze raw records. Silver transformations include: deduplication (removing duplicate records), type standardization (parsing dates and normalizing strings), null handling (rejecting or imputing missing critical values), business rule validation, and CDC MERGE INTO (maintaining current-state records from change event streams)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What transformations happen in the Silver Layer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Key Silver transformations: (1) Deduplication — removing duplicate events from Bronze using ROW_NUMBER window functions; (2) Schema conforming — standardizing column names, types, and formats across sources; (3) Null handling — imputing defaults or rejecting records with null primary keys; (4) CDC MERGE INTO — applying INSERT/UPDATE/DELETE events to maintain current-state tables; (5) Reference data enrichment — joining with dimension tables to add business context."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How should Silver tables be maintained?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Silver tables require regular compaction (frequent MERGE INTO operations generate many small files), periodic Z-ordering (to improve query performance for common filter patterns), and snapshot expiry (to prevent metadata bloat from accumulated snapshots). These maintenance operations are best automated via scheduled Airflow DAGs or Dremio's automatic table optimization."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Silver Layer</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Architecture Patterns</span>
+      <h1>Silver Layer: The Definitive Guide</h1>
+      <p class="hero-lede">The Silver Layer is the cleansed, validated, and conformed tier of the Medallion Architecture — transforming raw Bronze records into trusted, business-ready data through deduplication, schema standardization, CDC MERGE INTO, and quality validation. Silver tables are the trusted foundation that all Gold aggregations and business analytics build from.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is the Silver Layer?</a></li>
+        <li><a href="#section-2">Silver Layer: CDC Current-State Pattern</a></li>
+        <li><a href="#section-3">Silver Layer Maintenance</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is the Silver Layer?</h2>
+        <p>The <strong>Silver Layer</strong> is the second tier of the <a href="medallion-architecture.html">Medallion Architecture</a> — the transformation layer that converts raw Bronze records into clean, validated, business-conforming data that downstream Gold transformations and analytics can trust. Silver is where data quality enforcement happens: records that don't meet quality standards are rejected (written to a quarantine table for investigation) rather than propagated to Gold where they would corrupt business metrics.</p><p>Unlike the Bronze Layer (which preserves data exactly as received), the Silver Layer applies business-defined transformation logic: deduplication of duplicate events, schema standardization (consistent column names and types across sources), null handling, and — most importantly — CDC state management (maintaining the current state of source operational database tables from a stream of INSERT/UPDATE/DELETE events).
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Silver Layer: CDC Current-State Pattern</h2>
+        <p>The most important Silver Layer pattern for operational data is the <strong>CDC current-state table</strong>: a Silver Iceberg table that maintains the present state of a source operational database table by applying CDC change events via MERGE INTO.</p><p>Implementation:</p><ol><li>Bronze table contains a log of all CDC events (INSERT, UPDATE, DELETE) with operation type and full row image</li><li>Scheduled Spark or dbt job reads new Bronze CDC events since the last run</li><li>MERGE INTO applies events to Silver current-state table: INSERTs become new rows, UPDATEs replace existing rows, DELETEs remove rows</li><li>Silver table always reflects the current state of the source — analysts can query 'what is the current status of order #12345?' against Silver, not Bronze</li></ol>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Silver Layer CDC Current State Pattern diagram" loading="lazy"><figcaption>Figure 1: Silver CDC current-state pattern — MERGE INTO transforms CDC events into current-state Iceberg tables.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Silver Layer Maintenance</h2>
+        <p>Silver tables require consistent maintenance because frequent MERGE INTO operations accumulate many small files and delete files:</p><ul><li><strong>Compaction:</strong> Merge small data files and delete files created by MERGE INTO operations. Run daily or after large batch MERGE operations.</li><li><strong>Z-Ordering:</strong> Sort data by common query filter columns (customer_id, region, order_date) for improved data skipping. Run weekly for heavily queried tables.</li><li><strong>Snapshot expiry:</strong> Remove snapshots older than the retention window (typically 7 days for Silver). Each MERGE INTO creates a new snapshot; retaining thousands accumulates metadata overhead.</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Silver Layer Maintenance Schedule diagram" loading="lazy"><figcaption>Figure 2: Silver layer maintenance — compaction, Z-ordering, and snapshot expiry cadences.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>The Silver Layer is the trust-building tier of the <a href="medallion-architecture.html">Medallion Architecture</a> — the transformation stage where raw Bronze data is transformed into the clean, validated, business-conforming datasets that Gold aggregations and analyst queries depend on. Implemented as <a href="apache-iceberg.html">Apache Iceberg</a> tables with regular MERGE INTO for CDC current-state maintenance and compaction for read performance, Silver tables are the reliable middle tier that separates raw ingestion complexity from business analytics simplicity. High-quality Silver tables are the most important investment a data engineering team can make for downstream analytical trust.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Three-tier framework containing the Silver layer.</span>
+    </a>
+      <a class="related-card" href="bronze-layer.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Bronze Layer</span>
+      <span class="related-desc">Raw layer that Silver cleansing transforms.</span>
+    </a>
+      <a class="related-card" href="gold-layer.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Gold Layer</span>
+      <span class="related-desc">Business analytics layer built on Silver data.</span>
+    </a>
+      <a class="related-card" href="upsert.html">
+      <span class="related-label">Ingestion & Streaming</span>
+      <span class="related-term">Upsert</span>
+      <span class="related-desc">MERGE INTO upsert maintains Silver current-state tables.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">CDC events are processed by Silver MERGE INTO.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Compaction essential for Silver tables with frequent MERGEs.</span>
+    </a>
+      <a class="related-card" href="data-quality.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Quality</span>
+      <span class="related-desc">Quality gates enforced between Bronze and Silver.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Iceberg MERGE INTO implements Silver CDC maintenance.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

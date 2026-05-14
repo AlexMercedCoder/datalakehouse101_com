@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic Lakehouse: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what the Agentic Lakehouse is, how AI agents autonomously discover and query Apache Iceberg data via Dremio's MCP server, and why it is the next evolution of enterprise analytics.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/agentic-lakehouse.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Agentic Lakehouse: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what the Agentic Lakehouse is, how AI agents autonomously discover and query Apache Iceberg data via Dremio's MCP server, and why it is the next evolution of enterprise analytics.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/agentic-lakehouse.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Agentic Lakehouse: The Definitive Guide",
+      "description": "Learn what the Agentic Lakehouse is, how AI agents autonomously discover and query Apache Iceberg data via Dremio's MCP server, and why it is the next evolution of enterprise analytics.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/agentic-lakehouse.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Agentic Lakehouse", "item": "https://datalakehouse101.com/knowledge/agentic-lakehouse.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the Agentic Lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Agentic Lakehouse is a data lakehouse architecture designed to serve AI agents as first-class data consumers alongside human analysts. It combines an AI Semantic Layer (rich business context for LLM consumption), an MCP server (Model Context Protocol tools for autonomous agent data access), governed access control (RBAC ensuring agents access only authorized data), and Apache Iceberg tables (the open, governed data foundation)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do AI agents query the lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AI agents query the Agentic Lakehouse through Dremio's MCP (Model Context Protocol) server. When an AI agent needs data to answer a question, it calls MCP tools: list_datasets to find relevant tables, get_schema to understand structure and metric definitions, execute_query to run SQL, and get_results to retrieve data. The agent can autonomously perform multi-step data analysis without human SQL writing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What makes a lakehouse 'agentic-ready'?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An agentic-ready lakehouse requires: (1) An AI Semantic Layer with rich natural language descriptions of datasets and metric definitions that LLMs can interpret; (2) An MCP server exposing data access as AI-callable tools; (3) Governed access ensuring agents respect RBAC policies; (4) High-quality, current data (via streaming ingestion) that agents can trust for business decisions."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Agentic Lakehouse</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Architecture Patterns</span>
+      <h1>Agentic Lakehouse: The Definitive Guide</h1>
+      <p class="hero-lede">The Agentic Lakehouse is the evolution of the data lakehouse into an AI-native data platform where AI agents autonomously discover, query, and reason about enterprise data through governed interfaces. Powered by Dremio's AI Semantic Layer and MCP server, AI agents become first-class data consumers — querying the lakehouse as fluidly as human analysts.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is the Agentic Lakehouse?</a></li>
+        <li><a href="#section-2">The AI Agent Data Access Flow</a></li>
+        <li><a href="#section-3">Governance in the Agentic Lakehouse</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is the Agentic Lakehouse?</h2>
+        <p>The <strong>Agentic Lakehouse</strong> is the architectural evolution of the <a href="data-lakehouse.html">data lakehouse</a> from a human-centric analytics platform to an AI-native data platform where autonomous AI agents are first-class data consumers. In the Agentic Lakehouse, AI agents don't just assist human analysts — they autonomously discover business data, form SQL queries, execute analyses, interpret results, and produce actionable insights without requiring human SQL writing or data engineering support.</p><p>The Agentic Lakehouse is enabled by three components working together: the <a href="ai-semantic-layer.html">AI Semantic Layer</a> (providing rich business context that AI models can interpret), the <a href="model-context-protocol.html">MCP server</a> (exposing data access as AI-callable tools), and <a href="data-governance.html">governed access control</a> (ensuring agents access only data their principal is authorized for). Together, these create a data platform where any LLM-powered agent can become an autonomous data analyst.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>The AI Agent Data Access Flow</h2>
+        <p>How an AI agent answers a business question using the Agentic Lakehouse:</p><ol><li><strong>Question received:</strong> 'What are the top 5 performing product categories by revenue this quarter vs last quarter?'</li><li><strong>List datasets:</strong> Agent calls MCP list_datasets tool, discovers <code>gold.sales_metrics</code> with description 'Pre-computed revenue metrics by product category and time period'</li><li><strong>Get schema:</strong> Agent calls get_schema on sales_metrics, learns columns include category, quarter, revenue, yoy_growth_rate with business descriptions</li><li><strong>Form query:</strong> Agent formulates SQL: SELECT category, revenue, yoy_growth_rate FROM gold.sales_metrics WHERE quarter IN ('2026-Q1', '2025-Q1') ORDER BY revenue DESC LIMIT 10</li><li><strong>Execute and return:</strong> Agent calls execute_query, receives results, formats answer with business context — all autonomously, in seconds</li></ol>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="AI Agent Agentic Lakehouse Flow diagram" loading="lazy"><figcaption>Figure 1: AI agent data access flow — MCP tool calls from question to governed query to business answer.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Governance in the Agentic Lakehouse</h2>
+        <p>AI agents accessing enterprise data must respect the same governance policies as human users. In the Agentic Lakehouse, this is achieved through:</p><ul><li><strong>Agent principals:</strong> Each AI agent is assigned a principal identity in the catalog (Polaris or Dremio) with specific role assignments — an agent serving the sales team has sales data access, but not HR or financial data access</li><li><strong>Catalog-layer enforcement:</strong> The MCP server calls Dremio or the Iceberg REST catalog with the agent's credentials — access control is enforced at the catalog, not at the application layer</li><li><strong>Column masking:</strong> Agents receive masked values for sensitive columns according to their role's masking policies — PII is protected from agent access using the same policies that protect human analyst access</li><li><strong>Audit logging:</strong> All agent query executions are logged to the same audit trail as human queries — enabling compliance review of AI agent data access</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Agentic Lakehouse Governance diagram" loading="lazy"><figcaption>Figure 2: Governance in the Agentic Lakehouse — agent principals, catalog enforcement, masking, and audit.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>The Agentic Lakehouse represents the most significant evolution of the enterprise data platform since the introduction of cloud storage. By combining <a href="apache-iceberg.html">Apache Iceberg's</a> open, governed data foundation with <a href="dremio.html">Dremio's</a> <a href="ai-semantic-layer.html">AI Semantic Layer</a> and MCP server, organizations create a data platform where AI agents become autonomous analytical contributors — answering business questions, generating insights, and preparing ML features without human SQL assistance. The Agentic Lakehouse is not a future architecture — it is the current direction of Dremio's platform development and the destination that every enterprise data lakehouse investment is building toward.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="ai-semantic-layer.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">AI Semantic Layer</span>
+      <span class="related-desc">The AI-readable data interface powering the Agentic Lakehouse.</span>
+    </a>
+      <a class="related-card" href="model-context-protocol.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">MCP (Model Context Protocol)</span>
+      <span class="related-desc">MCP enables AI agents to call Dremio data tools.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Dremio's platform is the Agentic Lakehouse foundation.</span>
+    </a>
+      <a class="related-card" href="semantic-layer.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Semantic Layer</span>
+      <span class="related-desc">The semantic layer makes data interpretable by AI agents.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Governance ensures agents respect access policies.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Open Iceberg tables are the data foundation agents query.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The lakehouse evolving into the Agentic Lakehouse.</span>
+    </a>
+      <a class="related-card" href="feature-store.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Feature Store</span>
+      <span class="related-desc">Agents use feature stores for ML-powered decisions.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stream Processing: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/stream-processing.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Stream Processing: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/stream-processing.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Stream Processing: The Definitive Guide",
+      "description": "Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/stream-processing.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Stream Processing", "item": "https://datalakehouse101.com/knowledge/stream-processing.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is stream processing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Stream processing is the continuous computation on data as it arrives — processing events in real time or near-real time rather than accumulating data in batches and processing periodically. Stream processing systems maintain state across events, apply time-based windowing, and write results continuously to outputs like Apache Iceberg tables, databases, or downstream Kafka topics."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Apache Flink enable stream processing into Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Flink reads data from Kafka topics using its Kafka source connector, processes events using Flink's stateful stream processing APIs (filtering, aggregating, joining across streams), and writes results to Apache Iceberg tables using the Flink Iceberg sink connector. The sink supports both append mode (Bronze tables) and upsert mode (CDC-driven Silver tables) with exactly-once delivery guarantees."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I use stream processing vs batch processing for lakehouse ingestion?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use stream processing when data freshness matters — real-time dashboards, fraud detection, operational alerts. Use batch processing when throughput and transformation complexity matter more than freshness — large historical loads, complex multi-table joins, ML feature engineering. Most mature lakehouse architectures use both: streaming for Bronze CDC ingestion and operational analytics, batch for Silver and Gold transformations."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Stream Processing</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Ingestion & Streaming</span>
+      <h1>Stream Processing: The Definitive Guide</h1>
+      <p class="hero-lede">Stream processing continuously processes data as it arrives — event by event or in micro-batches — enabling real-time analytics, fraud detection, and live dashboards. Apache Flink is the dominant stream processing engine for lakehouse pipelines, writing real-time data to Apache Iceberg Bronze tables with exactly-once guarantees.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Stream Processing?</a></li>
+        <li><a href="#section-2">Flink Stream Processing to Iceberg</a></li>
+        <li><a href="#section-3">Micro-Batch vs True Streaming</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Stream Processing?</h2>
+        <p><strong>Stream processing</strong> is the computational model where data is processed continuously as it arrives — each event or small micro-batch is processed immediately upon ingestion, rather than accumulated and processed periodically in bulk. Stream processing systems maintain persistent state (aggregations, join buffers, session windows) across events, apply time-based operations (tumbling windows, sliding windows, session windows), and emit results continuously to downstream systems.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a>, stream processing is the ingestion layer that feeds real-time data into Bronze <a href="apache-iceberg.html">Apache Iceberg</a> tables. <a href="apache-kafka.html">Apache Kafka</a> delivers events from operational systems; stream processing engines (<a href="apache-flink.html">Apache Flink</a>, Spark Structured Streaming) consume those events and write them to Iceberg with low latency.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Flink Stream Processing to Iceberg</h2>
+        <p><a href="apache-flink.html">Apache Flink</a> is the leading stream processing engine for lakehouse ingestion. Key capabilities:</p><ul><li><strong>Exactly-once semantics:</strong> Flink's checkpointing mechanism ensures that even after failures, each event is processed exactly once in the output Iceberg table — no duplicates, no losses</li><li><strong>Iceberg sink connector:</strong> Native Flink Iceberg sink supports both append-only (Bronze CDC ingestion) and UPSERT mode (Silver current-state CDC tables)</li><li><strong>Watermark-based event time:</strong> Flink processes events by event time (when they occurred) rather than processing time (when they arrive) — correctly handling late-arriving events for accurate time-series aggregations</li><li><strong>Stateful stream joins:</strong> Flink can join streams with lookups against Iceberg tables (dimension lookups) or join two streams together within time windows</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Flink Stream Processing to Iceberg diagram" loading="lazy"><figcaption>Figure 1: Flink stream processing pipeline — Kafka source, stateful processing, Iceberg sink.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Micro-Batch vs True Streaming</h2>
+        <p>Two stream processing models exist for lakehouse ingestion:</p><ul><li><strong>True streaming (event-by-event):</strong> Apache Flink's default model. Each event is processed immediately as it arrives. Minimum latency. Used for time-critical workloads.</li><li><strong>Micro-batch streaming:</strong> Spark Structured Streaming's model. Events are accumulated over a short interval (seconds to minutes) and processed as a small batch. Higher throughput per resource unit, slightly higher latency. Simpler to reason about — each micro-batch is a mini-ETL job.</li></ul><p>For Iceberg ingestion, micro-batch Spark Structured Streaming is often sufficient (providing minute-level freshness) and simpler to operate than Flink. True streaming Flink is used when second-level freshness is required or when complex stateful operations (session detection, fraud pattern matching) are needed.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Stream vs Micro-Batch Iceberg Ingestion diagram" loading="lazy"><figcaption>Figure 2: True streaming vs micro-batch — latency and throughput tradeoffs for Iceberg ingestion.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Stream processing is the real-time ingestion capability that keeps <a href="data-lakehouse.html">data lakehouse</a> data fresh for operational analytics. By combining <a href="apache-kafka.html">Apache Kafka</a> as the event transport layer with <a href="apache-flink.html">Apache Flink</a> or Spark Structured Streaming for continuous processing and <a href="apache-iceberg.html">Apache Iceberg</a> as the ACID-safe destination, organizations achieve second-to-minute data freshness in their Bronze tables without sacrificing the governance, time travel, and schema evolution capabilities that make Iceberg the superior lakehouse table format.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-flink.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Flink</span>
+      <span class="related-desc">The primary stream processing engine for lakehouse ingestion.</span>
+    </a>
+      <a class="related-card" href="apache-kafka.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Apache Kafka</span>
+      <span class="related-desc">Event streaming platform feeding stream processors.</span>
+    </a>
+      <a class="related-card" href="batch-processing.html">
+      <span class="related-label">Ingestion & Streaming</span>
+      <span class="related-term">Batch Processing</span>
+      <span class="related-desc">Alternative to streaming for high-throughput workloads.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">CDC events processed by stream processors into Iceberg.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Destination table format for stream processing output.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Streaming feeds the Bronze layer in the Medallion pattern.</span>
+    </a>
+      <a class="related-card" href="real-time-analytics.html">
+      <span class="related-label">Ingestion & Streaming</span>
+      <span class="related-term">Real-Time Analytics</span>
+      <span class="related-desc">Stream processing enables real-time lakehouse analytics.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Stream processing keeps the lakehouse current.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

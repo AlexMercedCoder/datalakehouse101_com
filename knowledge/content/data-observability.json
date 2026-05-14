@@ -1,0 +1,98 @@
+{
+  "slug": "data-observability",
+  "term": "Data Observability",
+  "category": "Governance & Quality",
+  "metaTitle": "Data Observability: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what data observability is, how it monitors freshness, volume, schema, and distribution in Apache Iceberg pipelines, and why it is essential for reliable lakehouse operations.",
+  "h1": "Data Observability: The Definitive Guide",
+  "lede": "Data observability is the ability to understand the health of data in your lakehouse at all times \u2014 monitoring freshness, volume, schema changes, and statistical distributions to detect data quality incidents before they reach business users. It is the reliability engineering discipline for data pipelines.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is data observability?",
+      "a": "Data observability is the capability to monitor and understand the state of data pipelines and datasets in real time \u2014 detecting anomalies (unexpected volume drops, schema changes, freshness delays, distribution shifts) automatically and alerting data engineering teams before business users encounter data quality issues."
+    },
+    {
+      "q": "What are the five pillars of data observability?",
+      "a": "The five pillars (per Monte Carlo Data): Freshness (is data updated as expected?), Volume (are row counts within expected ranges?), Schema (has the schema changed unexpectedly?), Distribution (are value distributions within historical norms?), and Lineage (which upstream tables and pipelines affected this dataset?)."
+    },
+    {
+      "q": "How does data observability differ from data quality monitoring?",
+      "a": "Data quality checks test specific, predefined rules (not_null, unique, accepted_values). Data observability uses ML-based anomaly detection to automatically learn what 'normal' looks like for each metric and alert on deviations \u2014 catching issues that predefined rules don't anticipate, like a subtle distribution shift or a volume drop on a specific partition."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Data Observability?",
+      "content": "<p><strong>Data observability</strong> is the practice of continuously monitoring data assets and pipelines to understand their state, detect anomalies, and alert on incidents before they impact business users \u2014 analogous to application observability (metrics, logs, traces) but applied to data rather than software systems.</p><p>Traditional <a href=\"data-quality.html\">data quality</a> approaches define explicit rules and test them on a schedule. Data observability takes a broader, more dynamic approach: it monitors multiple health dimensions automatically, learns baseline behavior from historical patterns, and detects anomalies that predefined rules might miss \u2014 a 40% volume drop on Tuesday compared to every previous Tuesday, a new null rate appearing in a column that was previously 100% populated, or a schema change in an upstream source table.</p>"
+    },
+    {
+      "heading": "Five Pillars of Data Observability",
+      "content": "<ul><li><strong>Freshness:</strong> Is the dataset updated as frequently as expected? An orders table that is normally updated every 5 minutes but hasn't been updated in 2 hours indicates a pipeline failure. Freshness monitoring detects this before analysts notice stale data.</li><li><strong>Volume:</strong> Are row counts and record volumes within expected ranges? A daily batch that normally loads 500K records loading only 50K records indicates either a source system issue or a pipeline filter bug.</li><li><strong>Schema:</strong> Has the schema changed unexpectedly? A new column appeared, an existing column's data type changed, or a column was removed \u2014 any of these can break downstream transformations.</li><li><strong>Distribution:</strong> Are the statistical distributions of column values (mean, stddev, null rate, cardinality) within historical norms? A payment_amount column whose mean suddenly drops 50% indicates either a data issue or a significant business event.</li><li><strong>Lineage:</strong> When an anomaly is detected, lineage context immediately shows which upstream tables and pipelines contributed to the affected dataset \u2014 accelerating root cause investigation.</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Five Pillars Data Observability",
+      "diagramCaption": "Figure 1: Five pillars of data observability \u2014 freshness, volume, schema, distribution, and lineage monitoring."
+    },
+    {
+      "heading": "Data Observability Tools",
+      "content": "<p>Leading data observability platforms:</p><ul><li><strong>Monte Carlo Data:</strong> The pioneering commercial data observability platform. ML-based anomaly detection across all five pillars. Native integrations with Iceberg, Glue, dbt, Airflow, and major BI tools.</li><li><strong>Acceldata:</strong> Enterprise data observability with strong on-premises support. Pipeline monitoring, quality scoring, and SLA tracking.</li><li><strong>Elementary Data (open source):</strong> dbt-native observability built on top of dbt tests. Generates HTML reports and Slack alerts from dbt test runs. Free for dbt-based pipelines.</li><li><strong>Soda Core (open source):</strong> SQL-based quality checks with a Python SDK. Integrates with DataHub and OpenMetadata for catalog-visible quality scores.</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Data Observability Tools Ecosystem",
+      "diagramCaption": "Figure 2: Data observability tool ecosystem \u2014 commercial and open-source options for lakehouse monitoring."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Data observability is the reliability engineering practice that makes <a href=\"data-lakehouse.html\">data lakehouse</a> operations production-grade. By continuously monitoring freshness, volume, schema, distribution, and lineage context, observability platforms catch data incidents in minutes rather than hours \u2014 before business users encounter stale, missing, or incorrect data in their dashboards. Combined with <a href=\"data-quality.html\">data quality</a> checks in pipelines and <a href=\"data-lineage.html\">lineage</a> for root cause investigation, data observability completes the reliability toolkit for enterprise lakehouse operations.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "data-quality",
+      "term": "Data Quality",
+      "category": "Governance & Quality",
+      "desc": "Quality checks complement observability monitoring."
+    },
+    {
+      "slug": "data-lineage",
+      "term": "Data Lineage",
+      "category": "Governance & Quality",
+      "desc": "Lineage accelerates incident root cause investigation."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Observability supports governance through continuous monitoring."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Observability monitors health across all Medallion layers."
+    },
+    {
+      "slug": "data-catalog",
+      "term": "Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Catalogs surface observability scores alongside asset metadata."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "Observability monitors ETL pipeline health and freshness."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC pipeline freshness monitored by observability platforms."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Observability makes the lakehouse production-reliable."
+    }
+  ]
+}

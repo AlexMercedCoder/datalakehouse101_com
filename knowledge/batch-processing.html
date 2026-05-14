@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch Processing: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what batch processing is, how Apache Spark handles large-scale batch ETL into Apache Iceberg, and when to choose batch over streaming for lakehouse pipelines.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/batch-processing.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Batch Processing: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what batch processing is, how Apache Spark handles large-scale batch ETL into Apache Iceberg, and when to choose batch over streaming for lakehouse pipelines.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/batch-processing.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Batch Processing: The Definitive Guide",
+      "description": "Learn what batch processing is, how Apache Spark handles large-scale batch ETL into Apache Iceberg, and when to choose batch over streaming for lakehouse pipelines.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/batch-processing.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Batch Processing", "item": "https://datalakehouse101.com/knowledge/batch-processing.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is batch processing in the data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Batch processing is the data transformation model where data is accumulated over a time period (an hour, a day, a week) and processed in a single scheduled run — as opposed to continuous stream processing. In the lakehouse context, batch processing typically means Apache Spark jobs that read Bronze Iceberg tables, apply transformations, and write Silver or Gold Iceberg tables on a schedule (hourly, daily, etc.)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I use batch vs stream processing for lakehouse pipelines?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use batch when: transformation complexity is high (multi-table joins, complex business logic), historical data reprocessing is needed (backfills), data freshness requirements are hourly or daily, or when leveraging the Python ML ecosystem (Pandas, scikit-learn, PyTorch) for ML feature engineering. Use streaming when: data freshness must be seconds to minutes, or real-time fraud/anomaly detection is required."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Spark's role in batch lakehouse processing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Spark is the standard batch processing engine for lakehouse ETL. PySpark and Spark SQL provide the data transformation APIs; Spark's Iceberg connector enables reading and writing Iceberg tables; Spark's distributed execution scales from single-machine to thousand-node clusters. Most Silver and Gold layer transformations in the Medallion Architecture are implemented as scheduled Spark batch jobs."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Batch Processing</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Ingestion & Streaming</span>
+      <h1>Batch Processing: The Definitive Guide</h1>
+      <p class="hero-lede">Batch processing transforms large volumes of data in scheduled runs — the workload model for ETL jobs that produce Silver and Gold Iceberg tables from Bronze raw data. Apache Spark is the dominant batch processing engine for lakehouse pipelines, combining Python ecosystem richness with scalable distributed execution on Iceberg data.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Batch Processing?</a></li>
+        <li><a href="#section-2">Spark Batch Processing on Iceberg</a></li>
+        <li><a href="#section-3">Batch Patterns for Medallion Layers</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Batch Processing?</h2>
+        <p><strong>Batch processing</strong> is the data processing model where data is accumulated over a time period and processed together in a single scheduled run — as opposed to <a href="stream-processing.html">stream processing</a>, which processes data continuously as it arrives. Batch processing has been the dominant model for data transformation since the earliest days of computing, and it remains the most common pattern for Silver and Gold layer transformations in the <a href="medallion-architecture.html">Medallion Architecture</a>.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a>, batch processing is typically implemented with <a href="apache-spark.html">Apache Spark</a> — reading Bronze <a href="apache-iceberg.html">Apache Iceberg</a> tables that have been populated by streaming ingestion, applying complex transformations (joins, aggregations, business rule application), and writing Silver or Gold Iceberg tables. Batch jobs are scheduled by Apache Airflow or similar orchestrators.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Spark Batch Processing on Iceberg</h2>
+        <p><a href="apache-spark.html">Apache Spark</a> is the dominant batch processing engine for lakehouse ETL because it combines:</p><ul><li><strong>Python ecosystem:</strong> PySpark integrates with NumPy, Pandas, scikit-learn, and PyTorch — enabling ML feature engineering and data science workflows as part of the batch ETL pipeline</li><li><strong>Iceberg native integration:</strong> The Spark Iceberg connector supports all Iceberg DML (INSERT INTO, MERGE INTO, DELETE, UPDATE) and DDL (ALTER TABLE, schema evolution) operations natively</li><li><strong>Distributed execution:</strong> Spark scales from a single local machine to thousand-node EMR or Databricks clusters — the same PySpark code runs at any scale</li><li><strong>SQL and DataFrame API:</strong> Both Spark SQL and the DataFrame API can query and write Iceberg tables, allowing teams to choose the interface that fits their skills</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Spark Batch Processing Iceberg Pipeline diagram" loading="lazy"><figcaption>Figure 1: Spark batch pipeline — Bronze Iceberg scan, transformation, Silver/Gold Iceberg write, Airflow schedule.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Batch Patterns for Medallion Layers</h2>
+        <p>Specific batch patterns for each Medallion layer:</p><ul><li><strong>Bronze → Silver (Cleansing batch):</strong> Daily Spark job reading previous day's Bronze partitions, deduplicating, validating, and writing to Silver via MERGE INTO (applying CDC events to current state)</li><li><strong>Silver → Gold (Aggregation batch):</strong> Hourly or daily Spark SQL job computing business metrics (daily revenue by region, weekly cohort retention rates) and writing pre-aggregated Gold tables</li><li><strong>Gold optimization batch:</strong> Weekly Spark OPTIMIZE + Z-ORDER job maintaining Gold table performance by compacting small files and re-clustering data layout</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Batch Job Schedule Medallion Architecture diagram" loading="lazy"><figcaption>Figure 2: Batch job schedule across Medallion layers — cleansing, aggregation, and optimization cadences.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Batch processing remains the workhorse of <a href="data-lakehouse.html">data lakehouse</a> ETL — producing the cleansed Silver tables and business-ready Gold tables that analysts and BI tools depend on. <a href="apache-spark.html">Apache Spark's</a> combination of Python ecosystem richness, native <a href="apache-iceberg.html">Iceberg</a> integration, and horizontal scalability makes it the ideal batch processing engine for complex, high-volume transformations that require more than streaming can provide. The mature lakehouse architecture uses streaming (Flink) and batch (Spark) complementarily — each in the role it performs best.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">The primary batch processing engine for lakehouse ETL.</span>
+    </a>
+      <a class="related-card" href="stream-processing.html">
+      <span class="related-label">Ingestion & Streaming</span>
+      <span class="related-term">Stream Processing</span>
+      <span class="related-desc">Streaming complements batch in the lakehouse pipeline.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Batch jobs produce Silver and Gold Medallion layers.</span>
+    </a>
+      <a class="related-card" href="etl.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">Batch processing implements the Transform and Load steps.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Source and destination for Spark batch jobs.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Compaction is run as a batch maintenance operation.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">Batch MERGE INTO applies CDC events in scheduled runs.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Batch processing produces the business-ready lakehouse data.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

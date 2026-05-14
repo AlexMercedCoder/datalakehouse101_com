@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nessie Branching and Tagging: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn how Project Nessie's Git-like branching and tagging enables isolated data experimentation, reproducible ML experiments, and zero-risk schema migrations on Apache Iceberg tables.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/nessie-branching-tagging.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Nessie Branching and Tagging: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn how Project Nessie's Git-like branching and tagging enables isolated data experimentation, reproducible ML experiments, and zero-risk schema migrations on Apache Iceberg tables.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/nessie-branching-tagging.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Nessie Branching and Tagging: The Definitive Guide",
+      "description": "Learn how Project Nessie's Git-like branching and tagging enables isolated data experimentation, reproducible ML experiments, and zero-risk schema migrations on Apache Iceberg tables.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/nessie-branching-tagging.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Nessie Branching and Tagging", "item": "https://datalakehouse101.com/knowledge/nessie-branching-tagging.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Nessie branching?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nessie branching is a catalog-level feature that creates an isolated copy of the table namespace — new commits on the branch don't affect the main branch. Data engineers can run experimental transformations, test schema changes, or debug data quality issues on a branch without any impact on production queries running against main."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Nessie tagging work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nessie tags mark a specific point in the catalog's commit history with a named label — like a Git tag. A tag records the exact state of all tables at a specific moment. For ML experiments, tagging the data state used for training ensures that the exact same dataset can be reproduced months later by checking out the tag — enabling perfect experiment reproducibility."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can all engines use Nessie branches?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Engines connect to Nessie specifying a branch or tag name as part of their catalog configuration (or per-query). Spark, Trino, Dremio, and Flink can all be configured to read/write against a specific Nessie branch — enabling branch-isolated pipelines where the same ETL job logic runs against both a development branch and the production main branch."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Nessie Branching and Tagging</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Architecture Patterns</span>
+      <h1>Nessie Branching and Tagging: The Definitive Guide</h1>
+      <p class="hero-lede">Project Nessie brings Git-like branching and tagging to Apache Iceberg tables — enabling data engineers to experiment with transformations on isolated branches, tag specific versions for ML reproducibility, and deploy schema migrations with zero risk to production data. It is version control for the data lakehouse.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Nessie Branching and Tagging?</a></li>
+        <li><a href="#section-2">Branching for Safe Experimentation</a></li>
+        <li><a href="#section-3">Tagging for ML Reproducibility</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Nessie Branching and Tagging?</h2>
+        <p><a href="project-nessie.html">Project Nessie</a> implements a Git-inspired version control model for the Iceberg catalog — introducing <strong>branches</strong> (isolated parallel namespaces for experimentation and development) and <strong>tags</strong> (named snapshots of the catalog at a specific point in time) to the data lakehouse.</p><p>The core insight behind Nessie branching is that data teams face the same challenges that software teams faced before version control: how to develop and test changes to production data assets without risking data corruption, how to maintain reproducible experiments, and how to deploy changes safely. Git solved these problems for code; Nessie applies the same concepts to data tables.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Branching for Safe Experimentation</h2>
+        <p>The Nessie branching workflow for safe data experimentation:</p><ol><li><strong>Create a branch:</strong> <code>nessie branch experiment-branch main</code> — creates a new branch starting from main's current state</li><li><strong>Work on the branch:</strong> Configure Spark to write to <code>experiment-branch</code> and run the experimental transformation. All writes are isolated to the branch.</li><li><strong>Validate:</strong> Query the branch (with Dremio or Trino pointing to <code>experiment-branch</code>) to verify the transformation produced correct results</li><li><strong>Merge or discard:</strong> If the experiment is successful, merge to main. If unsuccessful, simply delete the branch — no rollback needed, main was never touched</li></ol>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Nessie Branching Workflow diagram" loading="lazy"><figcaption>Figure 1: Nessie branching workflow — isolated experimentation, validation, and safe merge to production.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Tagging for ML Reproducibility</h2>
+        <p>ML experiment reproducibility requires that the exact dataset used for training can be reconstructed at any future point. Nessie tags provide this capability:</p><pre><code># Tag the data state when training begins
+nessie tag create ml-experiment-2026-05-14 main
+
+# Train model using the tagged data state
+spark = SparkSession.builder\
+  .config('spark.sql.catalog.nessie.ref', 'ml-experiment-2026-05-14')\
+  .getOrCreate()
+
+# Six months later, reproduce exactly the same training dataset
+# by checking out the same tag</code></pre><p>This eliminates the 'training data drift' problem where re-running a training pipeline months later produces different results because the underlying Silver tables have been updated.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Nessie Tagging ML Reproducibility diagram" loading="lazy"><figcaption>Figure 2: Nessie tags for ML reproducibility — exact data state preserved for future experiment reproduction.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p><a href="project-nessie.html">Project Nessie's</a> branching and tagging brings the software engineering discipline of version control to the <a href="data-lakehouse.html">data lakehouse</a>. Branches enable safe, isolated experimentation and zero-risk schema migrations without production impact. Tags enable ML experiment reproducibility and point-in-time data audits. For data teams that have experienced the pain of experimental transformations corrupting production data or ML experiments that cannot be reproduced, Nessie branching is a transformative operational capability — bringing Git-like confidence to data engineering workflows on <a href="apache-iceberg.html">Apache Iceberg</a> tables.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="project-nessie.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Project Nessie</span>
+      <span class="related-desc">The catalog implementing branching and tagging.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Iceberg tables managed by Nessie with branches.</span>
+    </a>
+      <a class="related-card" href="time-travel.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Time Travel</span>
+      <span class="related-desc">Tags enable time travel to specific catalog states.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Branching and tagging improve lakehouse development safety.</span>
+    </a>
+      <a class="related-card" href="mlflow.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">MLflow</span>
+      <span class="related-desc">MLflow tracks experiments; Nessie tags track data states.</span>
+    </a>
+      <a class="related-card" href="data-science-lakehouse.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Data Science on the Lakehouse</span>
+      <span class="related-desc">Data science benefits from Nessie reproducibility.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Branch-based governance isolates changes from production.</span>
+    </a>
+      <a class="related-card" href="open-lakehouse.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Open Lakehouse</span>
+      <span class="related-desc">Nessie is part of the open lakehouse ecosystem.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

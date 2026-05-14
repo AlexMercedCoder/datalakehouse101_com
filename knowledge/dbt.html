@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dbt (Data Build Tool): The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what dbt is, how it implements SQL-based ELT transformations on Apache Iceberg tables, and why dbt-dremio and dbt-spark are key tools in the modern lakehouse pipeline.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/dbt.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="dbt (Data Build Tool): The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what dbt is, how it implements SQL-based ELT transformations on Apache Iceberg tables, and why dbt-dremio and dbt-spark are key tools in the modern lakehouse pipeline.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/dbt.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "dbt (Data Build Tool): The Definitive Guide",
+      "description": "Learn what dbt is, how it implements SQL-based ELT transformations on Apache Iceberg tables, and why dbt-dremio and dbt-spark are key tools in the modern lakehouse pipeline.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/dbt.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "dbt (Data Build Tool)", "item": "https://datalakehouse101.com/knowledge/dbt.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is dbt?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "dbt (data build tool) is an open-source transformation framework that allows data engineers and analysts to define data transformations as SQL SELECT statements (called models). dbt compiles these models into DDL/DML that runs on your data platform (Dremio, Spark, Trino, Snowflake), creates the target tables/views, runs automated tests, and generates documentation with lineage graphs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does dbt work with Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "dbt has adapters for platforms that support Iceberg: dbt-dremio (Dremio as the execution engine, writing to Dremio-managed Iceberg tables), dbt-spark (Spark as the execution engine, writing to any Iceberg catalog), and dbt-trino (Trino as the execution engine). dbt models materialize as Iceberg tables, views, or Virtual Datasets depending on the adapter and configuration."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is an incremental dbt model and why is it important for lakehouses?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An incremental dbt model processes only new or changed records rather than rebuilding the entire target table on each run — dramatically reducing compute time and cost for large tables. In the lakehouse context, an incremental Silver table model reads only the new Bronze partitions since the last run, applies transformations, and merges results into the Silver Iceberg table using INSERT OVERWRITE (partition) or MERGE INTO semantics."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">dbt (Data Build Tool)</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Ingestion & Streaming</span>
+      <h1>dbt (Data Build Tool): The Definitive Guide</h1>
+      <p class="hero-lede">dbt (data build tool) is the SQL-first transformation framework that defines Silver and Gold layer Iceberg tables as version-controlled SQL models — with built-in testing, documentation, lineage graphs, and incremental update strategies. It is the standard tool for the Transform step of ELT pipelines in the modern data lakehouse.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is dbt?</a></li>
+        <li><a href="#section-2">dbt Model Types and Iceberg Materialization</a></li>
+        <li><a href="#section-3">dbt Testing and Documentation for Lakehouse Quality</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is dbt?</h2>
+        <p><strong>dbt</strong> (data build tool) is an open-source framework that enables data engineers and analysts to define data transformation logic as SQL SELECT statements — called <em>models</em> — that dbt compiles into DDL/DML and executes on a connected data platform. dbt handles the boilerplate of table/view creation, dependency ordering, incremental update logic, test execution, and documentation generation — allowing practitioners to focus on transformation logic rather than infrastructure plumbing.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a> context, dbt is the standard tool for the <strong>Transform</strong> step of the ELT pattern: raw data is loaded into Bronze <a href="apache-iceberg.html">Iceberg</a> tables by ingestion pipelines (Flink, Airbyte, Spark batch jobs), and dbt models define the transformations that produce Silver (cleansed) and Gold (aggregated) Iceberg tables. dbt models are version-controlled SQL files — bringing software engineering practices (version control, CI/CD, peer review, automated testing) to data transformation.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>dbt Model Types and Iceberg Materialization</h2>
+        <p>dbt provides four model materialization types, each mapping to different Iceberg operations:</p><ul><li><strong>view:</strong> Creates an Iceberg view (or VDS in Dremio) — no data storage, query runs against base tables at query time</li><li><strong>table:</strong> Creates a full Iceberg table on each run — rewrites all data from scratch. Correct for small models; expensive for large tables.</li><li><strong>incremental:</strong> On first run, creates the full table. On subsequent runs, processes only new records and merges them into the existing table using MERGE INTO or INSERT OVERWRITE PARTITION — the most important materialization type for Silver and Gold lakehouse tables</li><li><strong>ephemeral:</strong> Compiles to a CTE, not a stored table — used for intermediate transformation logic within a model</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="dbt Model Types Iceberg Materialization diagram" loading="lazy"><figcaption>Figure 1: dbt model types mapped to Iceberg operations — incremental models for Silver and Gold layers.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>dbt Testing and Documentation for Lakehouse Quality</h2>
+        <p>dbt's built-in testing framework is one of its most valuable features for lakehouse <a href="data-quality.html">data quality</a> governance:</p><p><strong>Built-in tests:</strong> not_null (column has no null values), unique (column has no duplicate values), accepted_values (column contains only expected categorical values), relationships (foreign key integrity between tables)</p><p><strong>Custom tests:</strong> SQL-based tests for domain-specific business rules (revenue_amount > 0, order_date <= current_date)</p><p>dbt's documentation auto-generation produces a browsable, searchable website showing all models, their SQL logic, column descriptions, test results, and an interactive lineage DAG showing how models depend on each other. This documentation is ingestible by <a href="openmetadata.html">OpenMetadata</a> and DataHub for catalog-level lineage.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="dbt Testing Documentation Lineage diagram" loading="lazy"><figcaption>Figure 2: dbt testing and documentation — quality gates and interactive lineage DAG for lakehouse models.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>dbt is the SQL transformation standard for the modern <a href="data-lakehouse.html">data lakehouse</a> — providing version-controlled, tested, documented transformation models that produce Silver and Gold <a href="apache-iceberg.html">Iceberg</a> tables from Bronze raw data. Through adapters for <a href="dremio.html">Dremio</a> (dbt-dremio), <a href="apache-spark.html">Spark</a> (dbt-spark), and <a href="trino.html">Trino</a> (dbt-trino), dbt integrates with every major lakehouse execution engine — bringing software engineering discipline to data transformation and making <a href="data-quality.html">data quality</a> testing a first-class part of the ELT pipeline.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="etl.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">dbt implements the Transform step of ELT.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">dbt produces Silver and Gold Medallion layers.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">dbt models materialize as Iceberg tables.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">dbt-dremio adapter runs models on Dremio engine.</span>
+    </a>
+      <a class="related-card" href="data-quality.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Quality</span>
+      <span class="related-desc">dbt tests implement data quality gates.</span>
+    </a>
+      <a class="related-card" href="data-lineage.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Lineage</span>
+      <span class="related-desc">dbt manifest.json provides table-level lineage.</span>
+    </a>
+      <a class="related-card" href="openmetadata.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">OpenMetadata</span>
+      <span class="related-desc">OpenMetadata ingests dbt lineage and quality results.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">dbt-spark adapter runs models on Spark engine.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenMetadata: The Definitive Guide for Data Lakehouse Governance | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what OpenMetadata is, how it provides unified data discovery, lineage, and quality for Apache Iceberg lakehouses, and why it is the modern open-source catalog platform.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/openmetadata.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="OpenMetadata: The Definitive Guide for Data Lakehouse Governance | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what OpenMetadata is, how it provides unified data discovery, lineage, and quality for Apache Iceberg lakehouses, and why it is the modern open-source catalog platform.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/openmetadata.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "OpenMetadata: The Definitive Guide",
+      "description": "Learn what OpenMetadata is, how it provides unified data discovery, lineage, and quality for Apache Iceberg lakehouses, and why it is the modern open-source catalog platform.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/openmetadata.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "OpenMetadata", "item": "https://datalakehouse101.com/knowledge/openmetadata.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is OpenMetadata?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "OpenMetadata is an open-source, API-first data catalog and metadata management platform that provides data discovery, data lineage, data quality integration, collaboration features, and business glossary management in a single unified platform. It integrates with Apache Iceberg, Spark, dbt, Airflow, and over 80 data sources through native connectors."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does OpenMetadata differ from Apache Atlas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "OpenMetadata is a modern, API-first platform designed for cloud-native data stacks with broad connector coverage including Iceberg, Spark, dbt, Airflow, and cloud services. Apache Atlas was designed for the Hadoop ecosystem with native Hive/HDFS integration. OpenMetadata has a more modern React-based UI, more active community development, and better integration with modern lakehouse tooling."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does OpenMetadata integrate with Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. OpenMetadata can ingest metadata from Iceberg tables via integration with Iceberg REST catalogs (Glue, Polaris, Nessie) and from dbt manifest files. It displays Iceberg table schemas, partition specs, snapshot history, and data quality check results alongside business descriptions and lineage graphs."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">OpenMetadata</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance & Quality</span>
+      <h1>OpenMetadata: The Definitive Guide</h1>
+      <p class="hero-lede">OpenMetadata is the modern, API-first open-source data catalog and governance platform built for the cloud-native data stack. It provides unified data discovery, automated lineage, data quality integration, and rich collaboration features for Apache Iceberg lakehouses — combining what traditionally required three separate tools.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is OpenMetadata?</a></li>
+        <li><a href="#section-2">Core Capabilities</a></li>
+        <li><a href="#section-3">OpenMetadata and Iceberg Integration</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is OpenMetadata?</h2>
+        <p><strong>OpenMetadata</strong> is an open-source metadata management and data catalog platform that provides a unified, API-first foundation for data discovery, lineage tracking, quality monitoring, collaboration, and governance across the modern data stack. It was designed from the ground up for cloud-native architectures — with native integrations for <a href="apache-iceberg.html">Apache Iceberg</a>, dbt, <a href="apache-spark.html">Apache Spark</a>, Apache Airflow, and over 80 data sources and services.</p><p>OpenMetadata consolidates capabilities that organizations previously needed three separate tools to achieve: a data catalog (for discovery and documentation), a lineage platform (for data flow tracking), and a quality monitoring tool (for automated quality checks and scoring). Its unified metadata API enables programmatic integration with any tool in the data stack, making it the metadata backbone for the modern lakehouse.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Core Capabilities</h2>
+        <ul><li><strong>Data Discovery:</strong> Full-text search across all registered assets with intelligent filters (type, domain, owner, tier, tags). Similarity recommendations suggest related assets based on schema and usage patterns.</li><li><strong>Automated Metadata Ingestion:</strong> Scheduled connectors automatically ingest schema metadata from Iceberg catalogs, Spark job metadata from Spark History Server, dbt model definitions from manifest.json, and query logs from various engines.</li><li><strong>Data Lineage:</strong> Automatically parsed from SQL query logs, dbt manifests, and pipeline metadata. Column-level lineage available for dbt models and query log parsing.</li><li><strong>Data Quality:</strong> Native integration with dbt tests and Great Expectations. Quality scores computed from test results are displayed alongside table metadata. Quality alerts notify asset owners of quality degradation.</li><li><strong>Collaboration:</strong> Inline comments and discussions on any metadata entity. Activity feeds showing recent changes. Automated notifications for schema changes and quality alerts.</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="OpenMetadata Platform Architecture diagram" loading="lazy"><figcaption>Figure 1: OpenMetadata unified platform — catalog, lineage, quality, and collaboration in one system.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>OpenMetadata and Iceberg Integration</h2>
+        <p>OpenMetadata integrates with the Apache Iceberg lakehouse through multiple connectors:</p><ul><li><strong>Iceberg catalog connectors:</strong> Ingest table schemas, partition specs, and column statistics from Glue Data Catalog, custom REST catalog endpoints, and Hive Metastore (for Iceberg-over-Hive tables)</li><li><strong>dbt integration:</strong> Ingest dbt model definitions, test results, and table-level lineage from dbt manifest.json — the most complete source of transformation lineage for dbt-based Iceberg pipelines</li><li><strong>Airflow integration:</strong> Ingest DAG metadata and pipeline lineage from Apache Airflow — showing which Airflow DAGs produce which Iceberg tables</li><li><strong>Query log lineage:</strong> Parse SQL query logs from engines to extract runtime lineage — which tables are read and written by each query execution</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="OpenMetadata Iceberg Integration diagram" loading="lazy"><figcaption>Figure 2: OpenMetadata Iceberg integration — catalog, dbt, and Airflow connectors for complete metadata.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>OpenMetadata is the modern open-source data governance platform for the cloud-native <a href="data-lakehouse.html">data lakehouse</a> — combining catalog, lineage, quality, and collaboration in an API-first, actively maintained platform with broad connector coverage. For organizations building new cloud lakehouses or migrating from Hadoop (and seeking an alternative to <a href="apache-atlas.html">Apache Atlas</a>), OpenMetadata provides the comprehensive metadata management foundation that makes data assets discoverable, trustworthy, and governable across the entire analytics stack.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-atlas.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Apache Atlas</span>
+      <span class="related-desc">Hadoop-era predecessor OpenMetadata modernizes.</span>
+    </a>
+      <a class="related-card" href="data-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Data Catalog</span>
+      <span class="related-desc">OpenMetadata provides advanced data catalog capabilities.</span>
+    </a>
+      <a class="related-card" href="data-lineage.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Lineage</span>
+      <span class="related-desc">OpenMetadata tracks lineage from dbt, Airflow, and SQL logs.</span>
+    </a>
+      <a class="related-card" href="data-quality.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Quality</span>
+      <span class="related-desc">OpenMetadata integrates dbt test results for quality scoring.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">OpenMetadata provides the metadata governance backbone.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">OpenMetadata catalogs Iceberg tables via REST connectors.</span>
+    </a>
+      <a class="related-card" href="metadata-management.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Metadata Management</span>
+      <span class="related-desc">OpenMetadata is a comprehensive metadata management platform.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">OpenMetadata governs the modern cloud-native lakehouse.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

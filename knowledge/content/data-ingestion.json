@@ -1,0 +1,98 @@
+{
+  "slug": "data-ingestion",
+  "term": "Data Ingestion",
+  "category": "Ingestion & Streaming",
+  "metaTitle": "Data Ingestion: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what data ingestion is, the key ingestion patterns for Apache Iceberg lakehouses, and how to choose between streaming, batch, and federated ingestion approaches.",
+  "h1": "Data Ingestion: The Definitive Guide",
+  "lede": "Data ingestion is the first step of every lakehouse pipeline \u2014 moving data from operational sources into Apache Iceberg Bronze tables. Choosing the right ingestion pattern (streaming CDC, batch ETL, federated query, or file landing) determines data freshness, pipeline complexity, and the overall cost of keeping the lakehouse current.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is data ingestion in the data lakehouse?",
+      "a": "Data ingestion is the process of moving data from source systems (operational databases, SaaS APIs, event streams, files, IoT sensors) into Bronze Apache Iceberg tables in the lakehouse. Ingestion patterns include streaming CDC (near-real-time), batch ETL (scheduled loads), file-based landing (S3 drop zone), and federated query (read-in-place without moving data)."
+    },
+    {
+      "q": "What are the main data ingestion patterns for Apache Iceberg?",
+      "a": "Four main patterns: (1) Streaming CDC \u2014 Debezium + Kafka + Flink writes change events continuously to Bronze Iceberg; (2) Batch ETL \u2014 Spark jobs read source databases via JDBC and write to Iceberg on a schedule; (3) File landing \u2014 source systems drop CSV/JSON/Parquet files to S3, Spark converts them to Iceberg; (4) Federated query \u2014 Dremio reads source systems directly without physically ingesting data."
+    },
+    {
+      "q": "What tools handle data ingestion for Apache Iceberg?",
+      "a": "Key ingestion tools: Debezium (CDC capture from databases), Apache Kafka (event transport), Apache Flink (streaming ingestion to Iceberg), Apache Spark (batch ingestion via JDBC or file conversion), Airbyte and Fivetran (managed ELT connectors that write to Iceberg), dbt (transformation-layer ELT after initial load), and Dremio (federated query eliminating physical ingestion)."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Data Ingestion?",
+      "content": "<p><strong>Data ingestion</strong> is the process of acquiring data from source systems and loading it into the <a href=\"data-lakehouse.html\">data lakehouse</a> \u2014 specifically into Bronze <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables that serve as the raw data landing zone of the <a href=\"medallion-architecture.html\">Medallion Architecture</a>. Ingestion is the first stage of the lakehouse data lifecycle: data cannot be transformed, governed, or analyzed until it has been ingested.</p><p>Ingestion decisions have cascading effects: the ingestion pattern chosen determines data freshness (seconds vs hours), pipeline complexity (managed service vs custom Flink jobs), cost (compute for streaming vs cheaper batch schedules), and recovery characteristics (can the pipeline be replayed if a failure occurs?). Getting ingestion architecture right is foundational to lakehouse success."
+    },
+    {
+      "heading": "Ingestion Patterns Compared",
+      "content": "<table class=\"comparison-table\"><thead><tr><th>Pattern</th><th>Freshness</th><th>Complexity</th><th>Use Case</th></tr></thead><tbody><tr><td>Streaming CDC (Flink)</td><td>Seconds</td><td>High</td><td>Operational databases needing real-time freshness</td></tr><tr><td>Batch ETL (Spark)</td><td>Hours\u2013Days</td><td>Medium</td><td>High-volume historical loads, complex transformations</td></tr><tr><td>File landing</td><td>Hours</td><td>Low</td><td>Partner data drops, SaaS CSV exports</td></tr><tr><td>Managed ELT (Airbyte)</td><td>Minutes\u2013Hours</td><td>Low</td><td>SaaS sources (Salesforce, HubSpot, Google Ads)</td></tr><tr><td>Federation (Dremio)</td><td>Real-time</td><td>None</td><td>Small, frequently changing operational data</td></tr></tbody></table>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Data Ingestion Patterns Comparison",
+      "diagramCaption": "Figure 1: Ingestion pattern comparison \u2014 freshness, complexity, and use case fit for each pattern."
+    },
+    {
+      "heading": "Managed ELT Tools for Iceberg",
+      "content": "<p>Managed ELT platforms simplify ingestion by providing pre-built connectors for hundreds of data sources, eliminating the need to build and maintain custom JDBC batch jobs or API pollers:</p><ul><li><strong>Airbyte (open source):</strong> 350+ source connectors, supports writing to Iceberg destinations (via S3 Parquet landing + Spark conversion or direct Iceberg write). Self-hosted or cloud managed.</li><li><strong>Fivetran:</strong> Commercial managed ELT with automated schema change handling. Writes to data warehouse destinations; Iceberg support through partner integrations.</li><li><strong>dbt Cloud:</strong> Handles the T in ELT \u2014 runs dbt transformations on schedule after initial loads by other tools place data in Bronze tables.</li></ul><p>For SaaS source ingestion (Salesforce, HubSpot, Stripe, Google Analytics), managed ELT tools provide dramatically faster time-to-value than custom API integration code.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Managed ELT Iceberg Ingestion",
+      "diagramCaption": "Figure 2: Managed ELT tools for Iceberg \u2014 Airbyte, Fivetran, and dbt in the ingestion pipeline."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Data ingestion is the foundation of the <a href=\"data-lakehouse.html\">lakehouse</a> pipeline \u2014 without reliable, timely ingestion, no amount of transformation, governance, or query performance can produce business value. Choosing the right ingestion pattern for each data source (streaming <a href=\"change-data-capture.html\">CDC</a> for operational databases, <a href=\"batch-processing.html\">batch ETL</a> for high-volume historical sources, managed ELT for SaaS, <a href=\"lakehouse-federation.html\">federation</a> for small operational tables) is the data architecture decision that most directly determines the lakehouse's data freshness, cost, and operational reliability.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC is the streaming ingestion pattern for operational databases."
+    },
+    {
+      "slug": "batch-processing",
+      "term": "Batch Processing",
+      "category": "Ingestion & Streaming",
+      "desc": "Batch ETL is the scheduled ingestion pattern."
+    },
+    {
+      "slug": "stream-processing",
+      "term": "Stream Processing",
+      "category": "Ingestion & Streaming",
+      "desc": "Stream processing enables continuous ingestion."
+    },
+    {
+      "slug": "apache-kafka",
+      "term": "Apache Kafka",
+      "category": "Ingestion",
+      "desc": "Kafka transports events from sources to ingestion processors."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Ingestion populates the Bronze layer of the Medallion pattern."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The destination format for all ingestion pipelines."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "Ingestion is the Extract and Load steps of ETL."
+    },
+    {
+      "slug": "lakehouse-federation",
+      "term": "Lakehouse Federation",
+      "category": "Analytics & BI",
+      "desc": "Federation queries data in place \u2014 the no-ingestion pattern."
+    }
+  ]
+}

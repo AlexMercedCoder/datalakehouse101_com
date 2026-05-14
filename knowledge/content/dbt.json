@@ -1,0 +1,98 @@
+{
+  "slug": "dbt",
+  "term": "dbt (Data Build Tool)",
+  "category": "Ingestion & Streaming",
+  "metaTitle": "dbt (Data Build Tool): The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what dbt is, how it implements SQL-based ELT transformations on Apache Iceberg tables, and why dbt-dremio and dbt-spark are key tools in the modern lakehouse pipeline.",
+  "h1": "dbt (Data Build Tool): The Definitive Guide",
+  "lede": "dbt (data build tool) is the SQL-first transformation framework that defines Silver and Gold layer Iceberg tables as version-controlled SQL models \u2014 with built-in testing, documentation, lineage graphs, and incremental update strategies. It is the standard tool for the Transform step of ELT pipelines in the modern data lakehouse.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is dbt?",
+      "a": "dbt (data build tool) is an open-source transformation framework that allows data engineers and analysts to define data transformations as SQL SELECT statements (called models). dbt compiles these models into DDL/DML that runs on your data platform (Dremio, Spark, Trino, Snowflake), creates the target tables/views, runs automated tests, and generates documentation with lineage graphs."
+    },
+    {
+      "q": "How does dbt work with Apache Iceberg?",
+      "a": "dbt has adapters for platforms that support Iceberg: dbt-dremio (Dremio as the execution engine, writing to Dremio-managed Iceberg tables), dbt-spark (Spark as the execution engine, writing to any Iceberg catalog), and dbt-trino (Trino as the execution engine). dbt models materialize as Iceberg tables, views, or Virtual Datasets depending on the adapter and configuration."
+    },
+    {
+      "q": "What is an incremental dbt model and why is it important for lakehouses?",
+      "a": "An incremental dbt model processes only new or changed records rather than rebuilding the entire target table on each run \u2014 dramatically reducing compute time and cost for large tables. In the lakehouse context, an incremental Silver table model reads only the new Bronze partitions since the last run, applies transformations, and merges results into the Silver Iceberg table using INSERT OVERWRITE (partition) or MERGE INTO semantics."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is dbt?",
+      "content": "<p><strong>dbt</strong> (data build tool) is an open-source framework that enables data engineers and analysts to define data transformation logic as SQL SELECT statements \u2014 called <em>models</em> \u2014 that dbt compiles into DDL/DML and executes on a connected data platform. dbt handles the boilerplate of table/view creation, dependency ordering, incremental update logic, test execution, and documentation generation \u2014 allowing practitioners to focus on transformation logic rather than infrastructure plumbing.</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a> context, dbt is the standard tool for the <strong>Transform</strong> step of the ELT pattern: raw data is loaded into Bronze <a href=\"apache-iceberg.html\">Iceberg</a> tables by ingestion pipelines (Flink, Airbyte, Spark batch jobs), and dbt models define the transformations that produce Silver (cleansed) and Gold (aggregated) Iceberg tables. dbt models are version-controlled SQL files \u2014 bringing software engineering practices (version control, CI/CD, peer review, automated testing) to data transformation."
+    },
+    {
+      "heading": "dbt Model Types and Iceberg Materialization",
+      "content": "<p>dbt provides four model materialization types, each mapping to different Iceberg operations:</p><ul><li><strong>view:</strong> Creates an Iceberg view (or VDS in Dremio) \u2014 no data storage, query runs against base tables at query time</li><li><strong>table:</strong> Creates a full Iceberg table on each run \u2014 rewrites all data from scratch. Correct for small models; expensive for large tables.</li><li><strong>incremental:</strong> On first run, creates the full table. On subsequent runs, processes only new records and merges them into the existing table using MERGE INTO or INSERT OVERWRITE PARTITION \u2014 the most important materialization type for Silver and Gold lakehouse tables</li><li><strong>ephemeral:</strong> Compiles to a CTE, not a stored table \u2014 used for intermediate transformation logic within a model</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "dbt Model Types Iceberg Materialization",
+      "diagramCaption": "Figure 1: dbt model types mapped to Iceberg operations \u2014 incremental models for Silver and Gold layers."
+    },
+    {
+      "heading": "dbt Testing and Documentation for Lakehouse Quality",
+      "content": "<p>dbt's built-in testing framework is one of its most valuable features for lakehouse <a href=\"data-quality.html\">data quality</a> governance:</p><p><strong>Built-in tests:</strong> not_null (column has no null values), unique (column has no duplicate values), accepted_values (column contains only expected categorical values), relationships (foreign key integrity between tables)</p><p><strong>Custom tests:</strong> SQL-based tests for domain-specific business rules (revenue_amount > 0, order_date <= current_date)</p><p>dbt's documentation auto-generation produces a browsable, searchable website showing all models, their SQL logic, column descriptions, test results, and an interactive lineage DAG showing how models depend on each other. This documentation is ingestible by <a href=\"openmetadata.html\">OpenMetadata</a> and DataHub for catalog-level lineage.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "dbt Testing Documentation Lineage",
+      "diagramCaption": "Figure 2: dbt testing and documentation \u2014 quality gates and interactive lineage DAG for lakehouse models."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>dbt is the SQL transformation standard for the modern <a href=\"data-lakehouse.html\">data lakehouse</a> \u2014 providing version-controlled, tested, documented transformation models that produce Silver and Gold <a href=\"apache-iceberg.html\">Iceberg</a> tables from Bronze raw data. Through adapters for <a href=\"dremio.html\">Dremio</a> (dbt-dremio), <a href=\"apache-spark.html\">Spark</a> (dbt-spark), and <a href=\"trino.html\">Trino</a> (dbt-trino), dbt integrates with every major lakehouse execution engine \u2014 bringing software engineering discipline to data transformation and making <a href=\"data-quality.html\">data quality</a> testing a first-class part of the ELT pipeline.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "dbt implements the Transform step of ELT."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "dbt produces Silver and Gold Medallion layers."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "dbt models materialize as Iceberg tables."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "dbt-dremio adapter runs models on Dremio engine."
+    },
+    {
+      "slug": "data-quality",
+      "term": "Data Quality",
+      "category": "Governance & Quality",
+      "desc": "dbt tests implement data quality gates."
+    },
+    {
+      "slug": "data-lineage",
+      "term": "Data Lineage",
+      "category": "Governance & Quality",
+      "desc": "dbt manifest.json provides table-level lineage."
+    },
+    {
+      "slug": "openmetadata",
+      "term": "OpenMetadata",
+      "category": "Governance & Quality",
+      "desc": "OpenMetadata ingests dbt lineage and quality results."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "dbt-spark adapter runs models on Spark engine."
+    }
+  ]
+}

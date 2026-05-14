@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Observability: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what data observability is, how it monitors freshness, volume, schema, and distribution in Apache Iceberg pipelines, and why it is essential for reliable lakehouse operations.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-observability.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Data Observability: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what data observability is, how it monitors freshness, volume, schema, and distribution in Apache Iceberg pipelines, and why it is essential for reliable lakehouse operations.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-observability.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Data Observability: The Definitive Guide",
+      "description": "Learn what data observability is, how it monitors freshness, volume, schema, and distribution in Apache Iceberg pipelines, and why it is essential for reliable lakehouse operations.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/data-observability.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Data Observability", "item": "https://datalakehouse101.com/knowledge/data-observability.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is data observability?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data observability is the capability to monitor and understand the state of data pipelines and datasets in real time — detecting anomalies (unexpected volume drops, schema changes, freshness delays, distribution shifts) automatically and alerting data engineering teams before business users encounter data quality issues."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the five pillars of data observability?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The five pillars (per Monte Carlo Data): Freshness (is data updated as expected?), Volume (are row counts within expected ranges?), Schema (has the schema changed unexpectedly?), Distribution (are value distributions within historical norms?), and Lineage (which upstream tables and pipelines affected this dataset?)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does data observability differ from data quality monitoring?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data quality checks test specific, predefined rules (not_null, unique, accepted_values). Data observability uses ML-based anomaly detection to automatically learn what 'normal' looks like for each metric and alert on deviations — catching issues that predefined rules don't anticipate, like a subtle distribution shift or a volume drop on a specific partition."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Data Observability</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance & Quality</span>
+      <h1>Data Observability: The Definitive Guide</h1>
+      <p class="hero-lede">Data observability is the ability to understand the health of data in your lakehouse at all times — monitoring freshness, volume, schema changes, and statistical distributions to detect data quality incidents before they reach business users. It is the reliability engineering discipline for data pipelines.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Data Observability?</a></li>
+        <li><a href="#section-2">Five Pillars of Data Observability</a></li>
+        <li><a href="#section-3">Data Observability Tools</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Data Observability?</h2>
+        <p><strong>Data observability</strong> is the practice of continuously monitoring data assets and pipelines to understand their state, detect anomalies, and alert on incidents before they impact business users — analogous to application observability (metrics, logs, traces) but applied to data rather than software systems.</p><p>Traditional <a href="data-quality.html">data quality</a> approaches define explicit rules and test them on a schedule. Data observability takes a broader, more dynamic approach: it monitors multiple health dimensions automatically, learns baseline behavior from historical patterns, and detects anomalies that predefined rules might miss — a 40% volume drop on Tuesday compared to every previous Tuesday, a new null rate appearing in a column that was previously 100% populated, or a schema change in an upstream source table.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Five Pillars of Data Observability</h2>
+        <ul><li><strong>Freshness:</strong> Is the dataset updated as frequently as expected? An orders table that is normally updated every 5 minutes but hasn't been updated in 2 hours indicates a pipeline failure. Freshness monitoring detects this before analysts notice stale data.</li><li><strong>Volume:</strong> Are row counts and record volumes within expected ranges? A daily batch that normally loads 500K records loading only 50K records indicates either a source system issue or a pipeline filter bug.</li><li><strong>Schema:</strong> Has the schema changed unexpectedly? A new column appeared, an existing column's data type changed, or a column was removed — any of these can break downstream transformations.</li><li><strong>Distribution:</strong> Are the statistical distributions of column values (mean, stddev, null rate, cardinality) within historical norms? A payment_amount column whose mean suddenly drops 50% indicates either a data issue or a significant business event.</li><li><strong>Lineage:</strong> When an anomaly is detected, lineage context immediately shows which upstream tables and pipelines contributed to the affected dataset — accelerating root cause investigation.</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Five Pillars Data Observability diagram" loading="lazy"><figcaption>Figure 1: Five pillars of data observability — freshness, volume, schema, distribution, and lineage monitoring.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Data Observability Tools</h2>
+        <p>Leading data observability platforms:</p><ul><li><strong>Monte Carlo Data:</strong> The pioneering commercial data observability platform. ML-based anomaly detection across all five pillars. Native integrations with Iceberg, Glue, dbt, Airflow, and major BI tools.</li><li><strong>Acceldata:</strong> Enterprise data observability with strong on-premises support. Pipeline monitoring, quality scoring, and SLA tracking.</li><li><strong>Elementary Data (open source):</strong> dbt-native observability built on top of dbt tests. Generates HTML reports and Slack alerts from dbt test runs. Free for dbt-based pipelines.</li><li><strong>Soda Core (open source):</strong> SQL-based quality checks with a Python SDK. Integrates with DataHub and OpenMetadata for catalog-visible quality scores.</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Data Observability Tools Ecosystem diagram" loading="lazy"><figcaption>Figure 2: Data observability tool ecosystem — commercial and open-source options for lakehouse monitoring.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Data observability is the reliability engineering practice that makes <a href="data-lakehouse.html">data lakehouse</a> operations production-grade. By continuously monitoring freshness, volume, schema, distribution, and lineage context, observability platforms catch data incidents in minutes rather than hours — before business users encounter stale, missing, or incorrect data in their dashboards. Combined with <a href="data-quality.html">data quality</a> checks in pipelines and <a href="data-lineage.html">lineage</a> for root cause investigation, data observability completes the reliability toolkit for enterprise lakehouse operations.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="data-quality.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Quality</span>
+      <span class="related-desc">Quality checks complement observability monitoring.</span>
+    </a>
+      <a class="related-card" href="data-lineage.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Lineage</span>
+      <span class="related-desc">Lineage accelerates incident root cause investigation.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Observability supports governance through continuous monitoring.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Observability monitors health across all Medallion layers.</span>
+    </a>
+      <a class="related-card" href="data-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Data Catalog</span>
+      <span class="related-desc">Catalogs surface observability scores alongside asset metadata.</span>
+    </a>
+      <a class="related-card" href="etl.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">Observability monitors ETL pipeline health and freshness.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">CDC pipeline freshness monitored by observability platforms.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Observability makes the lakehouse production-reliable.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

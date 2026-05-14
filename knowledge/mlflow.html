@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLflow: The Definitive Guide for Data Lakehouse ML | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what MLflow is, how it tracks ML experiments on Apache Iceberg features, and why it is the standard open-source ML lifecycle management platform for lakehouse data science.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/mlflow.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="MLflow: The Definitive Guide for Data Lakehouse ML | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what MLflow is, how it tracks ML experiments on Apache Iceberg features, and why it is the standard open-source ML lifecycle management platform for lakehouse data science.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/mlflow.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "MLflow: The Definitive Guide",
+      "description": "Learn what MLflow is, how it tracks ML experiments on Apache Iceberg features, and why it is the standard open-source ML lifecycle management platform for lakehouse data science.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/mlflow.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "MLflow", "item": "https://datalakehouse101.com/knowledge/mlflow.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is MLflow?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MLflow is an open-source platform for managing the ML lifecycle — including experiment tracking (logging parameters, metrics, and artifacts for each training run), model registry (versioning and promoting models through staging and production), model serving, and project reproducibility. It is the most widely adopted open-source ML lifecycle management tool."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does MLflow integrate with the data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MLflow integrates with the lakehouse through its experiment tracking API: data scientists log the Iceberg table version (snapshot ID or Nessie tag) used for training as an MLflow artifact alongside model parameters and metrics. This creates a complete lineage link between each MLflow experiment and the exact data state that produced it. MLflow artifacts (model files) can also be stored in S3 alongside Iceberg data."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the MLflow Model Registry?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The MLflow Model Registry is a centralized store for managing model versions — tracking model stage transitions (Development → Staging → Production), storing model artifacts, and annotating model versions with descriptions, tags, and lineage. It serves as the governance layer for ML models, analogous to a data catalog for ML artifacts."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">MLflow</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Architecture Patterns</span>
+      <h1>MLflow: The Definitive Guide</h1>
+      <p class="hero-lede">MLflow is the open-source ML lifecycle management platform — tracking experiments, versioning models, managing deployments, and providing a model registry. Combined with Apache Iceberg for feature storage and Nessie for data versioning, MLflow completes the production ML stack on the open data lakehouse.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is MLflow?</a></li>
+        <li><a href="#section-2">MLflow Experiment Tracking with Iceberg</a></li>
+        <li><a href="#section-3">MLflow Model Registry</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is MLflow?</h2>
+        <p><strong>MLflow</strong> is an open-source platform for managing the end-to-end machine learning lifecycle. Originally developed at Databricks and now a Linux Foundation project, MLflow provides four core capabilities: Tracking (logging parameters, metrics, and artifacts for each experiment run), Projects (packaging ML code for reproducibility), Models (packaging models in a standardized format for deployment), and Registry (managing model versions and stage transitions from development to production).</p><p>In the <a href="data-lakehouse.html">data lakehouse</a> context, MLflow is the ML governance layer that sits alongside Iceberg's data governance — while <a href="apache-iceberg.html">Apache Iceberg</a> governs the data assets (tables, schemas, versions), MLflow governs the ML artifacts (experiments, model versions, deployment stages) that are produced from that data.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>MLflow Experiment Tracking with Iceberg</h2>
+        <p>The MLflow + Iceberg integration pattern for reproducible ML experiments:</p><pre><code>import mlflow
+from pyiceberg.catalog import load_catalog
+
+with mlflow.start_run(run_name='customer-churn-v3'):
+    # Log the Iceberg data version used for training
+    catalog = load_catalog('polaris', uri='...')
+    table = catalog.load_table('gold.customer_features')
+    snapshot_id = table.current_snapshot().snapshot_id
+    
+    mlflow.log_param('training_snapshot_id', snapshot_id)
+    mlflow.log_param('training_date', '2026-05-14')
+    
+    # Train model...
+    mlflow.log_metric('auc', 0.89)
+    mlflow.sklearn.log_model(model, 'churn_model')</code></pre><p>By logging the Iceberg snapshot_id alongside model parameters, each MLflow run creates a complete lineage link between the model and the exact data version used for training — enabling perfect reproducibility.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="MLflow Iceberg Experiment Tracking diagram" loading="lazy"><figcaption>Figure 1: MLflow + Iceberg experiment tracking — logging data version alongside model parameters.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>MLflow Model Registry</h2>
+        <p>The MLflow Model Registry provides governance for production ML deployments:</p><ul><li><strong>Version management:</strong> Each model artifact (sklearn, PyTorch, Spark ML) is versioned in the registry with a unique version number</li><li><strong>Stage transitions:</strong> Models progress through stages: None → Staging → Production → Archived. Stage promotion requires explicit API calls — preventing accidental production promotion</li><li><strong>Annotations:</strong> Model versions are annotated with descriptions, data lineage (which Iceberg snapshot trained the model), validation metrics, and approval status</li><li><strong>Deployment integration:</strong> MLflow Models can be served as REST APIs using mlflow models serve, or deployed to cloud ML serving platforms (SageMaker, Azure ML, Databricks serving)</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="MLflow Model Registry Governance diagram" loading="lazy"><figcaption>Figure 2: MLflow Model Registry — versioning, stage promotion, and deployment governance.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>MLflow is the ML governance companion to Apache Iceberg in the open lakehouse ML stack. While Iceberg governs data assets, MLflow governs ML artifacts — tracking experiments, versioning models, and managing production deployments. The combination of Iceberg feature tables + <a href="nessie-branching-tagging.html">Nessie tags</a> for data versioning + MLflow for experiment tracking creates a complete, reproducible, governed ML platform on the open lakehouse — without requiring proprietary ML platforms that create additional vendor dependencies alongside the data platform.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="data-science-lakehouse.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Data Science on the Lakehouse</span>
+      <span class="related-desc">MLflow is a core tool in the lakehouse data science stack.</span>
+    </a>
+      <a class="related-card" href="feature-store.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Feature Store</span>
+      <span class="related-desc">Feature store provides the training data MLflow tracks.</span>
+    </a>
+      <a class="related-card" href="nessie-branching-tagging.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Nessie Branching and Tagging</span>
+      <span class="related-desc">Nessie tags complement MLflow for data versioning.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Iceberg feature tables are the training data MLflow references.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Spark ML models tracked and registered in MLflow.</span>
+    </a>
+      <a class="related-card" href="data-science-lakehouse.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Data Science on the Lakehouse</span>
+      <span class="related-desc">Data science workflows use MLflow for experiment governance.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">MLflow extends governance to ML artifacts and models.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The lakehouse provides the data foundation for MLflow experiments.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

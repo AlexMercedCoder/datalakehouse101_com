@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Quality: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what data quality means in the data lakehouse, the key data quality dimensions, and how tools like Great Expectations and dbt tests enforce quality in Iceberg pipelines.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-quality.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Data Quality: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what data quality means in the data lakehouse, the key data quality dimensions, and how tools like Great Expectations and dbt tests enforce quality in Iceberg pipelines.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-quality.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Data Quality: The Definitive Guide",
+      "description": "Learn what data quality means in the data lakehouse, the key data quality dimensions, and how tools like Great Expectations and dbt tests enforce quality in Iceberg pipelines.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/data-quality.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Data Quality", "item": "https://datalakehouse101.com/knowledge/data-quality.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is data quality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data quality refers to the degree to which data is accurate (correct values), complete (no missing values), consistent (same value across systems), timely (fresh enough for its use case), and unique (no duplicates). High-quality data is fit for its intended use — analysts and AI models can trust it to make correct decisions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the main data quality dimensions?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The six key data quality dimensions: Accuracy (values are correct), Completeness (no missing required values), Consistency (values match across systems and tables), Timeliness (data is fresh enough for its use case), Uniqueness (no duplicate records), and Validity (values conform to defined formats, ranges, and constraints)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What tools enforce data quality in Apache Iceberg lakehouses?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Key data quality tools for lakehouse pipelines: dbt tests (built-in not_null, unique, accepted_values, relationships tests run as part of dbt model execution), Great Expectations (rich expectation library with HTML reports), Soda Core (SQL-based quality checks integrated with data catalogs), and Apache Griffin (open-source quality platform for Spark-based pipelines)."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Data Quality</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance & Quality</span>
+      <h1>Data Quality: The Definitive Guide</h1>
+      <p class="hero-lede">Data quality is the degree to which data is fit for its intended use — accurate, complete, consistent, timely, and unique. In the lakehouse, data quality enforcement through automated checks in ETL pipelines prevents bad data from propagating through Bronze, Silver, and Gold layers to corrupt business decisions.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Data Quality?</a></li>
+        <li><a href="#section-2">Six Data Quality Dimensions</a></li>
+        <li><a href="#section-3">Implementing Quality Gates in Medallion Pipelines</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Data Quality?</h2>
+        <p><strong>Data quality</strong> is the measure of how well data meets the requirements of its intended use — encompassing accuracy, completeness, consistency, timeliness, uniqueness, and validity across all data assets in the <a href="data-lakehouse.html">data lakehouse</a>. Poor data quality is one of the most expensive and pervasive problems in data-driven organizations: analysts who discover that data cannot be trusted spend time validating rather than analyzing, business decisions made on incorrect data have real operational consequences, and regulatory reports based on bad data create compliance exposure.</p><p>In the lakehouse context, data quality is not just a monitoring activity — it is an active engineering discipline that builds quality checks into ETL pipelines, enforces quality gates between <a href="medallion-architecture.html">Medallion Architecture</a> layers, makes quality metrics visible in the <a href="data-catalog.html">data catalog</a>, and alerts data engineers when quality degradation is detected before it reaches business consumers.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Six Data Quality Dimensions</h2>
+        <ul><li><strong>Accuracy:</strong> Values are correct representations of real-world facts. (Revenue amounts match transaction system totals)</li><li><strong>Completeness:</strong> All required fields are populated; no missing values for critical attributes. (customer_id is never null in the orders table)</li><li><strong>Consistency:</strong> The same fact has the same value across all systems and tables. (Customer address in CRM matches address in orders table)</li><li><strong>Timeliness:</strong> Data is available and updated within the freshness requirement for its use case. (Order data is available within 5 minutes of transaction for operational dashboards)</li><li><strong>Uniqueness:</strong> No duplicate records for the same real-world entity. (Each order appears exactly once in the orders Silver table)</li><li><strong>Validity:</strong> Values conform to defined formats, ranges, and business rules. (order_status is always one of ['pending', 'shipped', 'delivered', 'cancelled'])</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Six Data Quality Dimensions diagram" loading="lazy"><figcaption>Figure 1: Six data quality dimensions — the framework for defining and measuring lakehouse data quality.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Implementing Quality Gates in Medallion Pipelines</h2>
+        <p>The <a href="medallion-architecture.html">Medallion Architecture</a> provides natural quality gate insertion points between layers:</p><ul><li><strong>Bronze → Silver gate:</strong> Validate that Bronze records meet minimum standards before Silver transformation (not-null checks on primary keys, format validation on critical dates, range checks on numeric values)</li><li><strong>Silver → Gold gate:</strong> Validate Silver data completeness and referential integrity before Gold aggregation (join key existence checks, referential integrity between related tables, freshness checks)</li></ul><p>dbt's built-in test framework makes implementing these gates straightforward:</p><pre><code># dbt schema.yml
+models:
+  - name: silver_orders
+    columns:
+      - name: order_id
+        tests: [not_null, unique]
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: ['pending','shipped','delivered','cancelled']</code></pre>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Quality Gates in Medallion Architecture diagram" loading="lazy"><figcaption>Figure 2: Data quality gates between Medallion layers — preventing bad data from propagating to Gold.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Data quality is the foundation of analytical trust in the <a href="data-lakehouse.html">data lakehouse</a>. Without quality enforcement, every dataset is suspect, every metric is questioned, and the value of the lakehouse investment erodes through analyst distrust and business decision errors. Building quality checks into <a href="etl.html">ETL</a> pipelines as quality gates, surfacing quality metrics in the <a href="data-catalog.html">data catalog</a>, and alerting on quality degradation through <a href="data-observability.html">data observability</a> platforms creates a lakehouse where data consumers can confidently use data for analysis and AI without manual validation overhead.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="data-observability.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Observability</span>
+      <span class="related-desc">Observability extends quality monitoring with automated alerting.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Quality is a pillar of comprehensive data governance.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Quality gates between Bronze, Silver, and Gold layers.</span>
+    </a>
+      <a class="related-card" href="data-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Data Catalog</span>
+      <span class="related-desc">Catalogs surface quality metrics alongside table descriptions.</span>
+    </a>
+      <a class="related-card" href="data-lineage.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Lineage</span>
+      <span class="related-desc">Lineage helps trace data quality issues to their source.</span>
+    </a>
+      <a class="related-card" href="etl.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">Quality checks embedded in ETL pipeline quality gates.</span>
+    </a>
+      <a class="related-card" href="dbt.html">
+      <span class="related-label">Ingestion & Streaming</span>
+      <span class="related-term">dbt</span>
+      <span class="related-desc">dbt tests implement quality checks as pipeline artifacts.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">High quality data makes the lakehouse trustworthy.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

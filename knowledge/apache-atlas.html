@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apache Atlas: The Definitive Guide for Data Governance | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what Apache Atlas is, how it provides metadata management and governance for the Hadoop and lakehouse ecosystem, and how it integrates with Apache Ranger for comprehensive governance.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/apache-atlas.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Apache Atlas: The Definitive Guide for Data Governance | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what Apache Atlas is, how it provides metadata management and governance for the Hadoop and lakehouse ecosystem, and how it integrates with Apache Ranger for comprehensive governance.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/apache-atlas.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Apache Atlas: The Definitive Guide",
+      "description": "Learn what Apache Atlas is, how it provides metadata management and governance for the Hadoop and lakehouse ecosystem, and how it integrates with Apache Ranger for comprehensive governance.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/apache-atlas.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Apache Atlas", "item": "https://datalakehouse101.com/knowledge/apache-atlas.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Apache Atlas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Atlas is an open-source metadata management and governance framework developed for the Apache Hadoop ecosystem. It provides a data catalog (asset discovery and description), data lineage tracking (how data flows between Hadoop services), data classification (tagging data with PII, sensitive, regulatory labels), business glossary management, and integration with Apache Ranger for policy-driven access control."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Apache Atlas differ from modern data catalogs like DataHub?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Atlas was designed specifically for the Hadoop ecosystem and has deep native integration with Hive, HBase, Kafka, and HDFS. It excels in on-premises Hadoop environments. DataHub and OpenMetadata are newer, API-first platforms with broader integration coverage (modern cloud services, Iceberg, dbt, Airflow) and more modern UX. Organizations migrating from Hadoop to cloud lakehouses typically migrate from Atlas to DataHub or OpenMetadata."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Apache Atlas integrate with Apache Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Atlas has limited native Iceberg integration. It can ingest Iceberg table metadata via Hive bridge integration (for Iceberg tables accessed through Hive) or via custom integration with Atlas's REST API. Native Iceberg REST catalog integration is not a current Atlas strength, which is a factor driving Hadoop-to-lakehouse migrations to adopt newer catalog platforms."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Apache Atlas</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance & Quality</span>
+      <h1>Apache Atlas: The Definitive Guide</h1>
+      <p class="hero-lede">Apache Atlas is the open-source metadata management and governance framework for the Hadoop ecosystem — providing data catalog capabilities, lineage tracking, classification, and business glossary management. It is the governance companion to Apache Ranger, together forming the standard governance stack for Hadoop-era data platforms.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Apache Atlas?</a></li>
+        <li><a href="#section-2">Core Atlas Capabilities</a></li>
+        <li><a href="#section-3">Atlas vs Modern Catalog Platforms</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Apache Atlas?</h2>
+        <p><strong>Apache Atlas</strong> is an open-source metadata management and data governance framework developed as part of the Apache Hadoop ecosystem. Atlas provides the metadata and governance capabilities that complement <a href="apache-ranger.html">Apache Ranger's</a> access control: where Ranger enforces who can do what to which data, Atlas records what the data is, where it came from, and how it is classified — the metadata and lineage dimension of governance.</p><p>Together, Ranger (access control) and Atlas (metadata + lineage) form the complete Hadoop-era governance stack. This tandem has been deployed in thousands of enterprise Hadoop environments and remains in production for organizations that have not yet completed their migration to cloud lakehouse architectures.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Core Atlas Capabilities</h2>
+        <ul><li><strong>Data Catalog:</strong> Automatically ingests metadata from Hive, HDFS, HBase, and Kafka. Provides a searchable inventory of data assets with schema details, business descriptions, and ownership information.</li><li><strong>Data Lineage:</strong> Tracks data flow between Hadoop services — which Hive jobs read which input tables and write which output tables. Visualizes lineage as a directed graph in the Atlas UI.</li><li><strong>Data Classification:</strong> Users and automated classifiers can tag data assets with classification labels (PII, PHI, FINANCIAL, CONFIDENTIAL). These tags can trigger Ranger access control policies — data tagged PII automatically gets restricted access without manual policy updates.</li><li><strong>Business Glossary:</strong> Formal business term definitions linked to specific technical metadata assets. Bridges the gap between business language and technical data models.</li><li><strong>Ranger Integration:</strong> Atlas classifications automatically propagate to Ranger policies — tagging a column as PII in Atlas can trigger an automatic Ranger masking policy for that column.</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Apache Atlas Governance Architecture diagram" loading="lazy"><figcaption>Figure 1: Apache Atlas architecture — metadata ingestion, lineage, classification, and Ranger integration.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Atlas vs Modern Catalog Platforms</h2>
+        <p>For organizations migrating from Hadoop to cloud lakehouses, choosing between retaining Atlas and adopting a modern platform is a key governance architecture decision:</p><table class="comparison-table"><thead><tr><th>Dimension</th><th>Apache Atlas</th><th>DataHub / OpenMetadata</th></tr></thead><tbody><tr><td>Hadoop integration</td><td>Native, deep</td><td>Available via connectors</td></tr><tr><td>Iceberg integration</td><td>Limited</td><td>Strong and growing</td></tr><tr><td>Cloud services</td><td>Limited</td><td>Broad (Glue, S3, Snowflake)</td></tr><tr><td>Modern UI</td><td>Dated</td><td>Modern, React-based</td></tr><tr><td>Community activity</td><td>Declining</td><td>Active, growing</td></tr></tbody></table>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Atlas vs Modern Data Catalogs diagram" loading="lazy"><figcaption>Figure 2: Apache Atlas vs modern catalog platforms — migration considerations for lakehouse adoption.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Apache Atlas is the proven metadata governance platform of the Hadoop era — deeply integrated with Hive, HDFS, HBase, and Kafka, and widely deployed in enterprise Hadoop environments alongside <a href="apache-ranger.html">Apache Ranger</a>. For organizations modernizing to the cloud <a href="data-lakehouse.html">data lakehouse</a>, Atlas represents a migration target — replacing it with a modern catalog platform (<a href="openmetadata.html">OpenMetadata</a>, DataHub) that provides richer Iceberg integration, broader cloud service coverage, and more active community development while preserving the governance patterns Atlas established.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-ranger.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Apache Ranger</span>
+      <span class="related-desc">Ranger and Atlas form the Hadoop governance tandem.</span>
+    </a>
+      <a class="related-card" href="openmetadata.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">OpenMetadata</span>
+      <span class="related-desc">Modern catalog replacing Atlas for cloud lakehouses.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Atlas implements metadata governance for Hadoop.</span>
+    </a>
+      <a class="related-card" href="data-lineage.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Data Lineage</span>
+      <span class="related-desc">Atlas tracks lineage across Hadoop services.</span>
+    </a>
+      <a class="related-card" href="data-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Data Catalog</span>
+      <span class="related-desc">Atlas provides catalog capabilities for Hadoop assets.</span>
+    </a>
+      <a class="related-card" href="hive-metastore.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Hive Metastore</span>
+      <span class="related-desc">Atlas ingests Hive table metadata automatically.</span>
+    </a>
+      <a class="related-card" href="column-level-security.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Column-Level Security</span>
+      <span class="related-desc">Atlas PII tags trigger Ranger column masking policies.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Atlas governance patterns migrate to the cloud lakehouse.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+  "slug": "batch-processing",
+  "term": "Batch Processing",
+  "category": "Ingestion & Streaming",
+  "metaTitle": "Batch Processing: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what batch processing is, how Apache Spark handles large-scale batch ETL into Apache Iceberg, and when to choose batch over streaming for lakehouse pipelines.",
+  "h1": "Batch Processing: The Definitive Guide",
+  "lede": "Batch processing transforms large volumes of data in scheduled runs \u2014 the workload model for ETL jobs that produce Silver and Gold Iceberg tables from Bronze raw data. Apache Spark is the dominant batch processing engine for lakehouse pipelines, combining Python ecosystem richness with scalable distributed execution on Iceberg data.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is batch processing in the data lakehouse?",
+      "a": "Batch processing is the data transformation model where data is accumulated over a time period (an hour, a day, a week) and processed in a single scheduled run \u2014 as opposed to continuous stream processing. In the lakehouse context, batch processing typically means Apache Spark jobs that read Bronze Iceberg tables, apply transformations, and write Silver or Gold Iceberg tables on a schedule (hourly, daily, etc.)."
+    },
+    {
+      "q": "When should I use batch vs stream processing for lakehouse pipelines?",
+      "a": "Use batch when: transformation complexity is high (multi-table joins, complex business logic), historical data reprocessing is needed (backfills), data freshness requirements are hourly or daily, or when leveraging the Python ML ecosystem (Pandas, scikit-learn, PyTorch) for ML feature engineering. Use streaming when: data freshness must be seconds to minutes, or real-time fraud/anomaly detection is required."
+    },
+    {
+      "q": "What is Spark's role in batch lakehouse processing?",
+      "a": "Apache Spark is the standard batch processing engine for lakehouse ETL. PySpark and Spark SQL provide the data transformation APIs; Spark's Iceberg connector enables reading and writing Iceberg tables; Spark's distributed execution scales from single-machine to thousand-node clusters. Most Silver and Gold layer transformations in the Medallion Architecture are implemented as scheduled Spark batch jobs."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Batch Processing?",
+      "content": "<p><strong>Batch processing</strong> is the data processing model where data is accumulated over a time period and processed together in a single scheduled run \u2014 as opposed to <a href=\"stream-processing.html\">stream processing</a>, which processes data continuously as it arrives. Batch processing has been the dominant model for data transformation since the earliest days of computing, and it remains the most common pattern for Silver and Gold layer transformations in the <a href=\"medallion-architecture.html\">Medallion Architecture</a>.</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a>, batch processing is typically implemented with <a href=\"apache-spark.html\">Apache Spark</a> \u2014 reading Bronze <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables that have been populated by streaming ingestion, applying complex transformations (joins, aggregations, business rule application), and writing Silver or Gold Iceberg tables. Batch jobs are scheduled by Apache Airflow or similar orchestrators."
+    },
+    {
+      "heading": "Spark Batch Processing on Iceberg",
+      "content": "<p><a href=\"apache-spark.html\">Apache Spark</a> is the dominant batch processing engine for lakehouse ETL because it combines:</p><ul><li><strong>Python ecosystem:</strong> PySpark integrates with NumPy, Pandas, scikit-learn, and PyTorch \u2014 enabling ML feature engineering and data science workflows as part of the batch ETL pipeline</li><li><strong>Iceberg native integration:</strong> The Spark Iceberg connector supports all Iceberg DML (INSERT INTO, MERGE INTO, DELETE, UPDATE) and DDL (ALTER TABLE, schema evolution) operations natively</li><li><strong>Distributed execution:</strong> Spark scales from a single local machine to thousand-node EMR or Databricks clusters \u2014 the same PySpark code runs at any scale</li><li><strong>SQL and DataFrame API:</strong> Both Spark SQL and the DataFrame API can query and write Iceberg tables, allowing teams to choose the interface that fits their skills</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Spark Batch Processing Iceberg Pipeline",
+      "diagramCaption": "Figure 1: Spark batch pipeline \u2014 Bronze Iceberg scan, transformation, Silver/Gold Iceberg write, Airflow schedule."
+    },
+    {
+      "heading": "Batch Patterns for Medallion Layers",
+      "content": "<p>Specific batch patterns for each Medallion layer:</p><ul><li><strong>Bronze \u2192 Silver (Cleansing batch):</strong> Daily Spark job reading previous day's Bronze partitions, deduplicating, validating, and writing to Silver via MERGE INTO (applying CDC events to current state)</li><li><strong>Silver \u2192 Gold (Aggregation batch):</strong> Hourly or daily Spark SQL job computing business metrics (daily revenue by region, weekly cohort retention rates) and writing pre-aggregated Gold tables</li><li><strong>Gold optimization batch:</strong> Weekly Spark OPTIMIZE + Z-ORDER job maintaining Gold table performance by compacting small files and re-clustering data layout</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Batch Job Schedule Medallion Architecture",
+      "diagramCaption": "Figure 2: Batch job schedule across Medallion layers \u2014 cleansing, aggregation, and optimization cadences."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Batch processing remains the workhorse of <a href=\"data-lakehouse.html\">data lakehouse</a> ETL \u2014 producing the cleansed Silver tables and business-ready Gold tables that analysts and BI tools depend on. <a href=\"apache-spark.html\">Apache Spark's</a> combination of Python ecosystem richness, native <a href=\"apache-iceberg.html\">Iceberg</a> integration, and horizontal scalability makes it the ideal batch processing engine for complex, high-volume transformations that require more than streaming can provide. The mature lakehouse architecture uses streaming (Flink) and batch (Spark) complementarily \u2014 each in the role it performs best.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "The primary batch processing engine for lakehouse ETL."
+    },
+    {
+      "slug": "stream-processing",
+      "term": "Stream Processing",
+      "category": "Ingestion & Streaming",
+      "desc": "Streaming complements batch in the lakehouse pipeline."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Batch jobs produce Silver and Gold Medallion layers."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "Batch processing implements the Transform and Load steps."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Source and destination for Spark batch jobs."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Compaction is run as a batch maintenance operation."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "Batch MERGE INTO applies CDC events in scheduled runs."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Batch processing produces the business-ready lakehouse data."
+    }
+  ]
+}

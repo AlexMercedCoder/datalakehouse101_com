@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Analytics: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what real-time analytics means in the data lakehouse, how streaming ingestion and query engines like Dremio enable near-real-time dashboards on Apache Iceberg data.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/real-time-analytics.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Real-Time Analytics: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what real-time analytics means in the data lakehouse, how streaming ingestion and query engines like Dremio enable near-real-time dashboards on Apache Iceberg data.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/real-time-analytics.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Real-Time Analytics: The Definitive Guide",
+      "description": "Learn what real-time analytics means in the data lakehouse, how streaming ingestion and query engines like Dremio enable near-real-time dashboards on Apache Iceberg data.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/real-time-analytics.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Real-Time Analytics", "item": "https://datalakehouse101.com/knowledge/real-time-analytics.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is real-time analytics in the data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Real-time analytics in the data lakehouse refers to querying data that is updated continuously from operational systems — within seconds to minutes of events occurring — rather than querying historical batch-loaded data. It requires both a real-time ingestion pipeline (Kafka → Flink → Iceberg) and a fast query engine (Dremio with Reflections) that can serve queries on frequently updated tables with sub-second latency."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Dremio enable real-time analytics on Iceberg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio enables near-real-time analytics through two mechanisms: Reflections that refresh frequently (every few minutes) to pre-compute aggregations on recently ingested data, and direct Iceberg scan mode for the most current data where Reflection staleness is unacceptable. The combination delivers sub-second BI performance on data that may be only minutes old."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between real-time and near-real-time analytics?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "True real-time analytics (millisecond freshness) requires OLAP databases designed for high-frequency writes (ClickHouse, Apache Druid). Near-real-time analytics (second to minute freshness) is achievable in the lakehouse using streaming ingestion to Iceberg + fast query engines. Most business use cases labeled 'real-time' actually need near-real-time — a 2-minute-old fraud dashboard is operationally effective for most fraud teams."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Real-Time Analytics</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Ingestion & Streaming</span>
+      <h1>Real-Time Analytics: The Definitive Guide</h1>
+      <p class="hero-lede">Real-time analytics delivers business insights from data that is seconds to minutes old — enabling live operational dashboards, real-time fraud detection, and immediate response to business events. In the lakehouse, real-time analytics combines streaming ingestion (Flink → Iceberg) with fast query execution (Dremio Reflections) to close the gap between event and insight.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Real-Time Analytics?</a></li>
+        <li><a href="#section-2">The Near-Real-Time Lakehouse Stack</a></li>
+        <li><a href="#section-3">When the Lakehouse is Enough vs Specialized OLAP</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Real-Time Analytics?</h2>
+        <p><strong>Real-time analytics</strong> is the capability to query and analyze data that is continuously updated from source systems, delivering insights from events that occurred seconds to minutes ago — rather than from batch-loaded data that may be hours or days old. Real-time analytics enables operational use cases that require current data: fraud detection dashboards, live inventory monitoring, customer journey analysis, operational SLA tracking, and real-time A/B test result monitoring.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a>, real-time analytics is achieved by combining a streaming ingestion pipeline (<a href="apache-kafka.html">Kafka</a> → <a href="apache-flink.html">Flink</a> → Bronze <a href="apache-iceberg.html">Iceberg</a> tables) with a fast analytical query engine (<a href="dremio.html">Dremio</a> with <a href="dremio-reflections.html">Reflections</a>). The result is a lakehouse that serves BI queries on data that may be only 1–5 minutes old — sufficient for the vast majority of operational analytics use cases.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>The Near-Real-Time Lakehouse Stack</h2>
+        <p>The near-real-time lakehouse architecture:</p><ol><li><strong>Event sources:</strong> Operational databases (via Debezium CDC), application services (direct Kafka producers), and external APIs publish events to Kafka topics</li><li><strong>Flink ingestion:</strong> Flink reads Kafka topics and writes to Bronze Iceberg tables with Iceberg's streaming write mode — committing new snapshots every 1–5 minutes (configurable)</li><li><strong>Dremio Reflection refresh:</strong> Dremio's Reflection refresh schedule detects new Iceberg snapshots and refreshes relevant Aggregation Reflections — typically completing in 15–60 seconds for small incremental snapshots</li><li><strong>BI queries served:</strong> BI tools querying Dremio receive results from the refreshed Reflection — data is 2–7 minutes old end-to-end</li></ol>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Near Real Time Lakehouse Analytics Stack diagram" loading="lazy"><figcaption>Figure 1: Near-real-time analytics stack — Kafka, Flink, Iceberg, Dremio Reflections, BI tools.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>When the Lakehouse is Enough vs Specialized OLAP</h2>
+        <p>The lakehouse near-real-time approach is sufficient for most operational analytics use cases. Specialized real-time OLAP databases (Apache Druid, ClickHouse, Apache Pinot) provide true real-time query on data updated at very high frequency (millions of events/second, second-level freshness requirements), but at the cost of a separate system with its own storage, management, and data duplication.</p><p>For most organizations, the near-real-time lakehouse (2–5 minute data freshness on Iceberg + Dremio) eliminates the need for a separate real-time OLAP tier — reducing architectural complexity while delivering freshness levels that are operationally effective for fraud, operations, and business monitoring use cases.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Real Time Analytics Decision Framework diagram" loading="lazy"><figcaption>Figure 2: Real-time analytics decision — lakehouse near-real-time vs specialized OLAP database.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Real-time analytics in the <a href="data-lakehouse.html">data lakehouse</a> is achievable through the combination of streaming ingestion (<a href="apache-flink.html">Flink</a> writing to <a href="apache-iceberg.html">Iceberg</a> every few minutes) and fast query execution (<a href="dremio.html">Dremio</a> serving Reflection-accelerated queries on the most recent snapshots). For most operational analytics use cases, this near-real-time lakehouse approach delivers sufficient freshness while maintaining the governance, openness, and analytical richness of the full lakehouse platform — without requiring a separate real-time OLAP database and its associated operational complexity.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="stream-processing.html">
+      <span class="related-label">Ingestion & Streaming</span>
+      <span class="related-term">Stream Processing</span>
+      <span class="related-desc">Stream processing feeds real-time data into Iceberg.</span>
+    </a>
+      <a class="related-card" href="apache-flink.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Flink</span>
+      <span class="related-desc">Flink streams events into Iceberg for real-time analytics.</span>
+    </a>
+      <a class="related-card" href="dremio-reflections.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio Reflections</span>
+      <span class="related-desc">Reflections enable fast queries on frequently updated Iceberg.</span>
+    </a>
+      <a class="related-card" href="apache-kafka.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Apache Kafka</span>
+      <span class="related-desc">Kafka delivers real-time events to the ingestion layer.</span>
+    </a>
+      <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">CDC enables real-time operational data in the lakehouse.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Dremio's query engine enables real-time analytics queries.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Iceberg's snapshot model enables real-time ingestion.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Real-time analytics is a key lakehouse capability.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

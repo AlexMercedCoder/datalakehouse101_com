@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upsert: The Definitive Guide for Apache Iceberg | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what upsert is, how Apache Iceberg's MERGE INTO implements upsert semantics, and why upsert is essential for CDC pipelines maintaining current-state Silver tables.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/upsert.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Upsert: The Definitive Guide for Apache Iceberg | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what upsert is, how Apache Iceberg's MERGE INTO implements upsert semantics, and why upsert is essential for CDC pipelines maintaining current-state Silver tables.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/upsert.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Upsert: The Definitive Guide for Apache Iceberg",
+      "description": "Learn what upsert is, how Apache Iceberg's MERGE INTO implements upsert semantics, and why upsert is essential for CDC pipelines maintaining current-state Silver tables.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/upsert.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Upsert", "item": "https://datalakehouse101.com/knowledge/upsert.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is an upsert?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An upsert is a combined UPDATE + INSERT operation: if a record with the matching key already exists in the target table, update it with the new values; if no matching record exists, insert it as a new row. Upsert is essential for maintaining current-state tables from CDC change streams, where each event may be an INSERT (new record) or UPDATE (existing record changed) in the source."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Apache Iceberg implement upsert?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Iceberg implements upsert through the MERGE INTO SQL statement. MERGE INTO matches source and target rows by a join key, then applies WHEN MATCHED THEN UPDATE (update existing rows) and WHEN NOT MATCHED THEN INSERT (insert new rows) clauses atomically. Iceberg writes updates as either Copy-on-Write (rewrites entire affected data files) or Merge-on-Read (writes delete + new data files separately)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the performance difference between Copy-on-Write and Merge-on-Read upserts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Copy-on-Write (CoW) upserts rewrite entire data files for each updated row — slow for write-heavy workloads (each MERGE rewrites large files) but fast for reads (no delete file merging needed). Merge-on-Read (MoR) upserts write small delete + insert files separately — fast for writes (only changed records written) but requires merging on read. CoW is better for read-heavy Silver tables; MoR is better for high-frequency CDC streams."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Upsert</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Ingestion & Streaming</span>
+      <h1>Upsert: The Definitive Guide for Apache Iceberg</h1>
+      <p class="hero-lede">Upsert (UPDATE or INSERT) is the DML operation that updates existing records and inserts new ones in a single atomic operation. In Apache Iceberg, MERGE INTO implements upsert — the core operation for CDC pipelines that maintain current-state Silver tables reflecting the present state of source operational databases.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is an Upsert?</a></li>
+        <li><a href="#section-2">MERGE INTO: Iceberg's Upsert Implementation</a></li>
+        <li><a href="#section-3">CoW vs MoR Upsert Strategies</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is an Upsert?</h2>
+        <p>An <strong>upsert</strong> (a portmanteau of <em>update</em> and <em>insert</em>) is a database write operation that combines two behaviors in a single statement: if a record matching the specified key already exists in the target table, <em>update</em> it with the new values; if no matching record exists, <em>insert</em> it as a new row. Upsert is the fundamental operation for maintaining current-state tables from change data streams.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a>, upsert is the operation that makes Silver tables valuable — not just a raw historical log like Bronze tables, but a continuously updated <em>current state</em> that reflects the present state of source operational databases. A Silver orders table maintained via upsert always shows the current status of each order (not a log of all status changes), enabling analysts to query 'how many orders are currently pending?' rather than 'how many order_status = pending events have ever occurred?'
+        
+      </section>
+
+      <section id="section-2">
+        <h2>MERGE INTO: Iceberg's Upsert Implementation</h2>
+        <p>Apache Iceberg implements upsert through the ANSI standard <code>MERGE INTO</code> statement:</p><pre><code>MERGE INTO silver.orders AS target
+USING bronze.orders_cdc AS source
+  ON target.order_id = source.order_id
+WHEN MATCHED AND source.op_type = 'D'
+  THEN DELETE
+WHEN MATCHED AND source.op_type IN ('U', 'R')
+  THEN UPDATE SET
+    target.status = source.status,
+    target.updated_at = source.updated_at
+WHEN NOT MATCHED AND source.op_type = 'I'
+  THEN INSERT (order_id, status, created_at, updated_at)
+  VALUES (source.order_id, source.status, source.created_at, source.updated_at);</code></pre><p>This MERGE INTO processes a batch of CDC events (INSERTs, UPDATEs, DELETEs) from the Bronze CDC table and applies them atomically to the Silver current-state table — maintaining a correct, current-state representation of the source orders table.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="MERGE INTO Upsert Iceberg CDC diagram" loading="lazy"><figcaption>Figure 1: MERGE INTO for CDC upsert — applying Bronze CDC events to Silver current-state Iceberg tables.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>CoW vs MoR Upsert Strategies</h2>
+        <p>Apache Iceberg supports two physical write strategies for upsert operations:</p><h3>Copy-on-Write (CoW)</h3><p>When a MERGE INTO updates a row, Iceberg rewrites the entire Parquet data file containing that row — incorporating the updated value into a new file and marking the old file as deleted. Read queries require no merge logic — every data file contains only current values. Best for tables with low update frequency but high read volume.</p><h3>Merge-on-Read (MoR)</h3><p>When a MERGE INTO updates a row, Iceberg writes a small <em>equality delete file</em> (marking the old row as deleted by its primary key) and a new data file (containing the updated row). Old data files are not rewritten. Read queries must merge data files with delete files to produce current values. Best for high-frequency CDC streams where rewriting large files on every update is impractical. <a href="compaction.html">Compaction</a> periodically merges delete files back into data files to maintain read performance.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="CoW vs MoR Upsert Strategies diagram" loading="lazy"><figcaption>Figure 2: Copy-on-Write vs Merge-on-Read upsert — write performance vs read simplicity tradeoff.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Upsert via <code>MERGE INTO</code> is the cornerstone DML operation for maintaining current-state Silver tables in the <a href="data-lakehouse.html">data lakehouse</a>. By combining <a href="change-data-capture.html">CDC</a> events with Iceberg's MERGE INTO (implemented as either Copy-on-Write or Merge-on-Read depending on update frequency), data teams create Silver tables that continuously reflect the present state of source operational databases — enabling analysts to ask current-state questions of lakehouse data with the same confidence as querying the operational system directly, but with the scale, governance, and analytical richness of the <a href="apache-iceberg.html">Apache Iceberg</a> lakehouse.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="change-data-capture.html">
+      <span class="related-label">Ingestion</span>
+      <span class="related-term">Change Data Capture</span>
+      <span class="related-desc">CDC events are applied to Silver tables via upsert.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Iceberg MERGE INTO implements upsert semantics.</span>
+    </a>
+      <a class="related-card" href="merge-on-read.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Merge-on-Read</span>
+      <span class="related-desc">MoR is the efficient upsert write strategy for CDC.</span>
+    </a>
+      <a class="related-card" href="copy-on-write.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Copy-on-Write</span>
+      <span class="related-desc">CoW rewrites files for each upsert — optimizes reads.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Compaction merges MoR delete files after CDC upserts.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">Upsert maintains current-state Silver tables.</span>
+    </a>
+      <a class="related-card" href="acid-transactions.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">ACID Transactions</span>
+      <span class="related-desc">ACID ensures upsert atomicity across Iceberg commits.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Spark executes MERGE INTO for batch upsert pipelines.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

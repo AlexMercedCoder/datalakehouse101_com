@@ -1,0 +1,98 @@
+{
+  "slug": "automated-table-optimization",
+  "term": "Automated Table Optimization",
+  "category": "Analytics & BI",
+  "metaTitle": "Automated Table Optimization: The Definitive Guide",
+  "metaDescription": "Learn what automated table optimization is, how Dremio and Apache Iceberg automate compaction, Z-ordering, and snapshot expiry, and why it eliminates manual table maintenance.",
+  "h1": "Automated Table Optimization: The Definitive Guide",
+  "lede": "Automated table optimization removes the operational burden of manual Iceberg table maintenance \u2014 automatically scheduling compaction, Z-order optimization, snapshot expiry, and orphan file cleanup based on table activity and performance metrics. Dremio's Autonomous Optimization and Iceberg's native optimization procedures make performance self-maintaining.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is automated table optimization?",
+      "a": "Automated table optimization is the capability to automatically schedule and execute Apache Iceberg table maintenance operations \u2014 compaction (merging small files), Z-order optimization (clustering data for skipping), snapshot expiry (removing old metadata), and orphan file cleanup \u2014 without manual operator scheduling or intervention."
+    },
+    {
+      "q": "What operations are included in automated table optimization?",
+      "a": "Four main operations: Compaction (merging small files into optimally-sized Parquet files to reduce scan overhead), Z-ordering (re-clustering data files for better data skipping), Snapshot expiry (cleaning up old snapshot metadata beyond the retention period), and Orphan file removal (deleting data files no longer referenced by any snapshot)."
+    },
+    {
+      "q": "How does Dremio automate Iceberg table optimization?",
+      "a": "Dremio provides Automatic Optimization as a managed service for Iceberg tables in Dremio Open Catalog. When enabled, Dremio monitors table write activity and automatically triggers compaction when small file accumulation exceeds thresholds, runs Z-order optimization on tables with registered sort orders, and expires snapshots beyond the configured retention period."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Automated Table Optimization?",
+      "content": "<p><strong>Automated table optimization</strong> is the management capability that makes <a href=\"apache-iceberg.html\">Apache Iceberg</a> table performance self-maintaining \u2014 automatically scheduling and executing the maintenance operations that keep tables performant (right-sized files, clustered data layout, clean metadata) without requiring data engineers to manually schedule and monitor each maintenance job.</p><p>Without automation, Iceberg table maintenance is a significant operational burden: data engineers must monitor each table's file count, schedule compaction jobs in Airflow, run Z-order optimization jobs periodically, track snapshot ages and run expiry procedures, and clean up orphan files from failed commits. For organizations with dozens or hundreds of Iceberg tables, manual maintenance is unsustainable \u2014 tables drift into poor performance states and engineers spend more time on maintenance than on analytics.</p>"
+    },
+    {
+      "heading": "The Four Optimization Operations",
+      "content": "<ul><li><strong><a href=\"compaction.html\">Compaction:</a></strong> Merges many small Parquet files (created by streaming writes, frequent MERGE INTO, or small batch writes) into optimally-sized files (128MB\u20131GB). Reduces the number of files a query must open, improving scan efficiency and reducing S3 API costs from excessive LIST and GET operations.</li><li><strong><a href=\"z-ordering.html\">Z-Order Optimization:</a></strong> Re-sorts data files by multiple clustering columns to narrow per-file statistics and maximize data skipping. Should run after significant data accumulation or on a weekly schedule for heavily queried tables.</li><li><strong>Snapshot Expiry:</strong> Removes snapshot metadata beyond the retention window (typically 7\u201330 days). Old snapshots accumulate in the metadata.json file and manifest lists, increasing metadata read overhead for every query.</li><li><strong>Orphan File Removal:</strong> Deletes data files in the table's storage prefix that are not referenced by any active snapshot \u2014 left behind by failed write operations, aborted transactions, or manual file operations.</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Automated Table Optimization Operations",
+      "diagramCaption": "Figure 1: Four automated optimization operations \u2014 compaction, Z-order, snapshot expiry, orphan removal."
+    },
+    {
+      "heading": "Automation with Dremio and Apache Spark",
+      "content": "<p><a href=\"dremio.html\">Dremio</a> provides managed automatic optimization for tables in Dremio Open Catalog. Enabled per-table with a DDL statement:</p><pre><code>ALTER TABLE catalog.schema.orders\nSET TBLPROPERTIES (\n  'optimize.target-file-size-mb' = '256',\n  'optimize.auto-clean-orphan-files' = 'true',\n  'optimize.snapshot-expire-days' = '7'\n);</code></pre><p>Dremio's background optimization service monitors table write activity and triggers the appropriate maintenance operations automatically. For self-managed Iceberg tables on Spark, Apache Airflow DAGs can schedule Spark procedures:</p><pre><code>-- Spark compaction\nCALL catalog.system.rewrite_data_files('schema.orders');\n-- Snapshot expiry\nCALL catalog.system.expire_snapshots('schema.orders', TIMESTAMP '7 days ago');</code></pre>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Dremio Automated Optimization Pipeline",
+      "diagramCaption": "Figure 2: Dremio managed optimization \u2014 monitoring table activity and triggering maintenance automatically."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Automated table optimization is the operational maturity milestone that transforms Iceberg table management from a labor-intensive engineering task into a self-maintaining system. By automating <a href=\"compaction.html\">compaction</a>, <a href=\"z-ordering.html\">Z-ordering</a>, snapshot expiry, and orphan file cleanup, organizations maintain consistently high query performance without dedicating engineering time to table maintenance. <a href=\"dremio.html\">Dremio's</a> managed automatic optimization delivers this capability for tables in Dremio Open Catalog, while Apache Airflow + Spark procedures provide the self-managed equivalent for broader Iceberg deployments.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Primary automated optimization operation."
+    },
+    {
+      "slug": "z-ordering",
+      "term": "Z-Ordering",
+      "category": "Table Formats",
+      "desc": "Automated Z-order clustering for query performance."
+    },
+    {
+      "slug": "autonomous-reflections",
+      "term": "Autonomous Reflections",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's intelligent automated acceleration."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format automated optimization maintains."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Provides managed automated table optimization."
+    },
+    {
+      "slug": "snapshot-isolation",
+      "term": "Snapshot Isolation",
+      "category": "Table Formats",
+      "desc": "Snapshot expiry manages the snapshot history."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "Table optimization improves query optimization effectiveness."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Automated optimization reduces lakehouse operational burden."
+    }
+  ]
+}

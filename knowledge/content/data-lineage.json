@@ -1,0 +1,98 @@
+{
+  "slug": "data-lineage",
+  "term": "Data Lineage",
+  "category": "Governance & Quality",
+  "metaTitle": "Data Lineage: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what data lineage is, how it tracks data flow through lakehouse pipelines, and why lineage is essential for governance, debugging, and regulatory compliance.",
+  "h1": "Data Lineage: The Definitive Guide",
+  "lede": "Data lineage tracks how data flows from source systems through transformations to analytical outputs \u2014 which tables feed which, which columns derive from which. It is the governance and debugging capability that answers 'where did this number come from?' and 'if this source changes, what breaks?'",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is data lineage?",
+      "a": "Data lineage is the tracking of data's origin, movement, and transformation through a data system \u2014 from source systems through ETL pipelines, Iceberg tables, and transformations to reports and dashboards. It answers: where did this data come from, how was it transformed, and what depends on it?"
+    },
+    {
+      "q": "What are the types of data lineage?",
+      "a": "Three main types: Table-level lineage (which tables are inputs and outputs of each pipeline job \u2014 coarse-grained, easy to capture), Column-level lineage (which source columns contribute to each target column through transformations \u2014 fine-grained, harder to capture), and Query-level lineage (which tables are read by each query that produces a dashboard or report)."
+    },
+    {
+      "q": "How is data lineage captured in a lakehouse?",
+      "a": "Lineage is captured through: pipeline metadata (Airflow DAG definitions, Spark job metadata), catalog integration (tools like DataHub and OpenMetadata that parse ETL job metadata), query log parsing (capturing which tables each query reads and writes), and engine-native lineage APIs (Unity Catalog and Databricks capture lineage automatically from Spark operations)."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Data Lineage?",
+      "content": "<p><strong>Data lineage</strong> is the systematic tracking of data's journey through an organization's data systems \u2014 from the original source (an operational database, an API, a sensor) through every transformation, join, aggregation, and copy, to its final use in reports, dashboards, ML models, or analytical decisions. Lineage maps the full graph of data dependencies: for each data asset, lineage tells you where it came from (upstream lineage) and where it goes (downstream lineage).</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a>, lineage typically spans: source operational databases \u2192 Kafka CDC events \u2192 Bronze Iceberg tables \u2192 Silver Iceberg tables (after cleansing) \u2192 Gold Iceberg tables (after aggregation) \u2192 Dremio Virtual Datasets (semantic layer) \u2192 BI dashboards and reports. Without captured lineage, this chain is invisible \u2014 when a dashboard shows wrong numbers, finding which upstream transformation introduced the error requires manual investigation of every pipeline step.</p>"
+    },
+    {
+      "heading": "Table-Level vs Column-Level Lineage",
+      "content": "<p>Lineage granularity has a significant impact on its utility:</p><h3>Table-Level Lineage</h3><p>Records which tables are read and written by each pipeline job. Captures the dependency graph between Bronze, Silver, and Gold Iceberg tables. Sufficient for impact analysis (which downstream tables break if a source table schema changes?) and pipeline debugging at a coarse level. Relatively easy to capture from pipeline orchestration metadata (Airflow DAG definitions).</p><h3>Column-Level Lineage</h3><p>Records which specific source columns contribute to each target column in the output. Required for regulatory compliance (proving that a financial metric derives from validated, controlled source data) and for precise debugging (which upstream column mapping introduced a calculation error in a specific metric). Harder to capture \u2014 requires SQL parsing or engine-native API integration.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Data Lineage Table and Column Level",
+      "diagramCaption": "Figure 1: Data lineage levels \u2014 table-level dependency graph and column-level transformation tracking."
+    },
+    {
+      "heading": "Lineage Tools for the Lakehouse",
+      "content": "<p>Key data lineage tools for the lakehouse ecosystem:</p><ul><li><strong>DataHub (LinkedIn/open source):</strong> Automatic lineage ingestion from Spark, Airflow, dbt, and SQL query logs. Visualizes lineage graphs in a web UI. Most widely adopted open-source lineage platform.</li><li><strong>OpenMetadata:</strong> Unified metadata platform with built-in lineage capture from pipeline metadata and SQL parsing. Strong Iceberg catalog integration.</li><li><strong>Apache Atlas:</strong> The Hadoop-era governance and lineage platform. Deeply integrated with Apache Ranger for combined lineage + access control governance.</li><li><strong>Unity Catalog (Databricks):</strong> Captures column-level lineage automatically from Spark SQL operations within Databricks workspaces \u2014 the most comprehensive automated lineage for Databricks users.</li><li><strong>dbt lineage:</strong> dbt's manifest.json captures table-level lineage for all dbt model dependencies \u2014 visualized in dbt docs and ingested by DataHub or OpenMetadata.</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Lineage Tools Lakehouse Ecosystem",
+      "diagramCaption": "Figure 2: Data lineage tool ecosystem \u2014 DataHub, OpenMetadata, Atlas, Unity Catalog for lakehouse lineage."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Data lineage is the transparency layer that makes the <a href=\"data-lakehouse.html\">data lakehouse</a> trustworthy and governable. Without lineage, every debugging session and compliance inquiry requires manual pipeline archaeology. With comprehensive lineage \u2014 from source databases through Bronze/Silver/Gold <a href=\"apache-iceberg.html\">Iceberg</a> tables to <a href=\"dremio.html\">Dremio</a> Virtual Datasets and BI dashboards \u2014 data teams can instantly trace errors to their source, assess the impact of upstream changes, and provide regulators with complete data provenance documentation. Investing in data lineage tooling is one of the highest-ROI governance investments for any mature lakehouse organization.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Lineage is a core pillar of data governance."
+    },
+    {
+      "slug": "data-catalog",
+      "term": "Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Catalogs display lineage alongside business metadata."
+    },
+    {
+      "slug": "metadata-management",
+      "term": "Metadata Management",
+      "category": "Catalogs & Metadata",
+      "desc": "Lineage is a critical category of operational metadata."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Lineage tracks flow through Bronze, Silver, and Gold layers."
+    },
+    {
+      "slug": "unity-catalog",
+      "term": "Unity Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Unity Catalog provides automatic column-level lineage."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "ETL pipelines are the source of most lineage relationships."
+    },
+    {
+      "slug": "data-quality",
+      "term": "Data Quality",
+      "category": "Governance & Quality",
+      "desc": "Lineage helps trace the source of quality issues."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Lineage makes the lakehouse transparent and trustworthy."
+    }
+  ]
+}

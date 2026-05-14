@@ -1,0 +1,98 @@
+{
+  "slug": "agentic-lakehouse",
+  "term": "Agentic Lakehouse",
+  "category": "Architecture Patterns",
+  "metaTitle": "Agentic Lakehouse: The Definitive Guide",
+  "metaDescription": "Learn what the Agentic Lakehouse is, how AI agents autonomously discover and query Apache Iceberg data via Dremio's MCP server, and why it is the next evolution of enterprise analytics.",
+  "h1": "Agentic Lakehouse: The Definitive Guide",
+  "lede": "The Agentic Lakehouse is the evolution of the data lakehouse into an AI-native data platform where AI agents autonomously discover, query, and reason about enterprise data through governed interfaces. Powered by Dremio's AI Semantic Layer and MCP server, AI agents become first-class data consumers \u2014 querying the lakehouse as fluidly as human analysts.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the Agentic Lakehouse?",
+      "a": "The Agentic Lakehouse is a data lakehouse architecture designed to serve AI agents as first-class data consumers alongside human analysts. It combines an AI Semantic Layer (rich business context for LLM consumption), an MCP server (Model Context Protocol tools for autonomous agent data access), governed access control (RBAC ensuring agents access only authorized data), and Apache Iceberg tables (the open, governed data foundation)."
+    },
+    {
+      "q": "How do AI agents query the lakehouse?",
+      "a": "AI agents query the Agentic Lakehouse through Dremio's MCP (Model Context Protocol) server. When an AI agent needs data to answer a question, it calls MCP tools: list_datasets to find relevant tables, get_schema to understand structure and metric definitions, execute_query to run SQL, and get_results to retrieve data. The agent can autonomously perform multi-step data analysis without human SQL writing."
+    },
+    {
+      "q": "What makes a lakehouse 'agentic-ready'?",
+      "a": "An agentic-ready lakehouse requires: (1) An AI Semantic Layer with rich natural language descriptions of datasets and metric definitions that LLMs can interpret; (2) An MCP server exposing data access as AI-callable tools; (3) Governed access ensuring agents respect RBAC policies; (4) High-quality, current data (via streaming ingestion) that agents can trust for business decisions."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the Agentic Lakehouse?",
+      "content": "<p>The <strong>Agentic Lakehouse</strong> is the architectural evolution of the <a href=\"data-lakehouse.html\">data lakehouse</a> from a human-centric analytics platform to an AI-native data platform where autonomous AI agents are first-class data consumers. In the Agentic Lakehouse, AI agents don't just assist human analysts \u2014 they autonomously discover business data, form SQL queries, execute analyses, interpret results, and produce actionable insights without requiring human SQL writing or data engineering support.</p><p>The Agentic Lakehouse is enabled by three components working together: the <a href=\"ai-semantic-layer.html\">AI Semantic Layer</a> (providing rich business context that AI models can interpret), the <a href=\"model-context-protocol.html\">MCP server</a> (exposing data access as AI-callable tools), and <a href=\"data-governance.html\">governed access control</a> (ensuring agents access only data their principal is authorized for). Together, these create a data platform where any LLM-powered agent can become an autonomous data analyst.</p>"
+    },
+    {
+      "heading": "The AI Agent Data Access Flow",
+      "content": "<p>How an AI agent answers a business question using the Agentic Lakehouse:</p><ol><li><strong>Question received:</strong> 'What are the top 5 performing product categories by revenue this quarter vs last quarter?'</li><li><strong>List datasets:</strong> Agent calls MCP list_datasets tool, discovers <code>gold.sales_metrics</code> with description 'Pre-computed revenue metrics by product category and time period'</li><li><strong>Get schema:</strong> Agent calls get_schema on sales_metrics, learns columns include category, quarter, revenue, yoy_growth_rate with business descriptions</li><li><strong>Form query:</strong> Agent formulates SQL: SELECT category, revenue, yoy_growth_rate FROM gold.sales_metrics WHERE quarter IN ('2026-Q1', '2025-Q1') ORDER BY revenue DESC LIMIT 10</li><li><strong>Execute and return:</strong> Agent calls execute_query, receives results, formats answer with business context \u2014 all autonomously, in seconds</li></ol>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "AI Agent Agentic Lakehouse Flow",
+      "diagramCaption": "Figure 1: AI agent data access flow \u2014 MCP tool calls from question to governed query to business answer."
+    },
+    {
+      "heading": "Governance in the Agentic Lakehouse",
+      "content": "<p>AI agents accessing enterprise data must respect the same governance policies as human users. In the Agentic Lakehouse, this is achieved through:</p><ul><li><strong>Agent principals:</strong> Each AI agent is assigned a principal identity in the catalog (Polaris or Dremio) with specific role assignments \u2014 an agent serving the sales team has sales data access, but not HR or financial data access</li><li><strong>Catalog-layer enforcement:</strong> The MCP server calls Dremio or the Iceberg REST catalog with the agent's credentials \u2014 access control is enforced at the catalog, not at the application layer</li><li><strong>Column masking:</strong> Agents receive masked values for sensitive columns according to their role's masking policies \u2014 PII is protected from agent access using the same policies that protect human analyst access</li><li><strong>Audit logging:</strong> All agent query executions are logged to the same audit trail as human queries \u2014 enabling compliance review of AI agent data access</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Agentic Lakehouse Governance",
+      "diagramCaption": "Figure 2: Governance in the Agentic Lakehouse \u2014 agent principals, catalog enforcement, masking, and audit."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The Agentic Lakehouse represents the most significant evolution of the enterprise data platform since the introduction of cloud storage. By combining <a href=\"apache-iceberg.html\">Apache Iceberg's</a> open, governed data foundation with <a href=\"dremio.html\">Dremio's</a> <a href=\"ai-semantic-layer.html\">AI Semantic Layer</a> and MCP server, organizations create a data platform where AI agents become autonomous analytical contributors \u2014 answering business questions, generating insights, and preparing ML features without human SQL assistance. The Agentic Lakehouse is not a future architecture \u2014 it is the current direction of Dremio's platform development and the destination that every enterprise data lakehouse investment is building toward.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "ai-semantic-layer",
+      "term": "AI Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "The AI-readable data interface powering the Agentic Lakehouse."
+    },
+    {
+      "slug": "model-context-protocol",
+      "term": "MCP (Model Context Protocol)",
+      "category": "Architecture Patterns",
+      "desc": "MCP enables AI agents to call Dremio data tools."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's platform is the Agentic Lakehouse foundation."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "The semantic layer makes data interpretable by AI agents."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Governance ensures agents respect access policies."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Open Iceberg tables are the data foundation agents query."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The lakehouse evolving into the Agentic Lakehouse."
+    },
+    {
+      "slug": "feature-store",
+      "term": "Feature Store",
+      "category": "Architecture Patterns",
+      "desc": "Agents use feature stores for ML-powered decisions."
+    }
+  ]
+}

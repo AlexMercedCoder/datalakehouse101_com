@@ -1,0 +1,98 @@
+{
+  "slug": "stream-processing",
+  "term": "Stream Processing",
+  "category": "Ingestion & Streaming",
+  "metaTitle": "Stream Processing: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what stream processing is, how Apache Flink enables real-time stream processing into Apache Iceberg tables, and the difference between streaming and batch processing.",
+  "h1": "Stream Processing: The Definitive Guide",
+  "lede": "Stream processing continuously processes data as it arrives \u2014 event by event or in micro-batches \u2014 enabling real-time analytics, fraud detection, and live dashboards. Apache Flink is the dominant stream processing engine for lakehouse pipelines, writing real-time data to Apache Iceberg Bronze tables with exactly-once guarantees.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is stream processing?",
+      "a": "Stream processing is the continuous computation on data as it arrives \u2014 processing events in real time or near-real time rather than accumulating data in batches and processing periodically. Stream processing systems maintain state across events, apply time-based windowing, and write results continuously to outputs like Apache Iceberg tables, databases, or downstream Kafka topics."
+    },
+    {
+      "q": "How does Apache Flink enable stream processing into Iceberg?",
+      "a": "Apache Flink reads data from Kafka topics using its Kafka source connector, processes events using Flink's stateful stream processing APIs (filtering, aggregating, joining across streams), and writes results to Apache Iceberg tables using the Flink Iceberg sink connector. The sink supports both append mode (Bronze tables) and upsert mode (CDC-driven Silver tables) with exactly-once delivery guarantees."
+    },
+    {
+      "q": "When should I use stream processing vs batch processing for lakehouse ingestion?",
+      "a": "Use stream processing when data freshness matters \u2014 real-time dashboards, fraud detection, operational alerts. Use batch processing when throughput and transformation complexity matter more than freshness \u2014 large historical loads, complex multi-table joins, ML feature engineering. Most mature lakehouse architectures use both: streaming for Bronze CDC ingestion and operational analytics, batch for Silver and Gold transformations."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Stream Processing?",
+      "content": "<p><strong>Stream processing</strong> is the computational model where data is processed continuously as it arrives \u2014 each event or small micro-batch is processed immediately upon ingestion, rather than accumulated and processed periodically in bulk. Stream processing systems maintain persistent state (aggregations, join buffers, session windows) across events, apply time-based operations (tumbling windows, sliding windows, session windows), and emit results continuously to downstream systems.</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a>, stream processing is the ingestion layer that feeds real-time data into Bronze <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables. <a href=\"apache-kafka.html\">Apache Kafka</a> delivers events from operational systems; stream processing engines (<a href=\"apache-flink.html\">Apache Flink</a>, Spark Structured Streaming) consume those events and write them to Iceberg with low latency."
+    },
+    {
+      "heading": "Flink Stream Processing to Iceberg",
+      "content": "<p><a href=\"apache-flink.html\">Apache Flink</a> is the leading stream processing engine for lakehouse ingestion. Key capabilities:</p><ul><li><strong>Exactly-once semantics:</strong> Flink's checkpointing mechanism ensures that even after failures, each event is processed exactly once in the output Iceberg table \u2014 no duplicates, no losses</li><li><strong>Iceberg sink connector:</strong> Native Flink Iceberg sink supports both append-only (Bronze CDC ingestion) and UPSERT mode (Silver current-state CDC tables)</li><li><strong>Watermark-based event time:</strong> Flink processes events by event time (when they occurred) rather than processing time (when they arrive) \u2014 correctly handling late-arriving events for accurate time-series aggregations</li><li><strong>Stateful stream joins:</strong> Flink can join streams with lookups against Iceberg tables (dimension lookups) or join two streams together within time windows</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Flink Stream Processing to Iceberg",
+      "diagramCaption": "Figure 1: Flink stream processing pipeline \u2014 Kafka source, stateful processing, Iceberg sink."
+    },
+    {
+      "heading": "Micro-Batch vs True Streaming",
+      "content": "<p>Two stream processing models exist for lakehouse ingestion:</p><ul><li><strong>True streaming (event-by-event):</strong> Apache Flink's default model. Each event is processed immediately as it arrives. Minimum latency. Used for time-critical workloads.</li><li><strong>Micro-batch streaming:</strong> Spark Structured Streaming's model. Events are accumulated over a short interval (seconds to minutes) and processed as a small batch. Higher throughput per resource unit, slightly higher latency. Simpler to reason about \u2014 each micro-batch is a mini-ETL job.</li></ul><p>For Iceberg ingestion, micro-batch Spark Structured Streaming is often sufficient (providing minute-level freshness) and simpler to operate than Flink. True streaming Flink is used when second-level freshness is required or when complex stateful operations (session detection, fraud pattern matching) are needed.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Stream vs Micro-Batch Iceberg Ingestion",
+      "diagramCaption": "Figure 2: True streaming vs micro-batch \u2014 latency and throughput tradeoffs for Iceberg ingestion."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Stream processing is the real-time ingestion capability that keeps <a href=\"data-lakehouse.html\">data lakehouse</a> data fresh for operational analytics. By combining <a href=\"apache-kafka.html\">Apache Kafka</a> as the event transport layer with <a href=\"apache-flink.html\">Apache Flink</a> or Spark Structured Streaming for continuous processing and <a href=\"apache-iceberg.html\">Apache Iceberg</a> as the ACID-safe destination, organizations achieve second-to-minute data freshness in their Bronze tables without sacrificing the governance, time travel, and schema evolution capabilities that make Iceberg the superior lakehouse table format.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-flink",
+      "term": "Apache Flink",
+      "category": "Query Engines & Platforms",
+      "desc": "The primary stream processing engine for lakehouse ingestion."
+    },
+    {
+      "slug": "apache-kafka",
+      "term": "Apache Kafka",
+      "category": "Ingestion",
+      "desc": "Event streaming platform feeding stream processors."
+    },
+    {
+      "slug": "batch-processing",
+      "term": "Batch Processing",
+      "category": "Ingestion & Streaming",
+      "desc": "Alternative to streaming for high-throughput workloads."
+    },
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC events processed by stream processors into Iceberg."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Destination table format for stream processing output."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Streaming feeds the Bronze layer in the Medallion pattern."
+    },
+    {
+      "slug": "real-time-analytics",
+      "term": "Real-Time Analytics",
+      "category": "Ingestion & Streaming",
+      "desc": "Stream processing enables real-time lakehouse analytics."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Stream processing keeps the lakehouse current."
+    }
+  ]
+}

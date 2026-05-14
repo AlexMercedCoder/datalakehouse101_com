@@ -1,0 +1,94 @@
+{
+  "slug": "lakehouse-architecture",
+  "term": "Lakehouse Architecture",
+  "category": "Architecture Patterns",
+  "metaTitle": "Lakehouse Architecture: The Definitive Guide",
+  "metaDescription": "Learn what the data lakehouse architecture is, its key layers and components, and how Apache Iceberg, object storage, and query engines combine into the complete lakehouse stack.",
+  "h1": "Lakehouse Architecture: The Definitive Guide",
+  "lede": "The data lakehouse architecture combines the scalable, low-cost storage of data lakes with the governance, performance, and analytical capabilities of data warehouses \u2014 using open table formats (Apache Iceberg), object storage (S3, ADLS, GCS), and decoupled compute engines (Dremio, Spark, Trino) to deliver enterprise analytics without proprietary lock-in.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the data lakehouse architecture?",
+      "a": "The data lakehouse architecture is a modern data platform design that stores all data in open formats (Apache Iceberg, Parquet) on cheap, scalable object storage (S3, ADLS, GCS) and provides database-like capabilities (ACID transactions, schema enforcement, time travel, query optimization) through an open table format layer \u2014 while supporting multiple decoupled query engines for different workloads."
+    },
+    {
+      "q": "What are the key layers of the lakehouse architecture?",
+      "a": "The lakehouse architecture has five key layers: (1) Storage \u2014 object storage (S3, ADLS, GCS); (2) Table Format \u2014 Apache Iceberg managing ACID, schema, and metadata; (3) Catalog \u2014 Iceberg REST Catalog (Polaris, Nessie, Glue) tracking table locations; (4) Compute \u2014 decoupled engines (Dremio for BI, Spark for ETL, Flink for streaming); (5) Semantic & Governance \u2014 semantic layer (Dremio VDSs) and governance (RBAC, lineage, quality)."
+    },
+    {
+      "q": "What makes the lakehouse better than a data warehouse?",
+      "a": "Key lakehouse advantages over traditional warehouses: open data formats (no vendor lock-in), dramatically lower storage cost (object storage vs proprietary), multi-engine access (Dremio + Spark + Flink on the same data), infinite scale without cluster resizing, native ML/AI integration (Spark ML, PyIceberg), and time travel + schema evolution without downtime."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "The Five-Layer Lakehouse Architecture",
+      "content": "<p>The <strong>lakehouse architecture</strong> is organized into five functional layers, each providing specific capabilities:</p><h3>Layer 1: Storage</h3><p>All data lives in <a href=\"object-storage.html\">cloud object storage</a> (<a href=\"amazon-s3.html\">S3</a>, <a href=\"azure-adls.html\">ADLS</a>, <a href=\"google-cloud-storage.html\">GCS</a>) as <a href=\"apache-parquet.html\">Parquet</a> data files and <a href=\"apache-avro.html\">Avro</a> metadata files. Storage is infinitely scalable, always-on, and billed separately from compute.</p><h3>Layer 2: Table Format</h3><p><a href=\"apache-iceberg.html\">Apache Iceberg</a> organizes data files into tables with ACID transactions, schema enforcement, partition management, snapshot isolation, and time travel \u2014 providing database semantics on top of raw object storage.</p><h3>Layer 3: Catalog</h3><p>An <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> (<a href=\"apache-polaris.html\">Apache Polaris</a>, <a href=\"project-nessie.html\">Project Nessie</a>, <a href=\"aws-glue-catalog.html\">AWS Glue</a>) tracks table metadata locations and enforces RBAC access control \u2014 the shared metadata service all engines connect through.</p><h3>Layer 4: Compute</h3><p>Decoupled query engines each handle specific workloads: <a href=\"dremio.html\">Dremio</a> for BI analytics and semantic layer, <a href=\"apache-spark.html\">Spark</a> for batch ETL, <a href=\"apache-flink.html\">Flink</a> for streaming ingestion, <a href=\"trino.html\">Trino</a> for federated SQL.</p><h3>Layer 5: Semantic & Governance</h3><p><a href=\"semantic-layer.html\">Semantic layer</a> (Dremio VDSs), <a href=\"data-governance.html\">governance</a> (RBAC, lineage, quality), and <a href=\"data-catalog.html\">data catalog</a> (discovery and documentation) make the lakehouse usable and trustworthy for the entire organization.</p>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Five Layer Lakehouse Architecture",
+      "diagramCaption": "Figure 1: The five-layer lakehouse architecture \u2014 storage, table format, catalog, compute, and governance."
+    },
+    {
+      "heading": "Lakehouse vs Data Warehouse vs Data Lake",
+      "content": "<table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>Data Warehouse</th><th>Data Lake</th><th>Data Lakehouse</th></tr></thead><tbody><tr><td>Storage</td><td>Proprietary</td><td>Object storage</td><td>Object storage</td></tr><tr><td>File format</td><td>Proprietary</td><td>Any (Parquet, CSV)</td><td>Open (Iceberg + Parquet)</td></tr><tr><td>ACID transactions</td><td>Yes</td><td>No</td><td>Yes (Iceberg)</td></tr><tr><td>Schema enforcement</td><td>Yes</td><td>No</td><td>Yes (Iceberg)</td></tr><tr><td>Multi-engine support</td><td>No</td><td>Partial</td><td>Yes (open format)</td></tr><tr><td>Storage cost</td><td>High</td><td>Low</td><td>Low</td></tr><tr><td>ML/AI support</td><td>Limited</td><td>Good</td><td>Excellent</td></tr></tbody></table>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Lakehouse vs Warehouse vs Lake",
+      "diagramCaption": "Figure 2: Architecture comparison \u2014 data warehouse, data lake, and data lakehouse on key dimensions."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The <a href=\"data-lakehouse.html\">data lakehouse</a> architecture represents the convergence of the best properties of data warehouses (ACID, governance, performance) and data lakes (open formats, low cost, scalability) into a unified, open, multi-engine platform. Built on <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables in cloud <a href=\"object-storage.html\">object storage</a>, governed by open <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalogs</a>, and accessed by decoupled compute engines including <a href=\"dremio.html\">Dremio</a>, the lakehouse is the dominant enterprise data architecture of 2025 and beyond \u2014 providing the analytical capabilities of the warehouse at the economics and flexibility of the open data lake.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "The core concept this architecture implements."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format layer of the lakehouse architecture."
+    },
+    {
+      "slug": "open-lakehouse",
+      "term": "Open Lakehouse",
+      "category": "Architecture Patterns",
+      "desc": "The open, vendor-neutral lakehouse philosophy."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "The defining architectural principle of the lakehouse."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "The pipeline organization pattern for lakehouse data."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "BI and semantic layer compute engine in the lakehouse."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "The shared catalog layer of the lakehouse architecture."
+    },
+    {
+      "slug": "object-storage",
+      "term": "Object Storage",
+      "category": "File Formats & Storage",
+      "desc": "The storage foundation of the lakehouse architecture."
+    }
+  ]
+}

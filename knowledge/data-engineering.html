@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Engineering: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what data engineering is, the key skills and tools data engineers use to build Apache Iceberg lakehouse pipelines, and the modern data engineering career path.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-engineering.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Data Engineering: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what data engineering is, the key skills and tools data engineers use to build Apache Iceberg lakehouse pipelines, and the modern data engineering career path.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-engineering.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Data Engineering: The Definitive Guide",
+      "description": "Learn what data engineering is, the key skills and tools data engineers use to build Apache Iceberg lakehouse pipelines, and the modern data engineering career path.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/data-engineering.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Data Engineering", "item": "https://datalakehouse101.com/knowledge/data-engineering.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is data engineering?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data engineering is the discipline of designing, building, and maintaining the data infrastructure and pipelines that move, transform, and store data at scale — enabling analytics, machine learning, and AI applications. Data engineers build ingestion pipelines (CDC, batch ETL), transformation pipelines (Spark, dbt), storage systems (Apache Iceberg tables), and orchestration systems (Apache Airflow DAGs)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What tools does a modern data engineer need for the lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Modern lakehouse data engineers use: Apache Spark (batch ETL), Apache Flink (streaming ingestion), dbt (SQL transformation framework), Apache Airflow (pipeline orchestration), Apache Iceberg (table format), Python (for PySpark and data transformation logic), SQL (for dbt models and Iceberg DML), Git (version control for pipeline code), and cloud services (AWS S3, EMR, Glue or Dremio Cloud)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How has data engineering changed with the lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The lakehouse shifted data engineering from proprietary warehouse-specific skills to open, portable skills: from Redshift-specific SQL to ANSI SQL on open Iceberg, from Informatica ETL tools to Python-based Spark and dbt, from vendor-locked data movement to open Kafka+Flink CDC. The shift also introduced new responsibilities: table management (compaction, Z-ordering, snapshot expiry) that didn't exist in managed warehouse environments."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Data Engineering</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Architecture Patterns</span>
+      <h1>Data Engineering: The Definitive Guide</h1>
+      <p class="hero-lede">Data engineering is the discipline of building and maintaining the pipelines, infrastructure, and systems that make data available for analytics, machine learning, and AI. In the lakehouse era, data engineers build Apache Iceberg pipelines using Spark, Flink, dbt, and Airflow — creating the Bronze-Silver-Gold data products that power organizational decision-making.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Data Engineering?</a></li>
+        <li><a href="#section-2">Modern Data Engineering Stack</a></li>
+        <li><a href="#section-3">Table Management as a Data Engineering Responsibility</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Data Engineering?</h2>
+        <p><strong>Data engineering</strong> is the technical discipline of building and operating the systems and pipelines that acquire, transform, store, and serve data at scale — making data reliably available for analysts, data scientists, and AI applications. Data engineers are the builders of the data infrastructure that every data-driven organization depends on: they design and maintain the pipelines that move data from operational systems into the lakehouse, transform it through the <a href="medallion-architecture.html">Medallion Architecture</a>, and make it available through governed APIs and query engines.</p><p>In the <a href="data-lakehouse.html">data lakehouse</a> era, data engineering has become increasingly focused on open, portable tools: <a href="apache-spark.html">Apache Spark</a> for batch ETL, <a href="apache-flink.html">Apache Flink</a> for streaming ingestion, <a href="dbt.html">dbt</a> for SQL-based transformation, Apache Airflow for orchestration, and <a href="apache-iceberg.html">Apache Iceberg</a> for table management — all on open data in cloud object storage.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Modern Data Engineering Stack</h2>
+        <p>The modern lakehouse data engineering stack by functional category:</p><table class="comparison-table"><thead><tr><th>Function</th><th>Tool</th><th>Purpose</th></tr></thead><tbody><tr><td>Streaming ingestion</td><td>Flink + Kafka</td><td>CDC and event streaming to Bronze Iceberg</td></tr><tr><td>Batch ingestion</td><td>Spark + Airbyte</td><td>JDBC loads and SaaS ELT to Bronze Iceberg</td></tr><tr><td>Transformation</td><td>Spark, dbt</td><td>Bronze to Silver to Gold Iceberg tables</td></tr><tr><td>Orchestration</td><td>Apache Airflow</td><td>Schedule and monitor pipeline DAGs</td></tr><tr><td>Table format</td><td>Apache Iceberg</td><td>ACID transactions, schema evolution, time travel</td></tr><tr><td>Query engine</td><td>Dremio, Trino</td><td>SQL analytics on Iceberg tables</td></tr><tr><td>Quality</td><td>dbt tests, Great Expectations</td><td>Data quality validation in pipelines</td></tr></tbody></table>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Modern Data Engineering Stack diagram" loading="lazy"><figcaption>Figure 1: The modern lakehouse data engineering stack — ingestion, transformation, orchestration, quality.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Table Management as a Data Engineering Responsibility</h2>
+        <p>The lakehouse introduces a category of data engineering responsibility that didn't exist in managed data warehouse environments: <strong>table management</strong>. Apache Iceberg tables require active maintenance to sustain performance:</p><ul><li><a href="compaction.html">Compaction</a>: Scheduling and monitoring file compaction jobs for Silver tables with frequent MERGE INTO operations</li><li><a href="z-ordering.html">Z-Ordering</a>: Periodic Z-order optimization for Gold tables with demanding query performance SLAs</li><li>Snapshot expiry: Cleaning up snapshot history to prevent metadata bloat</li><li>Partition evolution: Adjusting partition specs as data volumes grow and query patterns change</li></ul><p>Data engineers who understand these table management responsibilities — and automate them through scheduled Airflow DAGs or Dremio's automatic optimization — maintain consistently high query performance without ad-hoc maintenance firefighting.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Data Engineering Table Management diagram" loading="lazy"><figcaption>Figure 2: Lakehouse table management as a data engineering responsibility — compaction, Z-order, expiry.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Data engineering is the discipline that makes the <a href="data-lakehouse.html">data lakehouse</a> function — building the pipelines, maintaining the tables, and ensuring the data quality that enables every downstream analytical use case. Modern lakehouse data engineers combine streaming (Flink), batch (Spark), transformation (dbt), orchestration (Airflow), and table management (Iceberg) skills into a cohesive platform engineering capability. As lakehouses mature and tooling automates more table management, data engineering increasingly shifts toward data product thinking — treating each Silver and Gold dataset as a trusted data product that business consumers can rely on.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">Primary batch ETL engine for data engineers.</span>
+    </a>
+      <a class="related-card" href="apache-flink.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Flink</span>
+      <span class="related-desc">Streaming ingestion engine for data engineers.</span>
+    </a>
+      <a class="related-card" href="dbt.html">
+      <span class="related-label">Ingestion & Streaming</span>
+      <span class="related-term">dbt</span>
+      <span class="related-desc">SQL transformation framework for data engineers.</span>
+    </a>
+      <a class="related-card" href="medallion-architecture.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Medallion Architecture</span>
+      <span class="related-desc">The pipeline framework data engineers implement.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Table format data engineers manage and maintain.</span>
+    </a>
+      <a class="related-card" href="compaction.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Compaction</span>
+      <span class="related-desc">Table maintenance data engineers schedule.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The platform data engineers build and maintain.</span>
+    </a>
+      <a class="related-card" href="etl.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">ETL</span>
+      <span class="related-desc">ETL is the core activity of data engineering.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

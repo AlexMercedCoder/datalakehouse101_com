@@ -1,0 +1,98 @@
+{
+  "slug": "data-quality",
+  "term": "Data Quality",
+  "category": "Governance & Quality",
+  "metaTitle": "Data Quality: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what data quality means in the data lakehouse, the key data quality dimensions, and how tools like Great Expectations and dbt tests enforce quality in Iceberg pipelines.",
+  "h1": "Data Quality: The Definitive Guide",
+  "lede": "Data quality is the degree to which data is fit for its intended use \u2014 accurate, complete, consistent, timely, and unique. In the lakehouse, data quality enforcement through automated checks in ETL pipelines prevents bad data from propagating through Bronze, Silver, and Gold layers to corrupt business decisions.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is data quality?",
+      "a": "Data quality refers to the degree to which data is accurate (correct values), complete (no missing values), consistent (same value across systems), timely (fresh enough for its use case), and unique (no duplicates). High-quality data is fit for its intended use \u2014 analysts and AI models can trust it to make correct decisions."
+    },
+    {
+      "q": "What are the main data quality dimensions?",
+      "a": "The six key data quality dimensions: Accuracy (values are correct), Completeness (no missing required values), Consistency (values match across systems and tables), Timeliness (data is fresh enough for its use case), Uniqueness (no duplicate records), and Validity (values conform to defined formats, ranges, and constraints)."
+    },
+    {
+      "q": "What tools enforce data quality in Apache Iceberg lakehouses?",
+      "a": "Key data quality tools for lakehouse pipelines: dbt tests (built-in not_null, unique, accepted_values, relationships tests run as part of dbt model execution), Great Expectations (rich expectation library with HTML reports), Soda Core (SQL-based quality checks integrated with data catalogs), and Apache Griffin (open-source quality platform for Spark-based pipelines)."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Data Quality?",
+      "content": "<p><strong>Data quality</strong> is the measure of how well data meets the requirements of its intended use \u2014 encompassing accuracy, completeness, consistency, timeliness, uniqueness, and validity across all data assets in the <a href=\"data-lakehouse.html\">data lakehouse</a>. Poor data quality is one of the most expensive and pervasive problems in data-driven organizations: analysts who discover that data cannot be trusted spend time validating rather than analyzing, business decisions made on incorrect data have real operational consequences, and regulatory reports based on bad data create compliance exposure.</p><p>In the lakehouse context, data quality is not just a monitoring activity \u2014 it is an active engineering discipline that builds quality checks into ETL pipelines, enforces quality gates between <a href=\"medallion-architecture.html\">Medallion Architecture</a> layers, makes quality metrics visible in the <a href=\"data-catalog.html\">data catalog</a>, and alerts data engineers when quality degradation is detected before it reaches business consumers."
+    },
+    {
+      "heading": "Six Data Quality Dimensions",
+      "content": "<ul><li><strong>Accuracy:</strong> Values are correct representations of real-world facts. (Revenue amounts match transaction system totals)</li><li><strong>Completeness:</strong> All required fields are populated; no missing values for critical attributes. (customer_id is never null in the orders table)</li><li><strong>Consistency:</strong> The same fact has the same value across all systems and tables. (Customer address in CRM matches address in orders table)</li><li><strong>Timeliness:</strong> Data is available and updated within the freshness requirement for its use case. (Order data is available within 5 minutes of transaction for operational dashboards)</li><li><strong>Uniqueness:</strong> No duplicate records for the same real-world entity. (Each order appears exactly once in the orders Silver table)</li><li><strong>Validity:</strong> Values conform to defined formats, ranges, and business rules. (order_status is always one of ['pending', 'shipped', 'delivered', 'cancelled'])</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Six Data Quality Dimensions",
+      "diagramCaption": "Figure 1: Six data quality dimensions \u2014 the framework for defining and measuring lakehouse data quality."
+    },
+    {
+      "heading": "Implementing Quality Gates in Medallion Pipelines",
+      "content": "<p>The <a href=\"medallion-architecture.html\">Medallion Architecture</a> provides natural quality gate insertion points between layers:</p><ul><li><strong>Bronze \u2192 Silver gate:</strong> Validate that Bronze records meet minimum standards before Silver transformation (not-null checks on primary keys, format validation on critical dates, range checks on numeric values)</li><li><strong>Silver \u2192 Gold gate:</strong> Validate Silver data completeness and referential integrity before Gold aggregation (join key existence checks, referential integrity between related tables, freshness checks)</li></ul><p>dbt's built-in test framework makes implementing these gates straightforward:</p><pre><code># dbt schema.yml\nmodels:\n  - name: silver_orders\n    columns:\n      - name: order_id\n        tests: [not_null, unique]\n      - name: order_status\n        tests:\n          - accepted_values:\n              values: ['pending','shipped','delivered','cancelled']</code></pre>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Quality Gates in Medallion Architecture",
+      "diagramCaption": "Figure 2: Data quality gates between Medallion layers \u2014 preventing bad data from propagating to Gold."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Data quality is the foundation of analytical trust in the <a href=\"data-lakehouse.html\">data lakehouse</a>. Without quality enforcement, every dataset is suspect, every metric is questioned, and the value of the lakehouse investment erodes through analyst distrust and business decision errors. Building quality checks into <a href=\"etl.html\">ETL</a> pipelines as quality gates, surfacing quality metrics in the <a href=\"data-catalog.html\">data catalog</a>, and alerting on quality degradation through <a href=\"data-observability.html\">data observability</a> platforms creates a lakehouse where data consumers can confidently use data for analysis and AI without manual validation overhead.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "data-observability",
+      "term": "Data Observability",
+      "category": "Governance & Quality",
+      "desc": "Observability extends quality monitoring with automated alerting."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Quality is a pillar of comprehensive data governance."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Quality gates between Bronze, Silver, and Gold layers."
+    },
+    {
+      "slug": "data-catalog",
+      "term": "Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Catalogs surface quality metrics alongside table descriptions."
+    },
+    {
+      "slug": "data-lineage",
+      "term": "Data Lineage",
+      "category": "Governance & Quality",
+      "desc": "Lineage helps trace data quality issues to their source."
+    },
+    {
+      "slug": "etl",
+      "term": "ETL",
+      "category": "Architecture Patterns",
+      "desc": "Quality checks embedded in ETL pipeline quality gates."
+    },
+    {
+      "slug": "dbt",
+      "term": "dbt",
+      "category": "Ingestion & Streaming",
+      "desc": "dbt tests implement quality checks as pipeline artifacts."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "High quality data makes the lakehouse trustworthy."
+    }
+  ]
+}

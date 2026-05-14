@@ -1,0 +1,98 @@
+{
+  "slug": "apache-ranger",
+  "term": "Apache Ranger",
+  "category": "Governance & Quality",
+  "metaTitle": "Apache Ranger: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn what Apache Ranger is, how it provides centralized security policy management for the Hadoop and lakehouse ecosystem, and its integration with Apache Iceberg and Hive.",
+  "h1": "Apache Ranger: The Definitive Guide",
+  "lede": "Apache Ranger is the open-source centralized security framework for the Apache Hadoop ecosystem \u2014 providing unified access control, auditing, and policy management for HDFS, Hive, HBase, Kafka, and increasingly Apache Iceberg. It is the governance backbone for enterprises with existing Hadoop environments migrating to the lakehouse.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Ranger?",
+      "a": "Apache Ranger is an open-source security framework developed for the Apache Hadoop ecosystem that provides centralized policy management for access control, data masking, row-level filtering, and audit logging across Hadoop components (HDFS, Hive, HBase, YARN, Kafka, Solr). It allows administrators to define security policies in one place that are enforced consistently across all connected services."
+    },
+    {
+      "q": "Does Apache Ranger work with Apache Iceberg?",
+      "a": "Apache Ranger has growing Iceberg integration. Ranger policies can be applied to Hive on Iceberg tables (enforcing access control when Hive queries Iceberg via the HiveCatalog). Ranger also integrates with Trino for access control of Iceberg tables queried through Trino. Direct REST catalog-level Ranger integration is an active area of community development."
+    },
+    {
+      "q": "When should I use Apache Ranger vs Apache Polaris for Iceberg governance?",
+      "a": "Use Apache Ranger if you have an existing Hadoop environment where Ranger already manages Hive, HDFS, and Kafka security \u2014 Ranger provides continuity for the Hadoop governance stack. Use Apache Polaris if you are building a new cloud-native Iceberg lakehouse from scratch \u2014 Polaris provides native Iceberg REST catalog-level RBAC without Hadoop dependencies."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Ranger?",
+      "content": "<p><strong>Apache Ranger</strong> is an open-source, centralized security administration framework for the Apache Hadoop ecosystem. Originally developed at Hortonworks (now part of Cloudera), Ranger provides a unified web UI and REST API for defining, managing, and auditing security policies across all major Hadoop components \u2014 HDFS file permissions, Hive table and column access, HBase row-level security, Kafka topic access, YARN queue permissions, and more.</p><p>Ranger's core value proposition is centralized policy management: instead of configuring access control separately in each Hadoop service (Hive ACLs, HDFS ACLs, Kafka ACLs), Ranger provides a single administrative interface where all policies are defined and distributed to each service's Ranger plugin for enforcement. Policy changes propagate automatically to all connected services without restarting them."
+    },
+    {
+      "heading": "Ranger Architecture",
+      "content": "<p>Apache Ranger has three components:</p><ul><li><strong>Ranger Admin:</strong> The central web UI and REST API server where administrators define security policies (who can do what on which resources), data masking policies (how to mask sensitive columns for specific roles), and row-level filter policies. Ranger Admin stores policies in a database (typically MySQL/PostgreSQL).</li><li><strong>Ranger Plugins:</strong> Lightweight agents deployed within each Hadoop service (Hive, HDFS, Kafka, Trino) that regularly pull policies from Ranger Admin and enforce them locally \u2014 allowing services to continue enforcing policies even if Ranger Admin is temporarily unavailable.</li><li><strong>Ranger Audit:</strong> All policy evaluation decisions (who requested what, was it allowed or denied) are logged to Ranger's audit store (typically Elasticsearch or HDFS) for compliance reporting and security investigation.</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Apache Ranger Architecture",
+      "diagramCaption": "Figure 1: Apache Ranger architecture \u2014 centralized policy admin distributing to service plugins."
+    },
+    {
+      "heading": "Ranger in the Lakehouse Migration Context",
+      "content": "<p>For enterprises with existing Hadoop deployments migrating to the cloud lakehouse, Apache Ranger plays an important transitional role. During migration, Ranger continues to govern on-premises Hive tables on <a href=\"hdfs.html\">HDFS</a> while new <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables in cloud object storage are governed by <a href=\"apache-polaris.html\">Apache Polaris</a> or AWS Lake Formation. Ranger policies for Hive users must be replicated or migrated to the new catalog governance system as tables are migrated from Hive to Iceberg format.</p><p>Ranger also integrates with <a href=\"trino.html\">Trino</a> via the Ranger Trino plugin \u2014 enabling Ranger-governed access to Iceberg tables queried through Trino in hybrid Hadoop-lakehouse environments.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Apache Ranger Lakehouse Migration",
+      "diagramCaption": "Figure 2: Ranger in lakehouse migration \u2014 governing on-premises Hive while Polaris governs cloud Iceberg."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Ranger is the security governance standard for the Apache Hadoop ecosystem \u2014 providing centralized, audited, role-based access control across all Hadoop services. For organizations with existing Hadoop environments, Ranger provides governance continuity during the migration to cloud <a href=\"data-lakehouse.html\">lakehouse</a> architectures. For new cloud-native lakehouse deployments, <a href=\"apache-polaris.html\">Apache Polaris</a> and cloud-native alternatives (AWS Lake Formation, Unity Catalog) provide more direct Iceberg REST catalog-level governance without Hadoop infrastructure dependencies.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs & Metadata",
+      "desc": "Cloud-native alternative to Ranger for Iceberg governance."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Ranger implements access control governance for Hadoop."
+    },
+    {
+      "slug": "hive-metastore",
+      "term": "Hive Metastore",
+      "category": "Catalogs & Metadata",
+      "desc": "Ranger governs Hive tables registered in HMS."
+    },
+    {
+      "slug": "rbac",
+      "term": "Role-Based Access Control",
+      "category": "Governance & Quality",
+      "desc": "Ranger implements RBAC for Hadoop ecosystem services."
+    },
+    {
+      "slug": "apache-atlas",
+      "term": "Apache Atlas",
+      "category": "Governance & Quality",
+      "desc": "Atlas and Ranger are companion governance tools."
+    },
+    {
+      "slug": "column-level-security",
+      "term": "Column-Level Security",
+      "category": "Governance & Quality",
+      "desc": "Ranger provides column masking for Hive tables."
+    },
+    {
+      "slug": "hdfs",
+      "term": "Apache Hadoop HDFS",
+      "category": "File Formats & Storage",
+      "desc": "Ranger governs HDFS file and directory permissions."
+    },
+    {
+      "slug": "trino",
+      "term": "Trino",
+      "category": "Query Engines & Platforms",
+      "desc": "Ranger Trino plugin enforces policies on Trino queries."
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Science on the Data Lakehouse: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn how data scientists use Apache Iceberg tables, PyIceberg, and Dremio's AI Semantic Layer for ML feature engineering, model training, and AI-ready data access.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-science-lakehouse.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Data Science on the Data Lakehouse: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn how data scientists use Apache Iceberg tables, PyIceberg, and Dremio's AI Semantic Layer for ML feature engineering, model training, and AI-ready data access.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-science-lakehouse.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Data Science on the Lakehouse: The Definitive Guide",
+      "description": "Learn how data scientists use Apache Iceberg tables, PyIceberg, and Dremio's AI Semantic Layer for ML feature engineering, model training, and AI-ready data access.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/data-science-lakehouse.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Data Science on the Lakehouse", "item": "https://datalakehouse101.com/knowledge/data-science-lakehouse.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do data scientists access Apache Iceberg data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data scientists access Iceberg data through multiple interfaces: PyIceberg (Python library for direct Iceberg table access without Spark — returns Arrow tables for Pandas), PySpark (Spark Iceberg integration for large-scale feature engineering), Dremio SQL via Arrow Flight SQL + PyArrow (high-throughput query results into Pandas), and dbt (for defining feature tables as SQL models on Silver/Gold data)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does time travel help with ML reproducibility?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Iceberg time travel allows data scientists to reconstruct the exact dataset state used for any historical model training run — query the Silver table as it existed on the date training occurred. Combined with Nessie branch tagging, this ensures that any model training run can be exactly reproduced months later, solving the training data drift problem."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the role of the AI Semantic Layer in data science?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The AI Semantic Layer (Dremio's MCP-exposed metric and dataset definitions) allows AI agents to autonomously discover, understand, and query enterprise lakehouse data for ML feature retrieval, dataset exploration, and model input preparation — without requiring data scientists to write custom SQL for each feature extraction task."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Data Science on the Lakehouse</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Architecture Patterns</span>
+      <h1>Data Science on the Lakehouse: The Definitive Guide</h1>
+      <p class="hero-lede">The data lakehouse is the ideal platform for data science — providing ACID-safe historical data, time travel for experiment reproducibility, open Parquet files for direct Python access, and the Dremio AI Semantic Layer for AI agent data access. Data scientists get governed, current, feature-rich data without waiting for data engineering tickets.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">The Lakehouse as a Data Science Platform</a></li>
+        <li><a href="#section-2">Python Access to Iceberg Data</a></li>
+        <li><a href="#section-3">Feature Engineering on the Lakehouse</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>The Lakehouse as a Data Science Platform</h2>
+        <p>The <a href="data-lakehouse.html">data lakehouse</a> solves the most frustrating problem in data science: access to good data. Traditional data science workflows were bottlenecked on data engineering: data scientists submitted tickets to get data extracted from warehouses, waited days, received stale dumps in CSV files, and then realized they needed different columns and started over. The lakehouse eliminates this bottleneck by giving data scientists direct, governed, self-service access to curated Gold and Silver <a href="apache-iceberg.html">Iceberg</a> tables through Python interfaces they already know.</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Python Access to Iceberg Data</h2>
+        <p>Data scientists access Iceberg data through several Python interfaces:</p><h3>PyIceberg: Direct Iceberg Access</h3><pre><code>from pyiceberg.catalog import load_catalog
+catalog = load_catalog('polaris', uri='https://polaris.example.com/api/catalog')
+table = catalog.load_table('gold.customer_features')
+df = table.scan(row_filter="region = 'US-WEST'").to_arrow().to_pandas()</code></pre><h3>Dremio + Arrow Flight SQL</h3><pre><code>from pyarrow import flight
+client = flight.FlightClient('grpc+tls://dremio.example.com:32010')
+df = client.do_get(...).read_all().to_pandas()
+# Sub-second for Reflection-accelerated queries</code></pre><h3>PySpark + Iceberg for Large-Scale Feature Engineering</h3><pre><code>df = spark.table('catalog.gold.customer_features')
+features = df.groupBy('customer_id').agg(F.sum('ltv'), F.count('orders'))</code></pre>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Python Data Science Access to Iceberg diagram" loading="lazy"><figcaption>Figure 1: Python data science access to lakehouse data — PyIceberg, Arrow Flight SQL, and PySpark.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Feature Engineering on the Lakehouse</h2>
+        <p>The lakehouse is the ideal platform for ML feature engineering:</p><ul><li><strong>Historical features:</strong> Time travel queries recreate exact historical feature values — essential for training models on point-in-time correct features (no label leakage)</li><li><strong>Fresh features:</strong> Streaming-ingested Iceberg tables provide near-real-time feature values for online inference</li><li><strong>Feature sharing:</strong> Gold Iceberg feature tables serve as a shared <a href="feature-store.html">feature store</a> — data scientists publish computed features as Iceberg tables that other teams can reuse</li><li><strong>Version control:</strong> <a href="nessie-branching-tagging.html">Nessie tags</a> snapshot the exact data state used for each training run — enabling perfect ML reproducibility</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="ML Feature Engineering on Iceberg diagram" loading="lazy"><figcaption>Figure 2: ML feature engineering on Iceberg — historical, fresh, shared, and version-controlled features.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>The <a href="data-lakehouse.html">data lakehouse</a> is transforming data science from a bottlenecked, ticket-driven, CSV-file workflow into a governed, self-service, feature-rich analytical platform. With PyIceberg for direct Python access, Dremio Arrow Flight SQL for high-throughput query results, PySpark for large-scale feature engineering, Nessie tagging for experiment reproducibility, and the AI Semantic Layer for autonomous agent data access, the lakehouse provides everything data scientists need — on trusted, governed, current data — without waiting for data engineering support on every feature extraction task.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format providing Python-accessible lakehouse data.</span>
+    </a>
+      <a class="related-card" href="feature-store.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Feature Store</span>
+      <span class="related-desc">Gold Iceberg tables as a shared feature store.</span>
+    </a>
+      <a class="related-card" href="mlflow.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">MLflow</span>
+      <span class="related-desc">MLflow tracks model experiments on lakehouse features.</span>
+    </a>
+      <a class="related-card" href="ai-semantic-layer.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">AI Semantic Layer</span>
+      <span class="related-desc">AI Semantic Layer enables autonomous data science access.</span>
+    </a>
+      <a class="related-card" href="nessie-branching-tagging.html">
+      <span class="related-label">Architecture Patterns</span>
+      <span class="related-term">Nessie Branching and Tagging</span>
+      <span class="related-desc">Nessie tags ensure ML experiment reproducibility.</span>
+    </a>
+      <a class="related-card" href="time-travel.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Time Travel</span>
+      <span class="related-desc">Time travel reconstructs historical feature values.</span>
+    </a>
+      <a class="related-card" href="apache-spark.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Apache Spark</span>
+      <span class="related-desc">PySpark for large-scale ML feature engineering on Iceberg.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Dremio Arrow Flight SQL for Python data science access.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Column-Level Security: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what column-level security is, how data masking and column visibility controls protect sensitive data in Apache Iceberg and Dremio, and why it enables PII governance.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/column-level-security.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Column-Level Security: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what column-level security is, how data masking and column visibility controls protect sensitive data in Apache Iceberg and Dremio, and why it enables PII governance.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/column-level-security.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Column-Level Security: The Definitive Guide",
+      "description": "Learn what column-level security is, how data masking and column visibility controls protect sensitive data in Apache Iceberg and Dremio, and why it enables PII governance.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/column-level-security.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Column-Level Security", "item": "https://datalakehouse101.com/knowledge/column-level-security.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is column-level security?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Column-level security is the access control capability that governs which users or roles can see specific columns in a table. It typically has two forms: column visibility (certain roles cannot see specific columns at all — the column is excluded from query results) and column masking (certain roles see masked values — SSN appears as '***-**-1234' instead of the full value)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is column-level security important for PII governance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "GDPR, CCPA, HIPAA, and other regulations require that personally identifiable information (PII) be accessible only to authorized personnel for legitimate purposes. Column-level security enforces PII access policies consistently at the query layer — analysts running SQL queries see masked or excluded PII columns automatically, without relying on them to apply their own filtering."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Dremio implement column masking?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dremio implements column masking through Column Masking Policies — rules that define replacement values for specific column values based on the querying user's role. When a user without PII access queries a Virtual Dataset containing an email column with a masking policy, Dremio returns a masked email (e.g., 'u***@example.com') transparently — the user sees masked data without knowing the unmasked value."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Column-Level Security</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance & Quality</span>
+      <h1>Column-Level Security: The Definitive Guide</h1>
+      <p class="hero-lede">Column-level security controls which users can see which columns in a table — masking PII fields, hiding sensitive financial data, and restricting access to confidential attributes. In Dremio and Apache Polaris, column masking policies enforce consistent data protection regardless of which engine or tool accesses the data.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is Column-Level Security?</a></li>
+        <li><a href="#section-2">Column Masking Policies in Dremio</a></li>
+        <li><a href="#section-3">Row-Level Security</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is Column-Level Security?</h2>
+        <p><strong>Column-level security</strong> is the data access control capability that governs access to specific columns within a table — going beyond table-level <a href="rbac.html">RBAC</a> (which controls whether a user can access the table at all) to control which specific data attributes a user can see within an authorized table. Column-level security is essential for protecting sensitive data categories — PII (personally identifiable information), financial data, healthcare data — while still enabling authorized analytics on the non-sensitive columns of the same tables.</p><p>Column-level security manifests in two forms in the lakehouse: <strong>column visibility</strong> (specific columns are completely hidden from unauthorized roles — they do not appear in SELECT * results or schema metadata) and <strong>column masking</strong> (specific columns return masked values for unauthorized roles — the column exists but returns a transformed value that protects the sensitive information while preserving referential utility).
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Column Masking Policies in Dremio</h2>
+        <p><a href="dremio.html">Dremio</a> implements column masking through policies applied to <a href="virtual-datasets.html">Virtual Datasets</a>. A masking policy defines:</p><ul><li><strong>Target column:</strong> Which column to mask (e.g., email, ssn, credit_card_number)</li><li><strong>Mask conditions:</strong> Which roles see masked vs unmasked values</li><li><strong>Masking expression:</strong> The SQL expression that produces the masked value (e.g., CONCAT(LEFT(email, 2), '***@', SPLIT_PART(email, '@', 2)) produces 'jo***@example.com')</li></ul><p>Masking is applied transparently at query execution time — the analyst's SQL query doesn't need to include masking logic; Dremio applies the masking policy automatically based on the querying user's role.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Column Masking Policy Architecture diagram" loading="lazy"><figcaption>Figure 1: Column masking policies in Dremio — transparent PII masking based on user role at query time.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Row-Level Security</h2>
+        <p>Closely related to column-level security is <strong>row-level security (RLS)</strong> — the ability to filter which rows a user sees based on their identity or role. In the lakehouse context:</p><ul><li>A regional manager can only see orders from their region (WHERE region = user's assigned region)</li><li>A customer service agent can only see records for their assigned customer accounts</li><li>A country-specific compliance analyst can only see records where data_residency = their country</li></ul><p>Row-level security is implemented in Dremio through VDS definitions that include role-based filters, in AWS Lake Formation through row filter policies, and in Unity Catalog through dynamic row filters. Combined with column masking, row-level security enables highly granular data access control — the right data, to the right people, with the right masking — across all engine queries.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Row Level Security and Column Masking diagram" loading="lazy"><figcaption>Figure 2: Row-level security combined with column masking — the complete fine-grained access control model.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>Column-level security is the fine-grained access control capability that enables enterprises to share data broadly for analytics while still protecting sensitive attributes from unauthorized access. By combining column masking (PII protected for unauthorized roles), column visibility restrictions (sensitive columns hidden entirely), and row-level filters (data scoped to authorized subsets), organizations achieve comprehensive data protection without sacrificing analytical utility. <a href="dremio.html">Dremio's</a> implementation through VDS-level masking policies makes column-level security consistently enforced across all BI tools and engines that access the <a href="semantic-layer.html">semantic layer</a> — protecting sensitive data at the governance layer, not at the individual tool layer.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="rbac.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">Role-Based Access Control</span>
+      <span class="related-desc">RBAC complements column security with table-level access.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Column security is a key governance capability.</span>
+    </a>
+      <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">Dremio's masking policies implement column-level security.</span>
+    </a>
+      <a class="related-card" href="virtual-datasets.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Virtual Datasets</span>
+      <span class="related-desc">Masking policies are applied to VDS definitions.</span>
+    </a>
+      <a class="related-card" href="apache-polaris.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Apache Polaris</span>
+      <span class="related-desc">Polaris enforces column-level privileges at catalog API.</span>
+    </a>
+      <a class="related-card" href="unity-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Unity Catalog</span>
+      <span class="related-desc">Unity Catalog supports column masking and row filters.</span>
+    </a>
+      <a class="related-card" href="self-service-analytics.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Self-Service Analytics</span>
+      <span class="related-desc">Column security enables safe broad self-service access.</span>
+    </a>
+      <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">Column security makes the open lakehouse enterprise-safe.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

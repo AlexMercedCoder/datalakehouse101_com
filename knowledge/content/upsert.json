@@ -1,0 +1,98 @@
+{
+  "slug": "upsert",
+  "term": "Upsert",
+  "category": "Ingestion & Streaming",
+  "metaTitle": "Upsert: The Definitive Guide for Apache Iceberg",
+  "metaDescription": "Learn what upsert is, how Apache Iceberg's MERGE INTO implements upsert semantics, and why upsert is essential for CDC pipelines maintaining current-state Silver tables.",
+  "h1": "Upsert: The Definitive Guide for Apache Iceberg",
+  "lede": "Upsert (UPDATE or INSERT) is the DML operation that updates existing records and inserts new ones in a single atomic operation. In Apache Iceberg, MERGE INTO implements upsert \u2014 the core operation for CDC pipelines that maintain current-state Silver tables reflecting the present state of source operational databases.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is an upsert?",
+      "a": "An upsert is a combined UPDATE + INSERT operation: if a record with the matching key already exists in the target table, update it with the new values; if no matching record exists, insert it as a new row. Upsert is essential for maintaining current-state tables from CDC change streams, where each event may be an INSERT (new record) or UPDATE (existing record changed) in the source."
+    },
+    {
+      "q": "How does Apache Iceberg implement upsert?",
+      "a": "Apache Iceberg implements upsert through the MERGE INTO SQL statement. MERGE INTO matches source and target rows by a join key, then applies WHEN MATCHED THEN UPDATE (update existing rows) and WHEN NOT MATCHED THEN INSERT (insert new rows) clauses atomically. Iceberg writes updates as either Copy-on-Write (rewrites entire affected data files) or Merge-on-Read (writes delete + new data files separately)."
+    },
+    {
+      "q": "What is the performance difference between Copy-on-Write and Merge-on-Read upserts?",
+      "a": "Copy-on-Write (CoW) upserts rewrite entire data files for each updated row \u2014 slow for write-heavy workloads (each MERGE rewrites large files) but fast for reads (no delete file merging needed). Merge-on-Read (MoR) upserts write small delete + insert files separately \u2014 fast for writes (only changed records written) but requires merging on read. CoW is better for read-heavy Silver tables; MoR is better for high-frequency CDC streams."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is an Upsert?",
+      "content": "<p>An <strong>upsert</strong> (a portmanteau of <em>update</em> and <em>insert</em>) is a database write operation that combines two behaviors in a single statement: if a record matching the specified key already exists in the target table, <em>update</em> it with the new values; if no matching record exists, <em>insert</em> it as a new row. Upsert is the fundamental operation for maintaining current-state tables from change data streams.</p><p>In the <a href=\"data-lakehouse.html\">data lakehouse</a>, upsert is the operation that makes Silver tables valuable \u2014 not just a raw historical log like Bronze tables, but a continuously updated <em>current state</em> that reflects the present state of source operational databases. A Silver orders table maintained via upsert always shows the current status of each order (not a log of all status changes), enabling analysts to query 'how many orders are currently pending?' rather than 'how many order_status = pending events have ever occurred?'"
+    },
+    {
+      "heading": "MERGE INTO: Iceberg's Upsert Implementation",
+      "content": "<p>Apache Iceberg implements upsert through the ANSI standard <code>MERGE INTO</code> statement:</p><pre><code>MERGE INTO silver.orders AS target\nUSING bronze.orders_cdc AS source\n  ON target.order_id = source.order_id\nWHEN MATCHED AND source.op_type = 'D'\n  THEN DELETE\nWHEN MATCHED AND source.op_type IN ('U', 'R')\n  THEN UPDATE SET\n    target.status = source.status,\n    target.updated_at = source.updated_at\nWHEN NOT MATCHED AND source.op_type = 'I'\n  THEN INSERT (order_id, status, created_at, updated_at)\n  VALUES (source.order_id, source.status, source.created_at, source.updated_at);</code></pre><p>This MERGE INTO processes a batch of CDC events (INSERTs, UPDATEs, DELETEs) from the Bronze CDC table and applies them atomically to the Silver current-state table \u2014 maintaining a correct, current-state representation of the source orders table.",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "MERGE INTO Upsert Iceberg CDC",
+      "diagramCaption": "Figure 1: MERGE INTO for CDC upsert \u2014 applying Bronze CDC events to Silver current-state Iceberg tables."
+    },
+    {
+      "heading": "CoW vs MoR Upsert Strategies",
+      "content": "<p>Apache Iceberg supports two physical write strategies for upsert operations:</p><h3>Copy-on-Write (CoW)</h3><p>When a MERGE INTO updates a row, Iceberg rewrites the entire Parquet data file containing that row \u2014 incorporating the updated value into a new file and marking the old file as deleted. Read queries require no merge logic \u2014 every data file contains only current values. Best for tables with low update frequency but high read volume.</p><h3>Merge-on-Read (MoR)</h3><p>When a MERGE INTO updates a row, Iceberg writes a small <em>equality delete file</em> (marking the old row as deleted by its primary key) and a new data file (containing the updated row). Old data files are not rewritten. Read queries must merge data files with delete files to produce current values. Best for high-frequency CDC streams where rewriting large files on every update is impractical. <a href=\"compaction.html\">Compaction</a> periodically merges delete files back into data files to maintain read performance.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "CoW vs MoR Upsert Strategies",
+      "diagramCaption": "Figure 2: Copy-on-Write vs Merge-on-Read upsert \u2014 write performance vs read simplicity tradeoff."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Upsert via <code>MERGE INTO</code> is the cornerstone DML operation for maintaining current-state Silver tables in the <a href=\"data-lakehouse.html\">data lakehouse</a>. By combining <a href=\"change-data-capture.html\">CDC</a> events with Iceberg's MERGE INTO (implemented as either Copy-on-Write or Merge-on-Read depending on update frequency), data teams create Silver tables that continuously reflect the present state of source operational databases \u2014 enabling analysts to ask current-state questions of lakehouse data with the same confidence as querying the operational system directly, but with the scale, governance, and analytical richness of the <a href=\"apache-iceberg.html\">Apache Iceberg</a> lakehouse.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "change-data-capture",
+      "term": "Change Data Capture",
+      "category": "Ingestion",
+      "desc": "CDC events are applied to Silver tables via upsert."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "Iceberg MERGE INTO implements upsert semantics."
+    },
+    {
+      "slug": "merge-on-read",
+      "term": "Merge-on-Read",
+      "category": "Table Formats",
+      "desc": "MoR is the efficient upsert write strategy for CDC."
+    },
+    {
+      "slug": "copy-on-write",
+      "term": "Copy-on-Write",
+      "category": "Table Formats",
+      "desc": "CoW rewrites files for each upsert \u2014 optimizes reads."
+    },
+    {
+      "slug": "compaction",
+      "term": "Compaction",
+      "category": "Table Formats",
+      "desc": "Compaction merges MoR delete files after CDC upserts."
+    },
+    {
+      "slug": "medallion-architecture",
+      "term": "Medallion Architecture",
+      "category": "Architecture Patterns",
+      "desc": "Upsert maintains current-state Silver tables."
+    },
+    {
+      "slug": "acid-transactions",
+      "term": "ACID Transactions",
+      "category": "Table Formats",
+      "desc": "ACID ensures upsert atomicity across Iceberg commits."
+    },
+    {
+      "slug": "apache-spark",
+      "term": "Apache Spark",
+      "category": "Query Engines & Platforms",
+      "desc": "Spark executes MERGE INTO for batch upsert pipelines."
+    }
+  ]
+}

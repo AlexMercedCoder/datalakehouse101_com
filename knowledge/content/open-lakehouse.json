@@ -1,0 +1,98 @@
+{
+  "slug": "open-lakehouse",
+  "term": "Open Lakehouse",
+  "category": "Architecture Patterns",
+  "metaTitle": "Open Lakehouse: The Definitive Guide",
+  "metaDescription": "Learn what the Open Lakehouse is, how open standards (Apache Iceberg, Parquet, Iceberg REST Catalog) prevent vendor lock-in, and why openness is the key principle for future-proof data architecture.",
+  "h1": "Open Lakehouse: The Definitive Guide",
+  "lede": "The Open Lakehouse is a data platform built entirely on open standards \u2014 Apache Iceberg, Apache Parquet, the Iceberg REST Catalog spec, and open-source engines \u2014 where no single vendor controls your data, your query engine, or your catalog. It is the antidote to proprietary data warehouse lock-in and the foundation of long-term data platform flexibility.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is the Open Lakehouse?",
+      "a": "The Open Lakehouse is a data platform architecture where every component uses open, vendor-neutral standards: Apache Iceberg (open table format), Apache Parquet (open file format), Iceberg REST Catalog specification (open catalog API), and open-source or multi-vendor compute engines. No proprietary format, no single-vendor lock-in, and data always accessible by any compliant engine."
+    },
+    {
+      "q": "Why does openness matter for data architecture?",
+      "a": "Openness protects organizational data investments from vendor lock-in. With open formats, you can switch query engines (from Spark to Dremio to Trino) without migrating data. You can adopt new engines as they emerge (DuckDB, new AI query engines) without format conversion. You can negotiate with vendors from a position of strength \u2014 your data is never held hostage by any single vendor's proprietary format."
+    },
+    {
+      "q": "How does Apache Iceberg enable the Open Lakehouse?",
+      "a": "Iceberg provides the open table format specification (published on GitHub, Apache-licensed) that any engine can implement. The Iceberg REST Catalog specification provides an open catalog API. Apache Polaris, Project Nessie, and other implementations provide open-source catalog implementations. Together, these open standards enable a fully open, vendor-neutral lakehouse."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is the Open Lakehouse?",
+      "content": "<p>The <strong>Open Lakehouse</strong> is a data architecture philosophy and design principle: build your data platform on open, vendor-neutral standards so that your data is always accessible by any engine, any tool, and any vendor \u2014 now and in the future. The Open Lakehouse stands in contrast to proprietary cloud data warehouses (Snowflake, BigQuery, Redshift) where data is stored in vendor-specific formats accessible only through that vendor's engine.</p><p>Open Lakehouse components:</p><ul><li><strong>Open file format:</strong> <a href=\"apache-parquet.html\">Apache Parquet</a> \u2014 any tool can read and write Parquet without a license</li><li><strong>Open table format:</strong> <a href=\"apache-iceberg.html\">Apache Iceberg</a> \u2014 open specification, Apache-licensed, any engine can implement the reader and writer spec</li><li><strong>Open catalog API:</strong> <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> specification \u2014 any catalog and any engine can implement this interface</li><li><strong>Open storage:</strong> Cloud object storage (S3, ADLS, GCS) \u2014 standard HTTP APIs, no proprietary storage protocol</li><li><strong>Open engines:</strong> <a href=\"apache-spark.html\">Spark</a>, <a href=\"trino.html\">Trino</a>, <a href=\"apache-flink.html\">Flink</a>, and <a href=\"dremio.html\">Dremio</a> (open source core) \u2014 competitive engine ecosystem on the same data</li></ul>"
+    },
+    {
+      "heading": "The Cost of Lock-In",
+      "content": "<p>Understanding the Open Lakehouse requires understanding what proprietary lock-in costs:</p><ul><li><strong>Pricing power:</strong> A vendor with your data in a proprietary format can increase prices knowing you cannot easily leave \u2014 migration would require re-loading all data into a new format</li><li><strong>Feature pacing:</strong> You are limited to the features the proprietary vendor builds; you cannot adopt better engines as they emerge</li><li><strong>Negotiating position:</strong> Every contract renewal starts from weakness \u2014 you need them more than they need you</li><li><strong>Architectural flexibility:</strong> You cannot use ML frameworks (PyTorch, scikit-learn) directly on proprietary storage \u2014 you must use the vendor's ML integration or pay for data export</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Open Lakehouse vs Proprietary Warehouse",
+      "diagramCaption": "Figure 1: Open Lakehouse vs proprietary warehouse \u2014 lock-in cost vs openness flexibility."
+    },
+    {
+      "heading": "Dremio and the Open Lakehouse",
+      "content": "<p><a href=\"dremio.html\">Dremio</a> is a central participant in the Open Lakehouse ecosystem. Dremio's architecture is explicitly designed to enable the open lakehouse:</p><ul><li>Dremio connects to your own <a href=\"object-storage.html\">S3/ADLS/GCS</a> bucket \u2014 your data is never stored in Dremio's proprietary system</li><li>Dremio's Open Catalog implements the open <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> specification \u2014 tables registered in Open Catalog are accessible by Spark, Trino, Flink, and any other Iceberg-compatible engine</li><li>Dremio's Arrow Flight SQL interface uses open <a href=\"apache-arrow.html\">Apache Arrow</a> format \u2014 standard, open data access protocol</li></ul><p>This means: if you choose Dremio for BI analytics today, your data is not locked to Dremio. You can also use Spark for ETL, Trino for federated queries, and Flink for streaming \u2014 all on the same open Iceberg data.",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Dremio Open Lakehouse Architecture",
+      "diagramCaption": "Figure 2: Dremio in the Open Lakehouse \u2014 your data, open formats, accessible by all engines."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>The Open Lakehouse is the data architecture that protects long-term organizational data investments from vendor lock-in. Built on <a href=\"apache-iceberg.html\">Apache Iceberg</a>, <a href=\"apache-parquet.html\">Apache Parquet</a>, the <a href=\"iceberg-rest-catalog.html\">Iceberg REST Catalog</a> specification, and open-source compute engines, the Open Lakehouse ensures that your data remains yours \u2014 accessible by any engine, extensible with any tool, and governed by open standards that no single vendor controls. As the data and AI ecosystem continues to evolve rapidly, the Open Lakehouse is the architectural foundation that gives organizations the flexibility to adopt the best tools of 2026, 2027, and beyond \u2014 without paying the re-migration cost of proprietary lock-in.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The open table format enabling the Open Lakehouse."
+    },
+    {
+      "slug": "iceberg-rest-catalog",
+      "term": "Iceberg REST Catalog",
+      "category": "Table Formats",
+      "desc": "Open catalog API specification for the Open Lakehouse."
+    },
+    {
+      "slug": "apache-polaris",
+      "term": "Apache Polaris",
+      "category": "Catalogs & Metadata",
+      "desc": "Open-source REST catalog enabling the Open Lakehouse."
+    },
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "Dremio's architecture is designed for the Open Lakehouse."
+    },
+    {
+      "slug": "catalog-interoperability",
+      "term": "Catalog Interoperability",
+      "category": "Catalogs & Metadata",
+      "desc": "Interop is the technical implementation of openness."
+    },
+    {
+      "slug": "multi-engine-interoperability",
+      "term": "Multi-Engine Interoperability",
+      "category": "Analytics & BI",
+      "desc": "Multi-engine access is the practical benefit of openness."
+    },
+    {
+      "slug": "lakehouse-architecture",
+      "term": "Lakehouse Architecture",
+      "category": "Architecture Patterns",
+      "desc": "The architecture implementing Open Lakehouse principles."
+    },
+    {
+      "slug": "decoupled-storage-compute",
+      "term": "Decoupled Storage and Compute",
+      "category": "Core Concepts",
+      "desc": "Decoupling is a core principle of the Open Lakehouse."
+    }
+  ]
+}

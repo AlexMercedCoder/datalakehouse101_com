@@ -1,0 +1,98 @@
+{
+  "slug": "apache-atlas",
+  "term": "Apache Atlas",
+  "category": "Governance & Quality",
+  "metaTitle": "Apache Atlas: The Definitive Guide for Data Governance",
+  "metaDescription": "Learn what Apache Atlas is, how it provides metadata management and governance for the Hadoop and lakehouse ecosystem, and how it integrates with Apache Ranger for comprehensive governance.",
+  "h1": "Apache Atlas: The Definitive Guide",
+  "lede": "Apache Atlas is the open-source metadata management and governance framework for the Hadoop ecosystem \u2014 providing data catalog capabilities, lineage tracking, classification, and business glossary management. It is the governance companion to Apache Ranger, together forming the standard governance stack for Hadoop-era data platforms.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is Apache Atlas?",
+      "a": "Apache Atlas is an open-source metadata management and governance framework developed for the Apache Hadoop ecosystem. It provides a data catalog (asset discovery and description), data lineage tracking (how data flows between Hadoop services), data classification (tagging data with PII, sensitive, regulatory labels), business glossary management, and integration with Apache Ranger for policy-driven access control."
+    },
+    {
+      "q": "How does Apache Atlas differ from modern data catalogs like DataHub?",
+      "a": "Apache Atlas was designed specifically for the Hadoop ecosystem and has deep native integration with Hive, HBase, Kafka, and HDFS. It excels in on-premises Hadoop environments. DataHub and OpenMetadata are newer, API-first platforms with broader integration coverage (modern cloud services, Iceberg, dbt, Airflow) and more modern UX. Organizations migrating from Hadoop to cloud lakehouses typically migrate from Atlas to DataHub or OpenMetadata."
+    },
+    {
+      "q": "Does Apache Atlas integrate with Apache Iceberg?",
+      "a": "Atlas has limited native Iceberg integration. It can ingest Iceberg table metadata via Hive bridge integration (for Iceberg tables accessed through Hive) or via custom integration with Atlas's REST API. Native Iceberg REST catalog integration is not a current Atlas strength, which is a factor driving Hadoop-to-lakehouse migrations to adopt newer catalog platforms."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is Apache Atlas?",
+      "content": "<p><strong>Apache Atlas</strong> is an open-source metadata management and data governance framework developed as part of the Apache Hadoop ecosystem. Atlas provides the metadata and governance capabilities that complement <a href=\"apache-ranger.html\">Apache Ranger's</a> access control: where Ranger enforces who can do what to which data, Atlas records what the data is, where it came from, and how it is classified \u2014 the metadata and lineage dimension of governance.</p><p>Together, Ranger (access control) and Atlas (metadata + lineage) form the complete Hadoop-era governance stack. This tandem has been deployed in thousands of enterprise Hadoop environments and remains in production for organizations that have not yet completed their migration to cloud lakehouse architectures.</p>"
+    },
+    {
+      "heading": "Core Atlas Capabilities",
+      "content": "<ul><li><strong>Data Catalog:</strong> Automatically ingests metadata from Hive, HDFS, HBase, and Kafka. Provides a searchable inventory of data assets with schema details, business descriptions, and ownership information.</li><li><strong>Data Lineage:</strong> Tracks data flow between Hadoop services \u2014 which Hive jobs read which input tables and write which output tables. Visualizes lineage as a directed graph in the Atlas UI.</li><li><strong>Data Classification:</strong> Users and automated classifiers can tag data assets with classification labels (PII, PHI, FINANCIAL, CONFIDENTIAL). These tags can trigger Ranger access control policies \u2014 data tagged PII automatically gets restricted access without manual policy updates.</li><li><strong>Business Glossary:</strong> Formal business term definitions linked to specific technical metadata assets. Bridges the gap between business language and technical data models.</li><li><strong>Ranger Integration:</strong> Atlas classifications automatically propagate to Ranger policies \u2014 tagging a column as PII in Atlas can trigger an automatic Ranger masking policy for that column.</li></ul>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "Apache Atlas Governance Architecture",
+      "diagramCaption": "Figure 1: Apache Atlas architecture \u2014 metadata ingestion, lineage, classification, and Ranger integration."
+    },
+    {
+      "heading": "Atlas vs Modern Catalog Platforms",
+      "content": "<p>For organizations migrating from Hadoop to cloud lakehouses, choosing between retaining Atlas and adopting a modern platform is a key governance architecture decision:</p><table class=\"comparison-table\"><thead><tr><th>Dimension</th><th>Apache Atlas</th><th>DataHub / OpenMetadata</th></tr></thead><tbody><tr><td>Hadoop integration</td><td>Native, deep</td><td>Available via connectors</td></tr><tr><td>Iceberg integration</td><td>Limited</td><td>Strong and growing</td></tr><tr><td>Cloud services</td><td>Limited</td><td>Broad (Glue, S3, Snowflake)</td></tr><tr><td>Modern UI</td><td>Dated</td><td>Modern, React-based</td></tr><tr><td>Community activity</td><td>Declining</td><td>Active, growing</td></tr></tbody></table>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Atlas vs Modern Data Catalogs",
+      "diagramCaption": "Figure 2: Apache Atlas vs modern catalog platforms \u2014 migration considerations for lakehouse adoption."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>Apache Atlas is the proven metadata governance platform of the Hadoop era \u2014 deeply integrated with Hive, HDFS, HBase, and Kafka, and widely deployed in enterprise Hadoop environments alongside <a href=\"apache-ranger.html\">Apache Ranger</a>. For organizations modernizing to the cloud <a href=\"data-lakehouse.html\">data lakehouse</a>, Atlas represents a migration target \u2014 replacing it with a modern catalog platform (<a href=\"openmetadata.html\">OpenMetadata</a>, DataHub) that provides richer Iceberg integration, broader cloud service coverage, and more active community development while preserving the governance patterns Atlas established.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "apache-ranger",
+      "term": "Apache Ranger",
+      "category": "Governance & Quality",
+      "desc": "Ranger and Atlas form the Hadoop governance tandem."
+    },
+    {
+      "slug": "openmetadata",
+      "term": "OpenMetadata",
+      "category": "Governance & Quality",
+      "desc": "Modern catalog replacing Atlas for cloud lakehouses."
+    },
+    {
+      "slug": "data-governance",
+      "term": "Data Governance",
+      "category": "Governance",
+      "desc": "Atlas implements metadata governance for Hadoop."
+    },
+    {
+      "slug": "data-lineage",
+      "term": "Data Lineage",
+      "category": "Governance & Quality",
+      "desc": "Atlas tracks lineage across Hadoop services."
+    },
+    {
+      "slug": "data-catalog",
+      "term": "Data Catalog",
+      "category": "Catalogs & Metadata",
+      "desc": "Atlas provides catalog capabilities for Hadoop assets."
+    },
+    {
+      "slug": "hive-metastore",
+      "term": "Hive Metastore",
+      "category": "Catalogs & Metadata",
+      "desc": "Atlas ingests Hive table metadata automatically."
+    },
+    {
+      "slug": "column-level-security",
+      "term": "Column-Level Security",
+      "category": "Governance & Quality",
+      "desc": "Atlas PII tags trigger Ranger column masking policies."
+    },
+    {
+      "slug": "data-lakehouse",
+      "term": "Data Lakehouse",
+      "category": "Core Concepts",
+      "desc": "Atlas governance patterns migrate to the cloud lakehouse."
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "slug": "sql-analytics",
+  "term": "SQL Analytics",
+  "category": "Analytics & BI",
+  "metaTitle": "SQL Analytics: The Definitive Guide for Data Lakehouse",
+  "metaDescription": "Learn how SQL analytics powers the data lakehouse, the key SQL patterns for Iceberg queries, and how engines like Dremio deliver ANSI SQL analytics on petabyte-scale data.",
+  "h1": "SQL Analytics: The Definitive Guide",
+  "lede": "SQL analytics is the universal language of data \u2014 the standard for querying, aggregating, and transforming data in every data lakehouse. From simple SELECT statements to complex window functions and nested CTEs, SQL is how analysts, engineers, and AI agents interact with Apache Iceberg tables at any scale.",
+  "datePublished": "2026-05-14",
+  "faqs": [
+    {
+      "q": "What is SQL analytics in the data lakehouse?",
+      "a": "SQL analytics in the data lakehouse refers to the use of ANSI SQL for querying, transforming, and analyzing data stored in Apache Iceberg tables on object storage. Engines like Dremio, Trino, and Spark SQL provide ANSI-compatible SQL interfaces that analysts use to write queries ranging from simple aggregations to complex multi-table joins, window functions, and time-series analysis."
+    },
+    {
+      "q": "What SQL features are most important for lakehouse analytics?",
+      "a": "Key SQL features for lakehouse analytics: window functions (ROW_NUMBER, RANK, LAG/LEAD for time-series analysis), CTEs (Common Table Expressions for readable complex query composition), lateral joins (for unnesting arrays and structs), Iceberg-specific DML (MERGE INTO for upserts, INSERT OVERWRITE for partition replacement), and time travel queries (SELECT FROM table FOR TIMESTAMP AS OF '...')."
+    },
+    {
+      "q": "Does Apache Iceberg support standard SQL?",
+      "a": "Apache Iceberg tables can be queried and modified with standard SQL through any compliant engine (Dremio, Spark SQL, Trino). Iceberg adds extensions for table management: ALTER TABLE for schema evolution, OPTIMIZE for compaction, CALL procedures for snapshot management, and FOR TIMESTAMP AS OF / FOR VERSION AS OF for time travel."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "What Is SQL Analytics in the Lakehouse?",
+      "content": "<p><strong>SQL analytics</strong> is the practice of using Structured Query Language to query, transform, and analyze data in the <a href=\"data-lakehouse.html\">data lakehouse</a>. SQL is the universal interface for data \u2014 it is the language that business analysts, data engineers, data scientists, and AI agents all use to interact with <a href=\"apache-iceberg.html\">Apache Iceberg</a> tables, regardless of which underlying engine executes the query.</p><p>Every major lakehouse query engine provides a SQL interface: <a href=\"dremio.html\">Dremio</a> offers ANSI SQL with extensions for Iceberg management and Reflection-accelerated analytics; <a href=\"apache-spark.html\">Spark SQL</a> provides Python and Scala-integrated SQL for batch ETL; <a href=\"trino.html\">Trino</a> delivers distributed ANSI SQL for federated queries; <a href=\"apache-flink.html\">Flink SQL</a> provides streaming SQL for real-time pipeline definition. SQL's universality means analytical skills transfer across engines \u2014 a DML pattern learned in Dremio works in Trino."
+    },
+    {
+      "heading": "Key SQL Patterns for Lakehouse Analytics",
+      "content": "<p>The most important SQL patterns for lakehouse analytics:</p><h3>Window Functions</h3><p>Essential for time-series analysis, ranking, and cumulative calculations:<br><code>SELECT customer_id, order_date, revenue, SUM(revenue) OVER (PARTITION BY customer_id ORDER BY order_date) AS cumulative_ltv FROM gold.orders;</code></p><h3>CTEs (Common Table Expressions)</h3><p>Named subqueries that improve complex query readability and reusability:<br><code>WITH active_customers AS (SELECT customer_id FROM silver.customers WHERE status = 'active'), revenue AS (SELECT customer_id, SUM(order_value) as ltv FROM gold.orders GROUP BY 1) SELECT a.customer_id, r.ltv FROM active_customers a JOIN revenue r ON a.customer_id = r.customer_id;</code></p><h3>Iceberg Time Travel SQL</h3><p><code>SELECT * FROM silver.orders FOR TIMESTAMP AS OF TIMESTAMP '2026-01-01 00:00:00';</code></p><h3>MERGE INTO for Upserts</h3><p>Efficient CDC application to current-state Silver tables without full table rewrites.</p>",
+      "diagram": "catalog-diagram-1.png",
+      "diagramAlt": "SQL Analytics Lakehouse Patterns",
+      "diagramCaption": "Figure 1: Key SQL patterns \u2014 window functions, CTEs, MERGE INTO, and time travel for lakehouse analytics."
+    },
+    {
+      "heading": "Dremio SQL Extensions",
+      "content": "<p><a href=\"dremio.html\">Dremio</a> extends ANSI SQL with lakehouse-specific capabilities:</p><ul><li><strong>OPTIMIZE TABLE:</strong> Triggers compaction and Z-order layout optimization on Iceberg tables</li><li><strong>ALTER TABLE ... REFRESH REFLECTIONS:</strong> Forces Reflection refresh outside the scheduled window</li><li><strong>CREATE VDS AS:</strong> Creates a Virtual Dataset from a SQL SELECT statement, adding it to the semantic layer</li><li><strong>AI_COMPLETE, AI_CLASSIFY, AI_GENERATE:</strong> AI functions for LLM-powered transformations directly in SQL queries</li><li><strong>AT BRANCH/TAG:</strong> Iceberg time travel via Nessie branch or tag name rather than timestamp</li></ul>",
+      "diagram": "catalog-diagram-2.png",
+      "diagramAlt": "Dremio SQL Extensions for Lakehouse",
+      "diagramCaption": "Figure 2: Dremio SQL extensions \u2014 Iceberg management, Reflection control, and AI SQL functions."
+    },
+    {
+      "heading": "Summary",
+      "content": "<p>SQL analytics is the universal interface of the <a href=\"data-lakehouse.html\">data lakehouse</a> \u2014 the common language connecting data consumers of every type (analysts, engineers, AI agents) to <a href=\"apache-iceberg.html\">Apache Iceberg</a> data through any compliant engine. Understanding key SQL patterns \u2014 window functions, CTEs, MERGE INTO, time travel \u2014 combined with engine-specific extensions like <a href=\"dremio.html\">Dremio's</a> AI functions and VDS creation, gives data teams the complete SQL toolkit for lakehouse analytics at any scale.</p>"
+    }
+  ],
+  "related": [
+    {
+      "slug": "dremio",
+      "term": "Dremio",
+      "category": "Query Engines & Platforms",
+      "desc": "SQL analytics engine with Iceberg extensions."
+    },
+    {
+      "slug": "trino",
+      "term": "Trino",
+      "category": "Query Engines & Platforms",
+      "desc": "Distributed ANSI SQL engine for federated lakehouse queries."
+    },
+    {
+      "slug": "apache-iceberg",
+      "term": "Apache Iceberg",
+      "category": "Table Formats",
+      "desc": "The table format SQL analytics queries target."
+    },
+    {
+      "slug": "semantic-layer",
+      "term": "Semantic Layer",
+      "category": "Analytics & BI",
+      "desc": "SQL VDS definitions form the semantic layer."
+    },
+    {
+      "slug": "self-service-analytics",
+      "term": "Self-Service Analytics",
+      "category": "Analytics & BI",
+      "desc": "SQL analytics enables self-service data access."
+    },
+    {
+      "slug": "query-optimization",
+      "term": "Query Optimization",
+      "category": "Analytics & BI",
+      "desc": "SQL queries are optimized by the engine's query planner."
+    },
+    {
+      "slug": "virtual-datasets",
+      "term": "Virtual Datasets",
+      "category": "Query Engines & Platforms",
+      "desc": "VDSs are SQL-defined views in the semantic layer."
+    },
+    {
+      "slug": "time-travel",
+      "term": "Time Travel",
+      "category": "Table Formats",
+      "desc": "Time travel via SQL FOR TIMESTAMP AS OF syntax."
+    }
+  ]
+}

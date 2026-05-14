@@ -71,44 +71,44 @@ Each page is a ~4,000-word authoritative reference article.
 | 60 | Apache Hadoop HDFS | hdfs | File Formats & Storage | ✅ |
 | 61 | Semantic Layer | semantic-layer | Analytics & BI | ✅ |
 | 62 | AI Semantic Layer (Dremio) | ai-semantic-layer | Analytics & BI | ✅ |
-| 63 | SQL Analytics | sql-analytics | Analytics & BI | ❌ |
+| 63 | SQL Analytics | sql-analytics | Analytics & BI | ✅ |
 | 64 | Self-Service Analytics | self-service-analytics | Analytics & BI | ✅ |
 | 65 | Lakehouse Federation | lakehouse-federation | Analytics & BI | ✅ |
 | 66 | Multi-Engine Interoperability | multi-engine-interoperability | Analytics & BI | ✅ |
 | 67 | Query Optimization | query-optimization | Analytics & BI | ✅ |
 | 68 | Z-Ordering (Data Sorting) | z-ordering | Analytics & BI | ✅ |
 | 69 | Data Skipping | data-skipping | Analytics & BI | ✅ |
-| 70 | Automated Table Optimization | automated-table-optimization | Analytics & BI | ❌ |
+| 70 | Automated Table Optimization | automated-table-optimization | Analytics & BI | ✅ |
 | 71 | Data Governance | data-governance | Governance & Quality | ✅ |
-| 72 | Data Lineage | data-lineage | Governance & Quality | ❌ |
-| 73 | Data Quality | data-quality | Governance & Quality | ❌ |
-| 74 | Data Observability | data-observability | Governance & Quality | ❌ |
-| 75 | Apache Ranger | apache-ranger | Governance & Quality | ❌ |
-| 76 | Apache Atlas | apache-atlas | Governance & Quality | ❌ |
-| 77 | OpenMetadata | openmetadata | Governance & Quality | ❌ |
-| 78 | Data Fabric | data-fabric | Governance & Quality | ❌ |
-| 79 | Role-Based Access Control (RBAC) | rbac | Governance & Quality | ❌ |
-| 80 | Column-Level Security | column-level-security | Governance & Quality | ❌ |
+| 72 | Data Lineage | data-lineage | Governance & Quality | ✅ |
+| 73 | Data Quality | data-quality | Governance & Quality | ✅ |
+| 74 | Data Observability | data-observability | Governance & Quality | ✅ |
+| 75 | Apache Ranger | apache-ranger | Governance & Quality | ✅ |
+| 76 | Apache Atlas | apache-atlas | Governance & Quality | ✅ |
+| 77 | OpenMetadata | openmetadata | Governance & Quality | ✅ |
+| 78 | Data Fabric | data-fabric | Governance & Quality | ✅ |
+| 79 | Role-Based Access Control (RBAC) | rbac | Governance & Quality | ✅ |
+| 80 | Column-Level Security | column-level-security | Governance & Quality | ✅ |
 | 81 | Apache Kafka | apache-kafka | Ingestion & Streaming | ✅ |
 | 82 | Change Data Capture (CDC) | change-data-capture | Ingestion & Streaming | ✅ |
-| 83 | Stream Processing | stream-processing | Ingestion & Streaming | ❌ |
-| 84 | Batch Processing | batch-processing | Ingestion & Streaming | ❌ |
-| 85 | Real-Time Analytics | real-time-analytics | Ingestion & Streaming | ❌ |
-| 86 | Data Ingestion | data-ingestion | Ingestion & Streaming | ❌ |
-| 87 | dbt (Data Build Tool) | dbt | Ingestion & Streaming | ❌ |
-| 88 | Upsert | upsert | Ingestion & Streaming | ❌ |
-| 89 | Bronze Layer | bronze-layer | Architecture Patterns | ❌ |
-| 90 | Silver Layer | silver-layer | Architecture Patterns | ❌ |
-| 91 | Gold Layer | gold-layer | Architecture Patterns | ❌ |
-| 92 | Data Engineering | data-engineering | Architecture Patterns | ❌ |
-| 93 | Lakehouse Architecture | lakehouse-architecture | Architecture Patterns | ❌ |
-| 94 | Open Lakehouse | open-lakehouse | Architecture Patterns | ❌ |
-| 95 | Nessie Branching and Tagging | nessie-branching-tagging | Architecture Patterns | ❌ |
-| 96 | Data Science on the Lakehouse | data-science-lakehouse | Architecture Patterns | ❌ |
-| 97 | MLflow | mlflow | Architecture Patterns | ❌ |
-| 98 | Feature Store | feature-store | Architecture Patterns | ❌ |
-| 99 | Agentic Lakehouse | agentic-lakehouse | Architecture Patterns | ❌ |
-| 100 | MCP (Model Context Protocol) | model-context-protocol | Architecture Patterns | ❌ |
+| 83 | Stream Processing | stream-processing | Ingestion & Streaming | ✅ |
+| 84 | Batch Processing | batch-processing | Ingestion & Streaming | ✅ |
+| 85 | Real-Time Analytics | real-time-analytics | Ingestion & Streaming | ✅ |
+| 86 | Data Ingestion | data-ingestion | Ingestion & Streaming | ✅ |
+| 87 | dbt (Data Build Tool) | dbt | Ingestion & Streaming | ✅ |
+| 88 | Upsert | upsert | Ingestion & Streaming | ✅ |
+| 89 | Bronze Layer | bronze-layer | Architecture Patterns | ✅ |
+| 90 | Silver Layer | silver-layer | Architecture Patterns | ✅ |
+| 91 | Gold Layer | gold-layer | Architecture Patterns | ✅ |
+| 92 | Data Engineering | data-engineering | Architecture Patterns | ✅ |
+| 93 | Lakehouse Architecture | lakehouse-architecture | Architecture Patterns | ✅ |
+| 94 | Open Lakehouse | open-lakehouse | Architecture Patterns | ✅ |
+| 95 | Nessie Branching and Tagging | nessie-branching-tagging | Architecture Patterns | ✅ |
+| 96 | Data Science on the Lakehouse | data-science-lakehouse | Architecture Patterns | ✅ |
+| 97 | MLflow | mlflow | Architecture Patterns | ✅ |
+| 98 | Feature Store | feature-store | Architecture Patterns | ✅ |
+| 99 | Agentic Lakehouse | agentic-lakehouse | Architecture Patterns | ✅ |
+| 100 | MCP (Model Context Protocol) | model-context-protocol | Architecture Patterns | ✅ |
 
 ---
 

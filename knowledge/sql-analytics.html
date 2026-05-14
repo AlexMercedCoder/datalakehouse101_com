@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Analytics: The Definitive Guide for Data Lakehouse | Data Lakehouse 101</title>
+  <meta name="description" content="Learn how SQL analytics powers the data lakehouse, the key SQL patterns for Iceberg queries, and how engines like Dremio deliver ANSI SQL analytics on petabyte-scale data.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/sql-analytics.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="SQL Analytics: The Definitive Guide for Data Lakehouse | Data Lakehouse 101">
+  <meta property="og:description" content="Learn how SQL analytics powers the data lakehouse, the key SQL patterns for Iceberg queries, and how engines like Dremio deliver ANSI SQL analytics on petabyte-scale data.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/sql-analytics.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "SQL Analytics: The Definitive Guide",
+      "description": "Learn how SQL analytics powers the data lakehouse, the key SQL patterns for Iceberg queries, and how engines like Dremio deliver ANSI SQL analytics on petabyte-scale data.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/sql-analytics.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "SQL Analytics", "item": "https://datalakehouse101.com/knowledge/sql-analytics.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is SQL analytics in the data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "SQL analytics in the data lakehouse refers to the use of ANSI SQL for querying, transforming, and analyzing data stored in Apache Iceberg tables on object storage. Engines like Dremio, Trino, and Spark SQL provide ANSI-compatible SQL interfaces that analysts use to write queries ranging from simple aggregations to complex multi-table joins, window functions, and time-series analysis."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What SQL features are most important for lakehouse analytics?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Key SQL features for lakehouse analytics: window functions (ROW_NUMBER, RANK, LAG/LEAD for time-series analysis), CTEs (Common Table Expressions for readable complex query composition), lateral joins (for unnesting arrays and structs), Iceberg-specific DML (MERGE INTO for upserts, INSERT OVERWRITE for partition replacement), and time travel queries (SELECT FROM table FOR TIMESTAMP AS OF '...')."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Apache Iceberg support standard SQL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Apache Iceberg tables can be queried and modified with standard SQL through any compliant engine (Dremio, Spark SQL, Trino). Iceberg adds extensions for table management: ALTER TABLE for schema evolution, OPTIMIZE for compaction, CALL procedures for snapshot management, and FOR TIMESTAMP AS OF / FOR VERSION AS OF for time travel."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">SQL Analytics</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Analytics & BI</span>
+      <h1>SQL Analytics: The Definitive Guide</h1>
+      <p class="hero-lede">SQL analytics is the universal language of data — the standard for querying, aggregating, and transforming data in every data lakehouse. From simple SELECT statements to complex window functions and nested CTEs, SQL is how analysts, engineers, and AI agents interact with Apache Iceberg tables at any scale.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is SQL Analytics in the Lakehouse?</a></li>
+        <li><a href="#section-2">Key SQL Patterns for Lakehouse Analytics</a></li>
+        <li><a href="#section-3">Dremio SQL Extensions</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is SQL Analytics in the Lakehouse?</h2>
+        <p><strong>SQL analytics</strong> is the practice of using Structured Query Language to query, transform, and analyze data in the <a href="data-lakehouse.html">data lakehouse</a>. SQL is the universal interface for data — it is the language that business analysts, data engineers, data scientists, and AI agents all use to interact with <a href="apache-iceberg.html">Apache Iceberg</a> tables, regardless of which underlying engine executes the query.</p><p>Every major lakehouse query engine provides a SQL interface: <a href="dremio.html">Dremio</a> offers ANSI SQL with extensions for Iceberg management and Reflection-accelerated analytics; <a href="apache-spark.html">Spark SQL</a> provides Python and Scala-integrated SQL for batch ETL; <a href="trino.html">Trino</a> delivers distributed ANSI SQL for federated queries; <a href="apache-flink.html">Flink SQL</a> provides streaming SQL for real-time pipeline definition. SQL's universality means analytical skills transfer across engines — a DML pattern learned in Dremio works in Trino.
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Key SQL Patterns for Lakehouse Analytics</h2>
+        <p>The most important SQL patterns for lakehouse analytics:</p><h3>Window Functions</h3><p>Essential for time-series analysis, ranking, and cumulative calculations:<br><code>SELECT customer_id, order_date, revenue, SUM(revenue) OVER (PARTITION BY customer_id ORDER BY order_date) AS cumulative_ltv FROM gold.orders;</code></p><h3>CTEs (Common Table Expressions)</h3><p>Named subqueries that improve complex query readability and reusability:<br><code>WITH active_customers AS (SELECT customer_id FROM silver.customers WHERE status = 'active'), revenue AS (SELECT customer_id, SUM(order_value) as ltv FROM gold.orders GROUP BY 1) SELECT a.customer_id, r.ltv FROM active_customers a JOIN revenue r ON a.customer_id = r.customer_id;</code></p><h3>Iceberg Time Travel SQL</h3><p><code>SELECT * FROM silver.orders FOR TIMESTAMP AS OF TIMESTAMP '2026-01-01 00:00:00';</code></p><h3>MERGE INTO for Upserts</h3><p>Efficient CDC application to current-state Silver tables without full table rewrites.</p>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="SQL Analytics Lakehouse Patterns diagram" loading="lazy"><figcaption>Figure 1: Key SQL patterns — window functions, CTEs, MERGE INTO, and time travel for lakehouse analytics.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Dremio SQL Extensions</h2>
+        <p><a href="dremio.html">Dremio</a> extends ANSI SQL with lakehouse-specific capabilities:</p><ul><li><strong>OPTIMIZE TABLE:</strong> Triggers compaction and Z-order layout optimization on Iceberg tables</li><li><strong>ALTER TABLE ... REFRESH REFLECTIONS:</strong> Forces Reflection refresh outside the scheduled window</li><li><strong>CREATE VDS AS:</strong> Creates a Virtual Dataset from a SQL SELECT statement, adding it to the semantic layer</li><li><strong>AI_COMPLETE, AI_CLASSIFY, AI_GENERATE:</strong> AI functions for LLM-powered transformations directly in SQL queries</li><li><strong>AT BRANCH/TAG:</strong> Iceberg time travel via Nessie branch or tag name rather than timestamp</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Dremio SQL Extensions for Lakehouse diagram" loading="lazy"><figcaption>Figure 2: Dremio SQL extensions — Iceberg management, Reflection control, and AI SQL functions.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>SQL analytics is the universal interface of the <a href="data-lakehouse.html">data lakehouse</a> — the common language connecting data consumers of every type (analysts, engineers, AI agents) to <a href="apache-iceberg.html">Apache Iceberg</a> data through any compliant engine. Understanding key SQL patterns — window functions, CTEs, MERGE INTO, time travel — combined with engine-specific extensions like <a href="dremio.html">Dremio's</a> AI functions and VDS creation, gives data teams the complete SQL toolkit for lakehouse analytics at any scale.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="dremio.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Dremio</span>
+      <span class="related-desc">SQL analytics engine with Iceberg extensions.</span>
+    </a>
+      <a class="related-card" href="trino.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Trino</span>
+      <span class="related-desc">Distributed ANSI SQL engine for federated lakehouse queries.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">The table format SQL analytics queries target.</span>
+    </a>
+      <a class="related-card" href="semantic-layer.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Semantic Layer</span>
+      <span class="related-desc">SQL VDS definitions form the semantic layer.</span>
+    </a>
+      <a class="related-card" href="self-service-analytics.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Self-Service Analytics</span>
+      <span class="related-desc">SQL analytics enables self-service data access.</span>
+    </a>
+      <a class="related-card" href="query-optimization.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Query Optimization</span>
+      <span class="related-desc">SQL queries are optimized by the engine's query planner.</span>
+    </a>
+      <a class="related-card" href="virtual-datasets.html">
+      <span class="related-label">Query Engines & Platforms</span>
+      <span class="related-term">Virtual Datasets</span>
+      <span class="related-desc">VDSs are SQL-defined views in the semantic layer.</span>
+    </a>
+      <a class="related-card" href="time-travel.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Time Travel</span>
+      <span class="related-desc">Time travel via SQL FOR TIMESTAMP AS OF syntax.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>

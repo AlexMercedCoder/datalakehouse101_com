@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Fabric: The Definitive Guide | Data Lakehouse 101</title>
+  <meta name="description" content="Learn what a data fabric is, how it provides a unified data management layer across distributed data sources, and how it relates to the data lakehouse and data mesh architectures.">
+  <link rel="canonical" href="https://datalakehouse101.com/knowledge/data-fabric.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Data Fabric: The Definitive Guide | Data Lakehouse 101">
+  <meta property="og:description" content="Learn what a data fabric is, how it provides a unified data management layer across distributed data sources, and how it relates to the data lakehouse and data mesh architectures.">
+  <meta property="og:url" content="https://datalakehouse101.com/knowledge/data-fabric.html">
+  <meta property="og:image" content="https://datalakehouse101.com/assets/img/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="knowledge.css">
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Data Fabric: The Definitive Guide",
+      "description": "Learn what a data fabric is, how it provides a unified data management layer across distributed data sources, and how it relates to the data lakehouse and data mesh architectures.",
+      "author": { "@type": "Person", "name": "Alex Merced" },
+      "publisher": { "@type": "Organization", "name": "DataLakehouse101.com", "url": "https://datalakehouse101.com" },
+      "datePublished": "2026-05-14",
+      "url": "https://datalakehouse101.com/knowledge/data-fabric.html"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://datalakehouse101.com" },
+        { "@type": "ListItem", "position": 2, "name": "Knowledge Base", "item": "https://datalakehouse101.com/knowledge/" },
+        { "@type": "ListItem", "position": 3, "name": "Data Fabric", "item": "https://datalakehouse101.com/knowledge/data-fabric.html" }
+      ]
+    },
+    {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a data fabric?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A data fabric is an architectural design pattern and set of technologies that provides a unified, consistent data management layer across distributed, heterogeneous data environments — different clouds, on-premises systems, databases, and lakehouses. It uses active metadata, AI-assisted data integration, and unified governance to manage data where it lives rather than requiring physical consolidation into a single platform."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does data fabric differ from data lakehouse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A data lakehouse is a specific architectural pattern (open table format + object storage + decoupled compute). A data fabric is a broader architectural philosophy that can encompass lakehouses, data warehouses, databases, and other systems. The lakehouse can be the core analytical component of a data fabric implementation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does data fabric differ from data mesh?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data mesh is an organizational operating model (domain ownership, product thinking, self-serve platform, federated governance). Data fabric is a technology architecture and tool set (unified metadata, AI integration, governed access). They are complementary: data fabric technology can enable data mesh organizational principles by providing the self-serve platform and federated governance tooling."
+      }
+    }
+  ]
+}
+  ]
+  </script>
+</head>
+<body>
+  <div id="reading-progress"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../index.html">Data<span>Lakehouse</span>101</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html" class="active">Knowledge Base</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="index.html">Knowledge Base</a></li>
+        <li class="current">Data Fabric</li>
+      </ol>
+    </div>
+  </nav>
+
+  <header class="article-hero">
+    <div class="hero-inner">
+      <span class="hero-category">Governance & Quality</span>
+      <h1>Data Fabric: The Definitive Guide</h1>
+      <p class="hero-lede">A data fabric is an architectural approach that provides unified data management, access, and governance across distributed, heterogeneous data environments — on-premises, multi-cloud, and edge. It is the governance and integration layer that connects data silos without forcing physical consolidation.</p>
+      <div class="hero-meta">
+        <span>By Alex Merced</span>
+        <span id="reading-time">Loading…</span>
+        <span>Updated 2026-05-14</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <h2>On This Page</h2>
+      <ol>
+        <li><a href="#section-1">What Is a Data Fabric?</a></li>
+        <li><a href="#section-2">Data Fabric Core Components</a></li>
+        <li><a href="#section-3">Data Fabric vs Data Lakehouse</a></li>
+        <li><a href="#section-4">Summary</a></li>
+      </ol>
+    </aside>
+
+    <article class="article-body">
+      
+      <section id="section-1">
+        <h2>What Is a Data Fabric?</h2>
+        <p>A <strong>data fabric</strong> is an architectural approach to data management that creates a unified, governed, and intelligently connected layer across all of an organization's data assets — regardless of where they physically reside. Rather than requiring all data to be consolidated into a single physical platform (like a data warehouse or lakehouse), a data fabric connects data in place through a shared metadata layer, unified access APIs, and consistent governance policies.</p><p>Gartner defines data fabric as an architecture and set of data services that provide consistent capabilities across a choice of endpoints spanning on-premises and multiple cloud environments. The key principles are: data accessed where it lives (no forced copy), metadata-driven integration (intelligent discovery and preparation via active metadata), and consistent governance (unified policies applied across all data sources).</p>
+        
+      </section>
+
+      <section id="section-2">
+        <h2>Data Fabric Core Components</h2>
+        <ul><li><strong>Active Metadata Layer:</strong> A continuously updated metadata repository that combines technical metadata (schemas, lineage), business metadata (descriptions, ownership), and operational metadata (usage statistics, quality scores). Active metadata drives automated data integration recommendations and access policy enforcement.</li><li><strong>Knowledge Graph:</strong> A semantic graph connecting data assets, business concepts, users, and policies — enabling AI-assisted data discovery and relationship inference.</li><li><strong>Data Integration:</strong> Federated query, replication, and transformation capabilities that move or access data across sources according to business rules.</li><li><strong>Unified Governance:</strong> Access control, quality, and compliance policies applied consistently across all connected data sources — cloud, on-premises, and edge.</li><li><strong>AI/ML-Assisted Operations:</strong> AI recommendation engines for data discovery (suggesting relevant datasets), integration (inferring mappings between heterogeneous schemas), and quality (detecting anomalies without predefined rules).</li></ul>
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-1.png" alt="Data Fabric Architecture diagram" loading="lazy"><figcaption>Figure 1: Data fabric architecture — unified metadata, governance, and access across distributed environments.</figcaption></figure>
+      </section>
+
+      <section id="section-3">
+        <h2>Data Fabric vs Data Lakehouse</h2>
+        <p>The <a href="data-lakehouse.html">data lakehouse</a> is often the central analytical component within a data fabric implementation, not a competing concept:</p><ul><li>The <strong>lakehouse</strong> provides the open, governed, high-performance analytical storage and query layer — <a href="apache-iceberg.html">Apache Iceberg</a> tables on object storage queried by <a href="dremio.html">Dremio</a>, Spark, or Trino</li><li>The <strong>data fabric</strong> provides the broader integration, governance, and metadata management layer — connecting the lakehouse with operational databases, SaaS systems, streaming platforms, and other data sources through unified metadata and governance</li></ul><p>Dremio's <a href="lakehouse-federation.html">federation</a> capabilities and the <a href="semantic-layer.html">semantic layer</a> are key data fabric enablers — providing the unified access point that connects the lakehouse to broader data estate resources.
+        <figure class="diagram-block"><img src="../assets/img/knowledge/catalog-diagram-2.png" alt="Data Fabric and Lakehouse Integration diagram" loading="lazy"><figcaption>Figure 2: Data lakehouse as the analytical core of a broader data fabric architecture.</figcaption></figure>
+      </section>
+
+      <section id="section-4">
+        <h2>Summary</h2>
+        <p>The data fabric represents the next evolution of enterprise data architecture thinking — moving beyond physical consolidation to unified logical management of distributed data. While the <a href="data-lakehouse.html">data lakehouse</a> provides the optimal analytical storage and query layer for structured data, the data fabric provides the governance, integration, and metadata management envelope that connects the lakehouse to the rest of the enterprise data estate. Organizations that combine an open lakehouse core (Iceberg + Dremio) with data fabric governance tooling (OpenMetadata, DataHub, active metadata) achieve the most comprehensive, scalable, and future-proof data architecture.</p>
+        
+      </section>
+    </article>
+  </div>
+
+  <section class="related-concepts">
+    <div class="container">
+      <h2>Related Concepts</h2>
+      <div class="related-grid">
+        <a class="related-card" href="data-lakehouse.html">
+      <span class="related-label">Core Concepts</span>
+      <span class="related-term">Data Lakehouse</span>
+      <span class="related-desc">The analytical core of a data fabric implementation.</span>
+    </a>
+      <a class="related-card" href="metadata-management.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Metadata Management</span>
+      <span class="related-desc">Active metadata is the foundation of data fabric.</span>
+    </a>
+      <a class="related-card" href="data-governance.html">
+      <span class="related-label">Governance</span>
+      <span class="related-term">Data Governance</span>
+      <span class="related-desc">Unified governance across data fabric is its defining feature.</span>
+    </a>
+      <a class="related-card" href="lakehouse-federation.html">
+      <span class="related-label">Analytics & BI</span>
+      <span class="related-term">Lakehouse Federation</span>
+      <span class="related-desc">Federation enables data fabric connected access.</span>
+    </a>
+      <a class="related-card" href="catalog-interoperability.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Catalog Interoperability</span>
+      <span class="related-desc">Catalog interop is a fabric enabler.</span>
+    </a>
+      <a class="related-card" href="openmetadata.html">
+      <span class="related-label">Governance & Quality</span>
+      <span class="related-term">OpenMetadata</span>
+      <span class="related-desc">OpenMetadata provides the metadata layer for data fabric.</span>
+    </a>
+      <a class="related-card" href="data-catalog.html">
+      <span class="related-label">Catalogs & Metadata</span>
+      <span class="related-term">Data Catalog</span>
+      <span class="related-desc">Catalog as the discovery layer in the data fabric.</span>
+    </a>
+      <a class="related-card" href="apache-iceberg.html">
+      <span class="related-label">Table Formats</span>
+      <span class="related-term">Apache Iceberg</span>
+      <span class="related-desc">Iceberg tables as the open format in the data fabric.</span>
+    </a>
+      </div>
+    </div>
+  </section>
+
+  
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-heading">Go Deeper — Recommended Resources</h2>
+    <p class="cta-sub">Expand your lakehouse expertise with these authoritative books and community resources.</p>
+    <div class="cta-grid">
+      <a class="cta-card" href="https://www.amazon.com/Architecting-Apache-Iceberg-Lakehouse-open-source/dp/1633435105/" target="_blank" rel="noopener">
+        <span class="cta-type">📘 Book</span>
+        <span class="cta-title">Architecting an Apache Iceberg Lakehouse</span>
+        <span class="cta-publisher">Manning Publications · Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Open-Source-Lakehouse-Architecting-Analytical/dp/B0GW595MVL/" target="_blank" rel="noopener">
+        <span class="cta-type">📗 Book</span>
+        <span class="cta-title">The Open Source Lakehouse</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Lakehouses-Apache-Iceberg-Agentic-Hands-ebook/dp/B0GQL4QNRT/" target="_blank" rel="noopener">
+        <span class="cta-type">📙 Book</span>
+        <span class="cta-title">The 2026 Guide to Lakehouses, Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://www.amazon.com/Apache-Iceberg-Agentic-Connecting-Structured/dp/B0GW2WF4PX/" target="_blank" rel="noopener">
+        <span class="cta-type">📕 Book</span>
+        <span class="cta-title">Apache Iceberg and Agentic AI</span>
+        <span class="cta-publisher">Alex Merced</span>
+        <span class="cta-btn">Buy on Amazon</span>
+      </a>
+      <a class="cta-card" href="https://amdatalakehouse.substack.com/" target="_blank" rel="noopener">
+        <span class="cta-type">📬 Newsletter</span>
+        <span class="cta-title">Alex Merced's Open Lakehouse Newsletter</span>
+        <span class="cta-publisher">Weekly updates on Lakehouse OSS &amp; Agentic AI</span>
+        <span class="cta-btn">Subscribe on Substack</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 DataLakehouse101.com &mdash; <a href="../index.html">Home</a> &middot; <a href="index.html">Knowledge Base</a></p>
+  </footer>
+
+  <script src="knowledge.js"></script>
+</body>
+</html>
