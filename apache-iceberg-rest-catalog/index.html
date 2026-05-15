@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iceberg REST Catalog, Apache Polaris & Catalog Interoperability Guide</title>
+    <meta name="description" content="A complete guide to the Iceberg REST Catalog spec, Apache Polaris, Project Nessie, and catalog interoperability. Learn how to choose and configure an Iceberg catalog for your lakehouse.">
+    <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg-rest-catalog/">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+      .content-body h2 { margin-top:2.5rem;margin-bottom:1rem;color:var(--color-primary);border-bottom:2px solid #e2e8f0;padding-bottom:.5rem }
+      .content-body h3 { margin-top:1.5rem;color:#1e293b }
+      .content-body p { line-height:1.8;margin-bottom:1.25rem;color:#334155;font-size:1.1rem }
+      .content-body ul,.content-body ol { margin-bottom:1.5rem;padding-left:1.5rem;line-height:1.7;font-size:1.1rem;color:#334155 }
+      .content-body li { margin-bottom:.5rem }
+      .content-body code { background:#f1f5f9;padding:.2rem .4rem;border-radius:4px;font-family:monospace;font-size:.95em;color:#0f172a }
+      .content-body table { width:100%;border-collapse:collapse;margin:2rem 0;font-size:1rem }
+      .content-body th,.content-body td { border:1px solid #e2e8f0;padding:1rem;text-align:left }
+      .content-body th { background:#f8fafc;font-weight:600;color:#0f172a }
+      .callout { background:#f8fafc;border-left:4px solid var(--color-accent);padding:1.5rem;margin:2rem 0;border-radius:0 8px 8px 0 }
+      .mermaid-container { margin:3rem 0;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);overflow-x:auto }
+    </style>
+    <script type="application/ld+json">
+    [
+      {"@context":"https://schema.org","@type":["TechArticle","Article"],"@id":"https://datalakehouse101.com/apache-iceberg-rest-catalog/#article","headline":"Iceberg REST Catalog, Apache Polaris & Catalog Interoperability Guide","description":"A complete guide to the Iceberg REST Catalog spec, Apache Polaris, Project Nessie, and catalog interoperability for the data lakehouse.","author":{"@type":"Person","name":"Alex Merced"},"publisher":{"@type":"Organization","name":"DataLakehouse101"},"datePublished":"2026-05-15"},
+      {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://datalakehouse101.com/"},{"@type":"ListItem","position":2,"name":"Apache Iceberg","item":"https://datalakehouse101.com/apache-iceberg/"},{"@type":"ListItem","position":3,"name":"REST Catalog","item":"https://datalakehouse101.com/apache-iceberg-rest-catalog/"}]}
+    ]
+    </script>
+</head>
+<body>
+  <nav class="site-nav" style="background:var(--color-primary);padding:1rem 0;">
+    <div class="container" style="display:flex;gap:1rem;align-items:center;">
+      <a href="/" style="color:#fff;font-weight:bold;text-decoration:none;font-size:1.2rem;">DataLakehouse101</a>
+      <a href="../apache-iceberg/" style="color:rgba(255,255,255,.8);text-decoration:none;">Apache Iceberg</a>
+      <a href="../knowledge/" style="color:rgba(255,255,255,.8);text-decoration:none;">Knowledge Base</a>
+    </div>
+  </nav>
+
+  <header class="hero" style="padding:5rem 0;background:var(--color-primary);color:#fff;">
+    <div class="container">
+      <h1 style="font-size:3rem;margin-bottom:1rem;">Iceberg REST Catalog, Apache Polaris & Interoperability</h1>
+      <p style="font-size:1.4rem;opacity:.9;">How catalogs enable true multi-engine interoperability in the data lakehouse.</p>
+    </div>
+  </header>
+
+  <main class="container content-body" style="padding:4rem 0;max-width:900px;margin:0 auto;">
+
+    <h2>What Is a Catalog in the Iceberg Ecosystem?</h2>
+    <p>Apache Iceberg defines a brilliant metadata architecture for organizing data files into versioned, ACID-compliant tables. But Iceberg itself doesn't specify <em>how to find a table's metadata</em> given just a table name. That's the catalog's job.</p>
+    <p>An <strong>Iceberg catalog</strong> is a service that maps human-readable table names (like <code>analytics.prod.sales</code>) to the physical URI of that table's current metadata file on object storage. It also enforces the atomic commit protocol — ensuring that when two writers try to update the same table simultaneously, exactly one succeeds and the other retries.</p>
+    <p>Without a catalog, each query engine would need to be individually configured with hardcoded metadata file paths — an unmanageable approach at any scale. With a centralized catalog, any engine that knows the catalog's address can discover, read, and write any table in the lakehouse.</p>
+
+    <div class="callout">
+      <strong>The Catalog's Two Jobs:</strong>
+      <ol>
+        <li><strong>Table Discovery:</strong> "Given the name <code>prod.orders</code>, what is the current metadata file location?"</li>
+        <li><strong>Atomic Commit:</strong> "Only allow a new metadata pointer to be committed if the previous version hasn't changed since the writer started."</li>
+      </ol>
+    </div>
+
+    <h2>The Iceberg REST Catalog Specification</h2>
+    <p>For the first few years of Iceberg's existence, catalogs were tightly coupled to specific backends — Hive Metastore, AWS Glue, or JDBC databases. Each engine needed a custom plugin for each catalog type, creating an M×N compatibility matrix that was difficult to maintain.</p>
+    <p>The <strong>Iceberg REST Catalog Specification</strong> (sometimes called the "Iceberg Open API" or "REST Catalog Spec") solved this elegantly. It defines a standard HTTP/REST API that any catalog can implement and any engine can connect to. Once an engine implements the REST catalog client, it automatically works with <em>every</em> catalog that implements the server side of the spec.</p>
+    <p>Key REST catalog API operations include:</p>
+    <ul>
+      <li><code>GET /v1/{prefix}/namespaces</code> — list all namespaces</li>
+      <li><code>GET /v1/{prefix}/namespaces/{namespace}/tables</code> — list all tables in a namespace</li>
+      <li><code>GET /v1/{prefix}/namespaces/{namespace}/tables/{table}</code> — load a table (returns current metadata + credentials)</li>
+      <li><code>POST /v1/{prefix}/namespaces/{namespace}/tables</code> — create a table</li>
+      <li><code>POST /v1/{prefix}/namespaces/{namespace}/tables/{table}/metrics</code> — report scan metrics</li>
+      <li><code>POST /v1/{prefix}/namespaces/{namespace}/tables/{table}/snapshots</code> — atomic commit (the heart of ACID)</li>
+    </ul>
+
+    <div class="mermaid-container">
+      <pre class="mermaid">
+      graph TD
+        Dremio[Dremio] -->|REST API| Cat[Iceberg REST Catalog Server]
+        Spark[Apache Spark] -->|REST API| Cat
+        Flink[Apache Flink] -->|REST API| Cat
+        Trino[Trino] -->|REST API| Cat
+        PyIceberg[PyIceberg Python] -->|REST API| Cat
+
+        Cat -->|Persists metadata pointers| S3[(S3 / Object Storage)]
+        Cat -->|Returns credentials| Engines["Query Engines (Dremio, Spark…)"]
+        Engines -->|Direct read of data files| S3
+
+        style Cat fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+        style S3 fill:#dcfce7,stroke:#22c55e
+      </pre>
+    </div>
+
+    <h2>Credential Vending: A Critical Security Feature</h2>
+    <p>One of the most underappreciated features of the REST catalog spec is <strong>credential vending</strong>. When an engine calls the REST catalog to load a table, the catalog response can include short-lived, scoped credentials for accessing only the specific S3 (or GCS, ADLS) prefixes where that table's data lives.</p>
+    <p>This means query engines never need permanent cloud storage credentials. An engine is granted access to <em>exactly the paths it needs</em> for <em>exactly the duration of the query</em>. This creates a powerful security boundary — even if an engine is compromised, its temporary credentials can only access the data it was explicitly authorized to query.</p>
+
+    <h2>Major Catalog Implementations</h2>
+
+    <h3>Apache Polaris (The Open Standard)</h3>
+    <p>Originally developed by Snowflake and donated to the Apache Software Foundation in 2024, <strong>Apache Polaris</strong> is now the de facto open-source, vendor-neutral implementation of the Iceberg REST Catalog spec.</p>
+    <p>Key Polaris capabilities:</p>
+    <ul>
+      <li><strong>Full REST Catalog compliance:</strong> Every Iceberg-compatible engine works with Polaris out of the box.</li>
+      <li><strong>Credential Vending:</strong> Fine-grained, temporary credential issuance per table access.</li>
+      <li><strong>Multi-principal governance:</strong> RBAC at the namespace, table, and view level.</li>
+      <li><strong>Multi-catalog federation:</strong> One Polaris instance can manage multiple "external" catalog connections, acting as a federated metadata hub.</li>
+    </ul>
+    <p>Dremio's <strong>Open Catalog</strong> offering is powered by Apache Polaris, providing a managed, enterprise-grade implementation available through Dremio Cloud.</p>
+
+    <h3>Project Nessie (Git for Data)</h3>
+    <p><strong>Project Nessie</strong> is a catalog with a unique superpower: it provides Git-like branching and tagging semantics for your entire data lakehouse. Just like you branch code in Git to make experimental changes without affecting the main branch, Nessie lets you branch your entire catalog — creating an isolated environment where you can test transformations, validate data pipelines, or run experiments on production-scale data.</p>
+    <p>Nessie capabilities:</p>
+    <ul>
+      <li><strong>Catalog-level branching:</strong> Create a <code>dev</code> branch, run 10 ETL jobs against it, then merge to <code>main</code> only if the results are correct.</li>
+      <li><strong>Atomic multi-table transactions:</strong> Because branches can span multiple tables, you can commit changes to 5 tables simultaneously as a single atomic operation.</li>
+      <li><strong>Audit history:</strong> Every commit to every branch is permanently logged with its author, timestamp, and description.</li>
+    </ul>
+    <p>Dremio uses Project Nessie as its internal catalog engine, exposing Nessie's branching capabilities directly in the Dremio UI for data engineers and data platform teams.</p>
+
+    <h3>AWS Glue Data Catalog</h3>
+    <p>AWS Glue Data Catalog is Amazon's managed metadata catalog, deeply integrated with the AWS ecosystem. Since 2023, it supports the Iceberg REST Catalog spec natively, meaning AWS Athena, EMR, and other services can use it as an Iceberg catalog. For organizations running primarily on AWS, Glue provides low operational overhead and seamless integration with IAM for access control.</p>
+
+    <h3>Hive Metastore (Legacy)</h3>
+    <p>The Hive Metastore (HMS) remains widely used for Iceberg catalog management, particularly in on-premises Hadoop environments and older cloud deployments. However, HMS was not designed for the REST catalog spec, lacks credential vending, and has significant operational overhead. Most organizations are migrating from HMS to REST-catalog-compatible alternatives.</p>
+
+    <h2>Catalog Comparison</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Catalog</th>
+          <th>REST Spec</th>
+          <th>Cred Vending</th>
+          <th>Branching</th>
+          <th>Best For</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Apache Polaris</strong></td><td>✅ Full</td><td>✅ Yes</td><td>❌ No</td><td>Open standard, multi-engine</td></tr>
+        <tr><td><strong>Project Nessie</strong></td><td>✅ Full</td><td>⚠️ Partial</td><td>✅ Yes (Git-like)</td><td>Data versioning, Dremio</td></tr>
+        <tr><td><strong>AWS Glue</strong></td><td>✅ Full</td><td>✅ Yes (IAM)</td><td>❌ No</td><td>AWS-native deployments</td></tr>
+        <tr><td><strong>Databricks Unity</strong></td><td>⚠️ Partial</td><td>✅ Yes</td><td>❌ No</td><td>Databricks ecosystem</td></tr>
+        <tr><td><strong>Hive Metastore</strong></td><td>❌ No</td><td>❌ No</td><td>❌ No</td><td>Legacy Hadoop environments</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Multi-Engine Interoperability in Practice</h2>
+    <p>The REST catalog's greatest value is enabling true multi-engine interoperability. Here's what this looks like in a production lakehouse:</p>
+    <ol>
+      <li><strong>Apache Flink</strong> streams events from Kafka into Bronze-layer Iceberg tables, committing every 60 seconds. It connects to the REST catalog to register each new snapshot.</li>
+      <li><strong>Apache Spark</strong> runs nightly batch jobs transforming Bronze to Silver. It connects to the same REST catalog, reads the latest snapshot committed by Flink, and writes new Silver snapshots.</li>
+      <li><strong>Dremio</strong> serves sub-second interactive queries for BI dashboards against both Silver and Gold tables. It uses the REST catalog to discover table locations and uses metadata pruning to skip irrelevant files.</li>
+      <li><strong>PyIceberg</strong> (Python library) allows data scientists to read Iceberg tables directly into Pandas or PyArrow DataFrames for model training, again via the same REST catalog endpoint.</li>
+    </ol>
+    <p>Every engine reads and writes to the same physical tables, governed by the same catalog, with the same ACID guarantees — zero data copying required.</p>
+
+    <h2>Conclusion</h2>
+    <p>The Iceberg REST Catalog specification is the connective tissue of the modern data lakehouse. By standardizing how engines discover, read, and commit to Iceberg tables through a simple HTTP API, it eliminates the catalog fragmentation that previously forced organizations to maintain separate data copies for different tools.</p>
+    <p><strong>Apache Polaris</strong> provides the open-source foundation. <strong>Project Nessie</strong> adds Git-like data versioning. And managed offerings like Dremio's Open Catalog provide enterprise-grade reliability on top of these foundations. Choose based on your priorities: pure openness (Polaris), data versioning (Nessie), or managed simplicity (Dremio or AWS Glue).</p>
+
+  </main>
+
+  <footer style="background:#0f172a;color:rgba(255,255,255,.7);padding:2rem 0;text-align:center;margin-top:4rem;">
+    <div class="container"><p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p></div>
+  </footer>
+</body>
+</html>

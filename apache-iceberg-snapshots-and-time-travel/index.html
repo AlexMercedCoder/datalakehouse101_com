@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Iceberg Snapshots, Time Travel & Rollbacks: Complete Guide</title>
+    <meta name="description" content="Master Apache Iceberg snapshots. Learn how time travel, point-in-time queries, and rollbacks work under the hood using Iceberg's snapshot isolation model.">
+    <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg-snapshots-and-time-travel/">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+      .content-body h2 { margin-top:2.5rem;margin-bottom:1rem;color:var(--color-primary);border-bottom:2px solid #e2e8f0;padding-bottom:.5rem }
+      .content-body h3 { margin-top:1.5rem;color:#1e293b }
+      .content-body p { line-height:1.8;margin-bottom:1.25rem;color:#334155;font-size:1.1rem }
+      .content-body ul,.content-body ol { margin-bottom:1.5rem;padding-left:1.5rem;line-height:1.7;font-size:1.1rem;color:#334155 }
+      .content-body li { margin-bottom:.5rem }
+      .content-body code { background:#f1f5f9;padding:.2rem .4rem;border-radius:4px;font-family:monospace;font-size:.95em;color:#0f172a }
+      .content-body pre { background:#0f172a;color:#e2e8f0;padding:1.5rem;border-radius:8px;overflow-x:auto;margin:1.5rem 0;font-size:.95rem;line-height:1.6 }
+      .callout { background:#f8fafc;border-left:4px solid var(--color-accent);padding:1.5rem;margin:2rem 0;border-radius:0 8px 8px 0 }
+      .mermaid-container { margin:3rem 0;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);overflow-x:auto }
+    </style>
+    <script type="application/ld+json">
+    [
+      {"@context":"https://schema.org","@type":["TechArticle","Article"],"@id":"https://datalakehouse101.com/apache-iceberg-snapshots-and-time-travel/#article","headline":"Apache Iceberg Snapshots, Time Travel & Rollbacks: Complete Guide","description":"Master Apache Iceberg snapshots. Learn how time travel, point-in-time queries, and rollbacks work under the hood.","author":{"@type":"Person","name":"Alex Merced"},"publisher":{"@type":"Organization","name":"DataLakehouse101"},"datePublished":"2026-05-15"},
+      {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://datalakehouse101.com/"},{"@type":"ListItem","position":2,"name":"Apache Iceberg","item":"https://datalakehouse101.com/apache-iceberg/"},{"@type":"ListItem","position":3,"name":"Snapshots & Time Travel","item":"https://datalakehouse101.com/apache-iceberg-snapshots-and-time-travel/"}]}
+    ]
+    </script>
+</head>
+<body>
+  <nav class="site-nav" style="background:var(--color-primary);padding:1rem 0;">
+    <div class="container" style="display:flex;gap:1rem;align-items:center;">
+      <a href="/" style="color:#fff;font-weight:bold;text-decoration:none;font-size:1.2rem;">DataLakehouse101</a>
+      <a href="../apache-iceberg/" style="color:rgba(255,255,255,.8);text-decoration:none;">Apache Iceberg</a>
+      <a href="../knowledge/" style="color:rgba(255,255,255,.8);text-decoration:none;">Knowledge Base</a>
+    </div>
+  </nav>
+
+  <header class="hero" style="padding:5rem 0;background:var(--color-primary);color:#fff;">
+    <div class="container">
+      <h1 style="font-size:3rem;margin-bottom:1rem;">Apache Iceberg Snapshots, Time Travel & Rollbacks</h1>
+      <p style="font-size:1.4rem;opacity:.9;">How Iceberg gives every table a complete, queryable history.</p>
+    </div>
+  </header>
+
+  <main class="container content-body" style="padding:4rem 0;max-width:900px;margin:0 auto;">
+
+    <h2>Introduction: Why Snapshots Matter</h2>
+    <p>One of the most powerful and underappreciated features of Apache Iceberg is its built-in snapshot system. Every time data is written to an Iceberg table — whether an insert, update, or delete — Iceberg creates a new <strong>snapshot</strong>. This snapshot is a complete, immutable record of exactly which files made up the table at that moment in time.</p>
+    <p>Because snapshots are additive (new ones are created, old ones preserved), Iceberg tables have a built-in time machine. You can query any table exactly as it appeared at any point in history. You can roll back a bad batch job in seconds. You can run audits against yesterday's data without maintaining separate backup copies.</p>
+    <p>This isn't a backup strategy bolted on top — it's a fundamental property of how Iceberg stores and tracks data.</p>
+
+    <div class="callout">
+      <strong>Key Insight:</strong> In Iceberg, "deleting" data doesn't immediately erase any files. It creates a new snapshot where those files are no longer referenced. Old snapshots — and the files they reference — remain intact until explicitly expired. This is what makes time travel possible.
+    </div>
+
+    <h2>What is an Iceberg Snapshot?</h2>
+    <p>An Iceberg <strong>snapshot</strong> is a named, immutable state of a table at a specific point in time. It is represented as a JSON entry inside the Table Metadata file, and contains:</p>
+    <ul>
+      <li><strong>Snapshot ID:</strong> A unique long integer (e.g., <code>8744736658020583554</code>) identifying this specific version.</li>
+      <li><strong>Timestamp (ms):</strong> The Unix epoch millisecond when the snapshot was committed.</li>
+      <li><strong>Manifest List location:</strong> A pointer to the Avro Manifest List file that indexes all the data files belonging to this snapshot.</li>
+      <li><strong>Summary:</strong> Statistics about the operation — how many records were added, deleted, or how many files changed.</li>
+      <li><strong>Parent Snapshot ID:</strong> The ID of the previous snapshot, forming a linked chain of history.</li>
+    </ul>
+
+    <div class="mermaid-container">
+      <pre class="mermaid">
+      graph LR
+        S1["Snapshot 1&#10;ID: 1001&#10;ts: 2026-01-01&#10;+ 1M rows inserted"] --> S2["Snapshot 2&#10;ID: 1002&#10;ts: 2026-01-15&#10;+ 500K rows inserted"]
+        S2 --> S3["Snapshot 3&#10;ID: 1003&#10;ts: 2026-01-30&#10;50K rows deleted"]
+        S3 --> S4["Snapshot 4 (CURRENT)&#10;ID: 1004&#10;ts: 2026-02-10&#10;Schema change: new column"]
+
+        style S4 fill:#dcfce7,stroke:#22c55e,stroke-width:2px
+        style S1 fill:#f1f5f9,stroke:#94a3b8
+        style S2 fill:#f1f5f9,stroke:#94a3b8
+        style S3 fill:#f1f5f9,stroke:#94a3b8
+      </pre>
+    </div>
+
+    <h2>How Time Travel Works Under the Hood</h2>
+    <p>When a query engine executes a time travel query, the mechanism is straightforward because of how the metadata tree is structured:</p>
+    <ol>
+      <li>The engine reads the Table Metadata JSON file (retrieved from the Catalog).</li>
+      <li>It scans the <code>snapshots</code> array inside the JSON to find the snapshot whose timestamp matches (or is closest before) the requested time.</li>
+      <li>It follows that snapshot's Manifest List pointer to get the file index for that historical state.</li>
+      <li>It reads only the data files listed in those manifests — which represent the table exactly as it was at that time.</li>
+    </ol>
+    <p>No data copying, no backup restores, no special infrastructure. It's just metadata pointer navigation.</p>
+
+    <h2>Time Travel SQL Syntax</h2>
+    <p>Different query engines expose Iceberg's time travel through slightly different SQL syntax, but the underlying mechanism is identical.</p>
+
+    <h3>Query by Timestamp</h3>
+    <pre>-- Dremio / Spark SQL: query as of a specific timestamp
+SELECT * FROM sales FOR SYSTEM_TIME AS OF '2026-01-15 00:00:00';
+
+-- Trino syntax
+SELECT * FROM sales FOR TIMESTAMP AS OF TIMESTAMP '2026-01-15 00:00:00 UTC';
+</pre>
+
+    <h3>Query by Snapshot ID</h3>
+    <pre>-- When you know the exact snapshot ID you want
+SELECT * FROM sales FOR SYSTEM_VERSION AS OF 1002;
+
+-- Spark with options
+SELECT * FROM spark_catalog.db.sales VERSION AS OF 1002;
+</pre>
+
+    <h3>List All Snapshots</h3>
+    <pre>-- See the full history of a table
+SELECT * FROM "my_catalog"."my_db"."sales$snapshots";
+
+-- In Spark
+SELECT * FROM spark_catalog.db.sales.snapshots;
+</pre>
+
+    <h2>Practical Use Cases for Time Travel</h2>
+
+    <h3>1. Auditing and Regulatory Compliance</h3>
+    <p>Financial and healthcare organizations often need to prove exactly what data they held at a specific point in time for regulatory audits. Instead of maintaining expensive, frozen backup copies of data, Iceberg's snapshot system provides instant, query-able access to any historical state of the data.</p>
+
+    <h3>2. Recovering from a Bad Data Pipeline</h3>
+    <p>An ETL job runs at 2 AM, accidentally populates a column with incorrect values across 50 million rows, and your data engineers don't notice until 9 AM. With Iceberg, the fix takes seconds:</p>
+    <pre>-- Step 1: Identify the snapshot before the bad run
+SELECT snapshot_id, committed_at FROM "sales$snapshots" ORDER BY committed_at DESC;
+
+-- Step 2: Roll back (Spark procedure)
+CALL spark_catalog.system.rollback_to_snapshot('db.sales', 1001);
+
+-- Step 3: Validate the data is restored, then re-run the corrected pipeline
+</pre>
+
+    <h3>3. Reproducing ML Model Training Data</h3>
+    <p>When a machine learning model produces unexpected results, data scientists need to reproduce the exact dataset that was used for training. With Iceberg snapshots, they can query the training table as it existed on the exact date the training run happened — even months later.</p>
+
+    <h3>4. "What Changed?" Incremental Analysis</h3>
+    <p>Iceberg supports <strong>Incremental Reads</strong> — reading only the records that changed between two snapshots. This is invaluable for streaming pipelines that only want to process new data.</p>
+    <pre>-- Read only records added between snapshot 1001 and 1003
+SELECT * FROM sales
+  START VERSION AS OF 1001
+  END VERSION AS OF 1003;
+</pre>
+
+    <h2>Snapshot Retention and Expiration</h2>
+    <p>Snapshots come with a tradeoff: because old files are retained until their referencing snapshots are expired, storage costs grow over time if snapshots are never cleaned up. Iceberg provides the <strong>expire_snapshots</strong> procedure to manage this.</p>
+    <pre>-- Expire snapshots older than 7 days (Spark)
+CALL spark_catalog.system.expire_snapshots(
+  table => 'db.sales',
+  older_than => TIMESTAMP '2026-05-08 00:00:00',
+  retain_last => 5  -- always keep at least 5 snapshots regardless of age
+);
+</pre>
+    <p>After expiring snapshots, the underlying Parquet files that are no longer referenced by any active snapshot become "orphan files." You then run a <strong>remove_orphan_files</strong> procedure to delete them from object storage and reclaim the storage cost.</p>
+    <p><strong>Dremio</strong> automates this entire lifecycle — snapshot expiration and orphan file cleanup run automatically on a configurable schedule, removing the operational burden from data engineers.</p>
+
+    <h2>Snapshot Isolation: How Concurrent Readers and Writers Coexist</h2>
+    <p>A critical property of Iceberg snapshots is that they enable <strong>Snapshot Isolation</strong> — the same isolation level used by production-grade relational databases. This means:</p>
+    <ul>
+      <li>A reader that begins scanning a table always reads from a single consistent snapshot. Even if a writer commits new data mid-query, the reader sees the old snapshot and is never surprised by partially-written data.</li>
+      <li>Multiple writers can work on different parts of the table simultaneously. Each writer commits a new snapshot atomically. If two writers try to commit conflicting changes (e.g., both updating the same set of rows), Iceberg's <strong>Optimistic Concurrency Control</strong> detects the conflict and forces one writer to retry.</li>
+    </ul>
+    <p>This is fundamentally different from a file system, where there is no concept of "snapshot isolation" — reads and writes on the same directory can interfere with each other at any time.</p>
+
+    <h2>Branching and Tagging (Iceberg v2+)</h2>
+    <p>Iceberg's snapshot model was extended in recent versions to support Git-like <strong>branches</strong> and <strong>tags</strong>, most commonly used through <strong>Project Nessie</strong>:</p>
+    <ul>
+      <li><strong>Tags</strong> are named pointers to a specific snapshot — equivalent to a Git tag. Use them to mark important milestones: <code>end-of-q1-2026</code>, <code>pre-migration-backup</code>.</li>
+      <li><strong>Branches</strong> are named, mutable pointers to a snapshot that can receive new commits. A data engineer can create a <code>dev</code> branch, run experimental transformations against it, validate the results, and then merge the branch to <code>main</code> — just like code review.</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+    <p>Apache Iceberg's snapshot system is one of the most practically valuable features in the modern data stack. It transforms every table into a fully versioned, auditable, time-travelable dataset — with zero additional infrastructure beyond what Iceberg already maintains for query performance.</p>
+    <p>The ability to roll back a bad pipeline in seconds, reproduce exact historical datasets for ML, and give auditors instant access to point-in-time data makes Iceberg's snapshot model an essential capability for any serious data lakehouse deployment.</p>
+
+  </main>
+
+  <footer style="background:#0f172a;color:rgba(255,255,255,.7);padding:2rem 0;text-align:center;margin-top:4rem;">
+    <div class="container"><p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p></div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Iceberg Schema Evolution & Hidden Partitioning: Complete Guide</title>
+    <meta name="description" content="A complete guide to Apache Iceberg schema evolution and hidden partitioning. Learn how to safely add, drop, and rename columns and change partition strategies without rewriting data.">
+    <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg-schema-evolution/">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+      .content-body h2 { margin-top:2.5rem;margin-bottom:1rem;color:var(--color-primary);border-bottom:2px solid #e2e8f0;padding-bottom:.5rem }
+      .content-body h3 { margin-top:1.5rem;color:#1e293b }
+      .content-body p { line-height:1.8;margin-bottom:1.25rem;color:#334155;font-size:1.1rem }
+      .content-body ul,.content-body ol { margin-bottom:1.5rem;padding-left:1.5rem;line-height:1.7;font-size:1.1rem;color:#334155 }
+      .content-body li { margin-bottom:.5rem }
+      .content-body code { background:#f1f5f9;padding:.2rem .4rem;border-radius:4px;font-family:monospace;font-size:.95em;color:#0f172a }
+      .content-body pre { background:#0f172a;color:#e2e8f0;padding:1.5rem;border-radius:8px;overflow-x:auto;margin:1.5rem 0;font-size:.95rem;line-height:1.6 }
+      .content-body table { width:100%;border-collapse:collapse;margin:2rem 0;font-size:1rem }
+      .content-body th,.content-body td { border:1px solid #e2e8f0;padding:1rem;text-align:left }
+      .content-body th { background:#f8fafc;font-weight:600;color:#0f172a }
+      .callout { background:#f8fafc;border-left:4px solid var(--color-accent);padding:1.5rem;margin:2rem 0;border-radius:0 8px 8px 0 }
+      .mermaid-container { margin:3rem 0;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);overflow-x:auto }
+    </style>
+    <script type="application/ld+json">
+    [
+      {"@context":"https://schema.org","@type":["TechArticle","Article"],"@id":"https://datalakehouse101.com/apache-iceberg-schema-evolution/#article","headline":"Apache Iceberg Schema Evolution & Hidden Partitioning: Complete Guide","description":"Learn how Iceberg handles schema evolution using unique column IDs and enables partition evolution with hidden partitioning — without rewriting historical data.","author":{"@type":"Person","name":"Alex Merced"},"publisher":{"@type":"Organization","name":"DataLakehouse101"},"datePublished":"2026-05-15"},
+      {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://datalakehouse101.com/"},{"@type":"ListItem","position":2,"name":"Apache Iceberg","item":"https://datalakehouse101.com/apache-iceberg/"},{"@type":"ListItem","position":3,"name":"Schema Evolution","item":"https://datalakehouse101.com/apache-iceberg-schema-evolution/"}]}
+    ]
+    </script>
+</head>
+<body>
+  <nav class="site-nav" style="background:var(--color-primary);padding:1rem 0;">
+    <div class="container" style="display:flex;gap:1rem;align-items:center;">
+      <a href="/" style="color:#fff;font-weight:bold;text-decoration:none;font-size:1.2rem;">DataLakehouse101</a>
+      <a href="../apache-iceberg/" style="color:rgba(255,255,255,.8);text-decoration:none;">Apache Iceberg</a>
+      <a href="../knowledge/" style="color:rgba(255,255,255,.8);text-decoration:none;">Knowledge Base</a>
+    </div>
+  </nav>
+
+  <header class="hero" style="padding:5rem 0;background:var(--color-primary);color:#fff;">
+    <div class="container">
+      <h1 style="font-size:3rem;margin-bottom:1rem;">Apache Iceberg Schema Evolution & Hidden Partitioning</h1>
+      <p style="font-size:1.4rem;opacity:.9;">How Iceberg handles changing data models without the pain of data rewrites.</p>
+    </div>
+  </header>
+
+  <main class="container content-body" style="padding:4rem 0;max-width:900px;margin:0 auto;">
+
+    <h2>The Problem: Data Models Always Change</h2>
+    <p>In any long-lived data system, the schema <em>will</em> change. Business requirements evolve. New data sources are added. Regulations require new fields. Existing columns are renamed to match organizational standards. A database that cannot adapt to these changes is a liability, not an asset.</p>
+    <p>In traditional data lakes using the Hive metastore, schema changes were dangerous, painful, and sometimes catastrophic:</p>
+    <ul>
+      <li>Renaming a column required either rewriting the entire table or maintaining complex mapping logic in every downstream query.</li>
+      <li>Adding a nullable column to a table with existing Parquet files often caused Spark jobs to fail or return nulls for historical data unexpectedly.</li>
+      <li>Changing a column type (e.g., from <code>INT</code> to <code>BIGINT</code>) required a full table rewrite.</li>
+    </ul>
+    <p>Apache Iceberg was designed from the ground up to handle schema evolution safely, efficiently, and without data rewrites. The secret lies in a fundamental architectural choice: <strong>columns are tracked by unique integer IDs, not by name.</strong></p>
+
+    <h2>The Foundation: Column ID Tracking</h2>
+    <p>In Apache Hive and most file format-based systems, a column is identified by its <em>name</em>. If you have a column called <code>customer_name</code> and you rename it to <code>full_name</code>, the system sees a completely new column. Historical Parquet files still have the old column name embedded in their footer schemas, so reading old data with the new column name fails.</p>
+    <p>Iceberg assigns every column a <strong>unique, immutable integer ID</strong> when it is first created. The column's name is just an alias for this ID. When you rename a column in Iceberg, you change the alias in the metadata — but all existing Parquet files still reference the same underlying integer ID. Iceberg's readers transparently map the new name to the old ID when reading historical files.</p>
+
+    <div class="mermaid-container">
+      <pre class="mermaid">
+      graph LR
+        subgraph "Table Metadata (Iceberg)"
+          Schema["Schema v2&#10;ID:1 → full_name&#10;ID:2 → email&#10;ID:3 → signup_date"]
+        end
+
+        subgraph "Historical Parquet Files (unchanged)"
+          File1["customer_2024.parquet&#10;col ID:1 = 'Alice'&#10;col ID:2 = 'alice@...'"]
+          File2["customer_2025.parquet&#10;col ID:1 = 'Bob'&#10;col ID:2 = 'bob@...'"]
+        end
+
+        Schema -->|"maps 'full_name' → ID:1"| File1
+        Schema -->|"maps 'full_name' → ID:1"| File2
+
+        style Schema fill:#dbeafe,stroke:#2563eb
+        style File1 fill:#f0fdf4,stroke:#16a34a
+        style File2 fill:#f0fdf4,stroke:#16a34a
+      </pre>
+    </div>
+
+    <h2>Supported Schema Evolution Operations</h2>
+    <p>Iceberg supports the following schema changes as safe, in-place metadata operations with no data rewrite required:</p>
+
+    <h3>ADD COLUMN</h3>
+    <p>Adding a new column is always safe. For existing data files, the new column is simply read as <code>NULL</code> (for nullable columns) or its declared default value.</p>
+    <pre>-- Add a new column to an Iceberg table
+ALTER TABLE sales ADD COLUMN loyalty_tier STRING;
+
+-- Add a column with a default value (Iceberg v2+)
+ALTER TABLE sales ADD COLUMN channel STRING NOT NULL DEFAULT 'online';
+</pre>
+
+    <h3>DROP COLUMN</h3>
+    <p>Dropping a column removes it from the schema, but the underlying Parquet files still contain the old column data. Because the column ID is no longer referenced in the active schema, query engines ignore it completely. The column data remains in the files until those files are rewritten by compaction.</p>
+    <pre>ALTER TABLE sales DROP COLUMN legacy_region_code;
+</pre>
+
+    <h3>RENAME COLUMN</h3>
+    <p>Renaming changes only the metadata alias for the column ID. All existing files continue to serve data for the renamed column transparently.</p>
+    <pre>ALTER TABLE sales RENAME COLUMN cust_nm TO customer_name;
+</pre>
+
+    <h3>UPDATE COLUMN TYPE</h3>
+    <p>Iceberg permits type promotions that are guaranteed to be backward-compatible:</p>
+    <table>
+      <thead><tr><th>Original Type</th><th>Can Promote To</th></tr></thead>
+      <tbody>
+        <tr><td><code>INT</code></td><td><code>BIGINT</code>, <code>FLOAT</code>, <code>DOUBLE</code>, <code>DECIMAL</code></td></tr>
+        <tr><td><code>FLOAT</code></td><td><code>DOUBLE</code></td></tr>
+        <tr><td><code>DECIMAL(p, s)</code></td><td><code>DECIMAL(p2, s)</code> where p2 &gt; p</td></tr>
+        <tr><td><code>DATE</code></td><td><code>TIMESTAMPTZ</code></td></tr>
+        <tr><td><code>STRING</code></td><td><code>UUID</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>REORDER COLUMNS</h3>
+    <p>Column ordering in the logical schema can be changed freely — it's a metadata-only operation. Physical column ordering in the Parquet files is unchanged and mapped transparently.</p>
+
+    <h2>What About Partitioning?</h2>
+    <p>Partitioning is the practice of physically organizing data files into groups based on the values of specific columns. A well-chosen partition strategy can eliminate 99% of the data a query engine needs to scan. A poorly chosen one can make every query do a full table scan.</p>
+    <p>In Hive-style partitioning, the partition column values are embedded in the directory path: <code>/data/year=2026/month=05/day=15/</code>. This means the partition strategy is permanently baked into the physical file layout. If you start a table partitioned by month and later decide you need daily partitions, you must rewrite the entire table. And users must explicitly filter by the exact partition column in their queries, or they trigger a full scan.</p>
+    <p>Iceberg solves this with two complementary innovations: <strong>Hidden Partitioning</strong> and <strong>Partition Evolution</strong>.</p>
+
+    <h2>Hidden Partitioning: Separating Logic from Physical Layout</h2>
+    <p>In Iceberg, partitioning is defined in the <strong>Partition Spec</strong> — a section of the table metadata that declares how to compute a partition value from a data column. Users query by the data column, and Iceberg automatically applies the partition transform during both writes and query planning.</p>
+    <p>Example: you create a table partitioned by <code>day(event_timestamp)</code>. Writers compute a daily partition bucket from the timestamp and store files accordingly. When a user queries <code>WHERE event_timestamp BETWEEN '2026-05-01' AND '2026-05-15'</code>, Iceberg automatically translates this into a daily partition range and skips all files outside those 15 days — with zero effort from the query author.</p>
+    <pre>-- Create a table with hidden partitioning
+CREATE TABLE events (
+  event_id BIGINT,
+  event_timestamp TIMESTAMP,
+  user_id STRING,
+  event_type STRING
+) USING iceberg
+PARTITIONED BY (days(event_timestamp));
+
+-- User queries by the raw column, not the partition key
+-- Iceberg automatically prunes to the relevant daily partitions
+SELECT count(*) FROM events
+WHERE event_timestamp >= '2026-05-01' AND event_timestamp < '2026-05-16';
+</pre>
+
+    <h3>Available Partition Transforms</h3>
+    <table>
+      <thead><tr><th>Transform</th><th>Input Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>identity(col)</code></td><td>Any</td><td>Partition by exact value (equivalent to Hive-style)</td></tr>
+        <tr><td><code>bucket(N, col)</code></td><td>Int, Long, String, UUID, Date, Time</td><td>Hash into N buckets (for high-cardinality IDs)</td></tr>
+        <tr><td><code>truncate(W, col)</code></td><td>Int, Long, String, Decimal</td><td>Truncate to width W (for strings: first W chars)</td></tr>
+        <tr><td><code>year(col)</code></td><td>Date, Timestamp</td><td>Partition by calendar year</td></tr>
+        <tr><td><code>month(col)</code></td><td>Date, Timestamp</td><td>Partition by calendar month</td></tr>
+        <tr><td><code>day(col)</code></td><td>Date, Timestamp</td><td>Partition by calendar day</td></tr>
+        <tr><td><code>hour(col)</code></td><td>Timestamp</td><td>Partition by calendar hour (for high-frequency data)</td></tr>
+        <tr><td><code>void()</code></td><td>Any</td><td>Effectively removes partitioning (for partition evolution)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Partition Evolution: Changing Strategy Without a Full Rewrite</h2>
+    <p>Iceberg's most unique partitioning feature is the ability to <strong>change the partition strategy on an active table without rewriting historical data</strong>. Each new Partition Spec is stored alongside older specs in the table metadata. When Iceberg plans a query, it checks which spec version applies to which files and uses the correct spec to prune each subset of files.</p>
+    <pre>-- Start partitioned monthly (millions of rows per day warrants finer granularity later)
+CREATE TABLE orders (...) PARTITIONED BY (months(order_date));
+
+-- A year later, the table is massive. Switch to daily partitioning.
+ALTER TABLE orders REPLACE PARTITION FIELD months(order_date) WITH days(order_date);
+
+-- Iceberg now:
+-- Writes NEW data partitioned daily
+-- Reads OLD data using the monthly partition spec automatically
+-- No historical files are moved, rewritten, or touched
+</pre>
+
+    <h2>Why This Matters for Real Teams</h2>
+    <p>These features combine to make Iceberg tables dramatically more maintainable than traditional data lake tables at scale:</p>
+    <ul>
+      <li><strong>Data producers can evolve their schemas</strong> (adding fields, renaming, or changing types) without coordinating a "big bang" table migration with all downstream consumers.</li>
+      <li><strong>Data platform engineers can re-partition tables</strong> as they grow from small to large without scheduling expensive, multi-hour full table rewrites.</li>
+      <li><strong>Query authors never need to know the partition structure</strong> — they filter by natural data values and Iceberg handles the partition translation transparently.</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+    <p>Apache Iceberg's schema evolution and hidden partitioning capabilities represent a fundamental step forward in how we manage large, long-lived analytical tables. By decoupling the logical schema from the physical file layout, and by tracking columns by ID rather than name, Iceberg makes it possible for data models to evolve continuously without the costly, risky data rewrites that were once unavoidable.</p>
+    <p>For any organization planning to maintain its data lakehouse for years — not just months — these features are essential to long-term operational health.</p>
+
+  </main>
+
+  <footer style="background:#0f172a;color:rgba(255,255,255,.7);padding:2rem 0;text-align:center;margin-top:4rem;">
+    <div class="container"><p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p></div>
+  </footer>
+</body>
+</html>
