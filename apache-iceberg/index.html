@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Iceberg Explained: Architecture, Features, and Guide</title>
+    <meta name="description" content="Learn what Apache Iceberg is, how its architecture works, and why it is the standard open table format for the data lakehouse.">
+    <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://datalakehouse101.com/apache-iceberg/">
+    <meta property="og:title" content="Apache Iceberg Explained">
+    <meta property="og:description" content="Learn what Apache Iceberg is, how its architecture works, and why it is the standard open table format for the data lakehouse.">
+
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": ["TechArticle", "Article"],
+        "@id": "https://datalakehouse101.com/apache-iceberg/#article",
+        "headline": "Apache Iceberg Explained",
+        "description": "Learn what Apache Iceberg is, how its architecture works, and why it is the standard open table format.",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://datalakehouse101.com/apache-iceberg/"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Alex Merced",
+          "url": "https://alexmerced.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "DataLakehouse101",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://datalakehouse101.com/assets/img/favicon.png"
+          }
+        },
+        "datePublished": "2026-05-15"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://datalakehouse101.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Apache Iceberg",
+            "item": "https://datalakehouse101.com/apache-iceberg/"
+          }
+        ]
+      }
+    ]
+    </script>
+</head>
+<body>
+    <header class="hero" style="padding: 4rem 0;">
+        <div class="container">
+            <h1 class="hero-title">Apache Iceberg Explained</h1>
+            <p class="hero-description">The standard open table format powering the modern data lakehouse.</p>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0;">
+        <article class="article-body">
+            <h2>What is Apache Iceberg?</h2>
+            <p>Apache Iceberg is a high-performance format for huge analytic tables. Iceberg brings the reliability and simplicity of SQL tables to big data, while making it possible for engines like Spark, Trino, Flink, and Dremio to safely work with the same tables, at the same time.</p>
+            
+            <h2>Key Capabilities</h2>
+            <ul>
+                <li><strong>Schema Evolution:</strong> Add, drop, update, or rename, and reorder columns without side-effects.</li>
+                <li><strong>Hidden Partitioning:</strong> Iceberg handles the tedious and error-prone task of producing partition values for rows.</li>
+                <li><strong>Time Travel & Rollback:</strong> Reproducible queries using exact table snapshots, or easily roll back to earlier versions.</li>
+            </ul>
+            
+            <h2>Dive Deeper</h2>
+            <p>Learn more about the <a href="../apache-iceberg-architecture/">Apache Iceberg Architecture</a> and how it compares in our <a href="../apache-iceberg-vs-delta-lake-vs-hudi/">Iceberg vs Delta Lake vs Hudi</a> guide.</p>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Iceberg Architecture: Snapshots, Manifests, and Catalogs</title>
+    <meta name="description" content="Deep dive into Apache Iceberg architecture. Learn how metadata files, manifest lists, and snapshots enable time travel and ACID transactions.">
+    <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg-architecture/">
+    
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": ["TechArticle", "Article"],
+        "@id": "https://datalakehouse101.com/apache-iceberg-architecture/#article",
+        "headline": "Apache Iceberg Architecture",
+        "description": "Deep dive into Apache Iceberg architecture.",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://datalakehouse101.com/apache-iceberg-architecture/"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Alex Merced"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "DataLakehouse101"
+        },
+        "datePublished": "2026-05-15"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://datalakehouse101.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Apache Iceberg",
+            "item": "https://datalakehouse101.com/apache-iceberg/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Architecture",
+            "item": "https://datalakehouse101.com/apache-iceberg-architecture/"
+          }
+        ]
+      }
+    ]
+    </script>
+</head>
+<body>
+    <header class="hero" style="padding: 4rem 0;">
+        <div class="container">
+            <h1 class="hero-title">Apache Iceberg Architecture</h1>
+            <p class="hero-description">Inside the metadata tree: snapshots, manifests, and table state.</p>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0;">
+        <article class="article-body">
+            <h2>The Metadata Tree</h2>
+            <p>Iceberg's power comes from its metadata tree architecture. Instead of tracking directories, Iceberg tracks individual files. The tree consists of:</p>
+            <ul>
+                <li><strong>Table Metadata File (JSON):</strong> The root of the table, tracking schema, partitioning, and the current snapshot.</li>
+                <li><strong>Manifest List (Avro):</strong> A list of manifest files that make up a specific snapshot.</li>
+                <li><strong>Manifest File (Avro):</strong> Tracks individual data files, including min/max statistics for pruning.</li>
+                <li><strong>Data Files:</strong> The actual data, usually stored in Parquet or ORC format.</li>
+            </ul>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

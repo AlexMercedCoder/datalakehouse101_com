@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Iceberg vs Delta Lake vs Apache Hudi | Open Table Formats Compared</title>
+    <meta name="description" content="Compare the top open table formats: Apache Iceberg, Delta Lake, and Apache Hudi. Learn the differences in architecture, performance, and engine support.">
+    <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg-vs-delta-lake-vs-hudi/">
+    
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": ["TechArticle", "Article"],
+        "@id": "https://datalakehouse101.com/apache-iceberg-vs-delta-lake-vs-hudi/#article",
+        "headline": "Apache Iceberg vs Delta Lake vs Apache Hudi",
+        "description": "Compare the top open table formats: Apache Iceberg, Delta Lake, and Apache Hudi.",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://datalakehouse101.com/apache-iceberg-vs-delta-lake-vs-hudi/"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Alex Merced"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "DataLakehouse101"
+        },
+        "datePublished": "2026-05-15"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://datalakehouse101.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Comparison",
+            "item": "https://datalakehouse101.com/apache-iceberg-vs-delta-lake-vs-hudi/"
+          }
+        ]
+      }
+    ]
+    </script>
+</head>
+<body>
+    <header class="hero" style="padding: 4rem 0;">
+        <div class="container">
+            <h1 class="hero-title">Iceberg vs Delta Lake vs Hudi</h1>
+            <p class="hero-description">Choosing the right open table format for your data lakehouse.</p>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 2rem 0;">
+        <article class="article-body">
+            <h2>The Big Three Open Table Formats</h2>
+            <p>To build a data lakehouse, you need an open table format. The three leading choices are Apache Iceberg, Delta Lake, and Apache Hudi. While they all aim to solve similar problems (ACID transactions on the data lake), they have different architectural roots.</p>
+            
+            <h2>Key Differences</h2>
+            <ul>
+                <li><strong>Apache Iceberg:</strong> Built at Netflix to solve the "huge table" problem. It tracks metadata at the file level rather than directory level, and boasts the broadest multi-engine support.</li>
+                <li><strong>Delta Lake:</strong> Originally developed at Databricks. Uses a transaction log (Delta Log) alongside data files. Heavily optimized for Spark environments.</li>
+                <li><strong>Apache Hudi:</strong> Developed at Uber. Focuses heavily on streaming, incremental processing, and efficient upserts.</li>
+            </ul>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
