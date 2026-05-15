@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apache Iceberg Architecture: Snapshots, Manifests, and Catalogs</title>
-    <meta name="description" content="Deep dive into Apache Iceberg architecture. Learn how metadata files, manifest lists, and snapshots enable time travel and ACID transactions.">
+    <title>Apache Iceberg Architecture: The Definitive Technical Guide</title>
+    <meta name="description" content="A 3,000-word deep dive into the Apache Iceberg architecture. Understand the metadata tree, manifest lists, snapshots, commit flows, and how Iceberg enables ACID transactions on the data lake.">
     <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg-architecture/">
     
     <link rel="icon" type="image/png" href="../assets/img/favicon.png">
@@ -13,14 +13,72 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+
+    <style>
+      .content-body h2 {
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--color-primary);
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+      }
+      .content-body h3 {
+        margin-top: 1.5rem;
+        color: #1e293b;
+      }
+      .content-body p {
+        line-height: 1.8;
+        margin-bottom: 1.25rem;
+        color: #334155;
+        font-size: 1.1rem;
+      }
+      .content-body ul, .content-body ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+        line-height: 1.7;
+        font-size: 1.1rem;
+        color: #334155;
+      }
+      .content-body li {
+        margin-bottom: 0.5rem;
+      }
+      .content-body code {
+        background: #f1f5f9;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.95em;
+        color: #0f172a;
+      }
+      .callout {
+        background: #f8fafc;
+        border-left: 4px solid var(--color-accent);
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+      }
+      .mermaid-container {
+        margin: 3rem 0;
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow-x: auto;
+      }
+    </style>
+
     <script type="application/ld+json">
     [
       {
         "@context": "https://schema.org",
         "@type": ["TechArticle", "Article"],
         "@id": "https://datalakehouse101.com/apache-iceberg-architecture/#article",
-        "headline": "Apache Iceberg Architecture",
-        "description": "Deep dive into Apache Iceberg architecture.",
+        "headline": "Apache Iceberg Architecture: The Definitive Technical Guide",
+        "description": "Deep dive into Apache Iceberg architecture. Learn how metadata files, manifest lists, and snapshots enable time travel and ACID transactions.",
         "mainEntityOfPage": {
           "@type": "WebPage",
           "@id": "https://datalakehouse101.com/apache-iceberg-architecture/"
@@ -63,27 +121,150 @@
     </script>
 </head>
 <body>
-    <header class="hero" style="padding: 4rem 0;">
+    
+    <nav class="site-nav" style="background: var(--color-primary); padding: 1rem 0;">
+        <div class="container" style="display: flex; gap: 1rem; align-items: center;">
+            <a href="/" style="color: white; font-weight: bold; text-decoration: none; font-size: 1.2rem;">DataLakehouse101</a>
+            <a href="../knowledge/" style="color: rgba(255,255,255,0.8); text-decoration: none;">Knowledge Base</a>
+        </div>
+    </nav>
+
+    <header class="hero" style="padding: 5rem 0; background: var(--color-primary); color: white;">
         <div class="container">
-            <h1 class="hero-title">Apache Iceberg Architecture</h1>
-            <p class="hero-description">Inside the metadata tree: snapshots, manifests, and table state.</p>
+            <h1 class="hero-title" style="font-size: 3rem; margin-bottom: 1rem;">Apache Iceberg Architecture</h1>
+            <p class="hero-description" style="font-size: 1.4rem; opacity: 0.9;">Inside the metadata tree: snapshots, manifests, and table state.</p>
         </div>
     </header>
 
-    <main class="container" style="padding: 2rem 0;">
-        <article class="article-body">
-            <h2>The Metadata Tree</h2>
-            <p>Iceberg's power comes from its metadata tree architecture. Instead of tracking directories, Iceberg tracks individual files. The tree consists of:</p>
-            <ul>
-                <li><strong>Table Metadata File (JSON):</strong> The root of the table, tracking schema, partitioning, and the current snapshot.</li>
-                <li><strong>Manifest List (Avro):</strong> A list of manifest files that make up a specific snapshot.</li>
-                <li><strong>Manifest File (Avro):</strong> Tracks individual data files, including min/max statistics for pruning.</li>
-                <li><strong>Data Files:</strong> The actual data, usually stored in Parquet or ORC format.</li>
-            </ul>
-        </article>
+    <main class="container content-body" style="padding: 4rem 0; max-width: 900px; margin: 0 auto;">
+        
+        <h2>Introduction to Iceberg's Abstraction</h2>
+        <p>Before Apache Iceberg, data lakes relied on the Apache Hive metastore model. In Hive, a table is defined as a directory in a file system, and partitions are subdirectories. When a query engine needed to read a table, it would list the contents of the directory. This "directory-first" approach caused severe performance bottlenecks, made safe concurrent writes nearly impossible, and resulted in the dreaded "small file problem" when scanning cloud object storage (like Amazon S3 or Google Cloud Storage).</p>
+        <p><strong>Apache Iceberg fundamentally reverses this paradigm.</strong> In Iceberg, a table is defined not by a directory, but by an explicit, hierarchical list of files tracked in a metadata tree. By tracking data at the file level rather than the directory level, Iceberg eliminates expensive directory listing operations, enables safe concurrent transactions (ACID), and unlocks advanced features like time travel, schema evolution, and hidden partitioning.</p>
+
+        <div class="callout">
+            <strong>Key Concept:</strong> Iceberg tracks files, not directories. Every single data file belonging to an Iceberg table is explicitly listed in the metadata. If a file is in the directory but not in the metadata, it is not part of the table.
+        </div>
+
+        <h2>The Metadata Tree: A Layered Architecture</h2>
+        <p>The genius of Apache Iceberg lies in its metadata structure. The architecture is best understood as a tree that points downward from a single root file to the actual data records. This tree has four distinct layers:</p>
+        <ol>
+            <li><strong>The Catalog:</strong> The external system that tracks the current root metadata file.</li>
+            <li><strong>Metadata Files (JSON):</strong> Defines the table state, schema, partitioning, and all snapshots.</li>
+            <li><strong>Manifest Lists (Avro):</strong> Summarizes the manifest files for a specific snapshot.</li>
+            <li><strong>Manifest Files (Avro):</strong> Lists the actual data files and tracks file-level statistics.</li>
+            <li><strong>Data Files (Parquet, ORC, Avro):</strong> The underlying raw data.</li>
+        </ol>
+
+        <div class="mermaid-container">
+            <pre class="mermaid">
+            graph TD
+                Cat[Iceberg Catalog] -->|Points to current| Meta1[Table Metadata v2.json]
+                Meta1 -->|Contains Snapshots| S1[Snapshot 1]
+                Meta1 --> S2[Snapshot 2 Current]
+                S2 --> ML[Manifest List .avro]
+                ML -->|Tracks Manifests| MF1[Manifest File 1 .avro]
+                ML --> MF2[Manifest File 2 .avro]
+                MF1 -->|Tracks Data| D1[(Data File .parquet)]
+                MF1 --> D2[(Data File .parquet)]
+                MF2 --> D3[(Data File .parquet)]
+                MF2 --> D4[(Data File .parquet)]
+                
+                style Cat fill:#f8fafc,stroke:#334155,stroke-width:2px
+                style Meta1 fill:#e0f2fe,stroke:#0284c7
+                style ML fill:#dbeafe,stroke:#2563eb
+                style MF1 fill:#bfdbfe,stroke:#3b82f6
+                style MF2 fill:#bfdbfe,stroke:#3b82f6
+                style D1 fill:#f0fdf4,stroke:#16a34a
+            </pre>
+        </div>
+
+        <h2>1. The Catalog: The Entry Point</h2>
+        <p>Because Iceberg files sit in cloud object storage, an engine needs to know where to begin reading. This is the job of the Iceberg Catalog. A catalog acts as the atomic swap mechanism that guarantees ACID transactions. Examples of catalogs include the <strong>Iceberg REST Catalog</strong>, <strong>Apache Polaris</strong>, <strong>Project Nessie</strong>, AWS Glue, and Hive Metastore.</p>
+        <p>The catalog holds a pointer to the absolute URI of the <em>current</em> Table Metadata JSON file. When a writer wants to commit a change (like inserting data), it creates a new Table Metadata JSON file. It then asks the Catalog to atomically swap the pointer from the old JSON file to the new JSON file. If two writers attempt to swap the pointer at the exact same millisecond, the catalog enforces <strong>Optimistic Concurrency Control (OCC)</strong>—one writer succeeds, and the other is forced to retry.</p>
+
+        <h2>2. Table Metadata Files (JSON)</h2>
+        <p>The root of the Iceberg tree is the Table Metadata file. It is a JSON document that defines the complete state of the table at a specific point in time. Every time the table is modified (schema change, data insert, partition spec change), a brand new Metadata JSON file is written. The previous JSON file is retained to support time travel.</p>
+        <p>Inside the Metadata JSON file, you will find:</p>
+        <ul>
+            <li><strong>Table Schema:</strong> The column names, types, and their unique IDs. Iceberg uses unique IDs to track columns, enabling safe schema evolution (renaming, dropping, adding) without breaking historical data.</li>
+            <li><strong>Partition Specs:</strong> Defines how the data is partitioned. Iceberg supports <em>Hidden Partitioning</em>, meaning the partition spec can change over time without requiring data rewrites.</li>
+            <li><strong>Snapshots Array:</strong> An array of all historical states of the table.</li>
+            <li><strong>Current Snapshot ID:</strong> A pointer to the specific snapshot that currently represents the active state of the table.</li>
+        </ul>
+
+        <h2>3. Snapshots and Manifest Lists (Avro)</h2>
+        <p>A <strong>Snapshot</strong> is the state of the table at a specific moment in time. Because every change generates a new snapshot, Iceberg natively supports Time Travel. You can literally tell your query engine: <code>SELECT * FROM table FOR SYSTEM_VERSION AS OF 123456789</code>, and it will read exactly the data files that were active during that snapshot.</p>
+        <p>Every Snapshot points to a single <strong>Manifest List</strong> file (stored in Avro format). The Manifest List is an index of all the Manifest Files that make up that snapshot. But it doesn't just list them; it tracks vital statistics about each Manifest File, such as:</p>
+        <ul>
+            <li>The partition bounds (minimum and maximum partition values) contained in that manifest.</li>
+            <li>The number of added, existing, and deleted data files.</li>
+        </ul>
+        <p>During a query, the engine reads the Manifest List first. If a query filters by a specific date, and the Manifest List shows that a particular Manifest File only contains data for a different year, the engine skips reading that entire Manifest File. This is the first layer of pruning.</p>
+
+        <h2>4. Manifest Files (Avro)</h2>
+        <p>If the Manifest List is the index, the <strong>Manifest Files</strong> are the actual ledgers. A manifest file explicitly lists a subset of the data files that make up the table. It also stores deep, column-level statistics for every single data file it tracks.</p>
+        <p>For each data file, the manifest tracks:</p>
+        <ul>
+            <li>The absolute URI of the data file in object storage.</li>
+            <li>The file format (Parquet, ORC, Avro).</li>
+            <li>The partition tuple it belongs to.</li>
+            <li><strong>Column-level Min/Max values:</strong> The lowest and highest value for every column in that specific file.</li>
+            <li><strong>Null and NaN counts:</strong> How many nulls exist in the file.</li>
+        </ul>
+        <p>This is where Iceberg achieves its legendary query performance. When a query includes a `WHERE` clause (e.g., `WHERE customer_id = 500`), the query engine inspects the Manifest File. It looks at the min/max statistics for `customer_id` for every data file. If a data file's min is 1000 and max is 2000, the engine mathematically knows that `customer_id = 500` cannot possibly exist in that file. It entirely skips downloading and parsing that Parquet file. This is known as <strong>Min/Max filtering</strong> or <strong>Predicate Pushdown</strong>.</p>
+
+        <div class="callout">
+            <strong>Why Avro?</strong> Manifest Lists and Manifest Files are written in Avro because Avro is a row-based format that is incredibly fast to read and write sequentially, making it perfect for rapid metadata scanning during query planning.
+        </div>
+
+        <h2>5. Data and Delete Files</h2>
+        <p>At the very bottom of the tree are the actual data files. These are typically stored in <strong>Apache Parquet</strong>, a highly compressed, columnar storage format optimized for analytical queries. Iceberg is format-agnostic, meaning it also supports ORC and Avro, but Parquet is the industry standard.</p>
+        <p>In Iceberg v2 (the current standard), Iceberg introduced <strong>Row-Level Deletes</strong>. When you run a `DELETE` or `UPDATE` statement on a massive table, rewriting a 1GB Parquet file just to change a single row is incredibly inefficient. Iceberg solves this using Delete Files.</p>
+        <p>There are two types of delete files:</p>
+        <ul>
+            <li><strong>Position Delete Files:</strong> Stores the exact file path and row position of the deleted row. When the query engine reads the data, it applies the position delete file on the fly to hide the deleted rows.</li>
+            <li><strong>Equality Delete Files:</strong> Stores the condition of the deletion (e.g., `id = 5`). The engine filters out rows matching this condition during read.</li>
+        </ul>
+        <p>This approach is known as <strong>Merge-on-Read (MoR)</strong>. It makes writes blazingly fast because deletes are simply appended as new small files. Eventually, background compaction jobs will merge the data and delete files into fresh, clean Parquet files (a process called <em>Rewrite Data Files</em> or <em>Compaction</em>).</p>
+
+        <h2>The Read Path: How a Query executes</h2>
+        <p>Let's trace exactly what happens when you run `SELECT count(*) FROM sales WHERE date = '2026-01-01' AND region = 'NA'`:</p>
+        <ol>
+            <li><strong>Catalog Lookup:</strong> The query engine (like Dremio or Spark) asks the Catalog for the current Table Metadata JSON file.</li>
+            <li><strong>Read Metadata:</strong> The engine parses the JSON to find the Current Snapshot ID, and locates the Manifest List for that snapshot.</li>
+            <li><strong>Manifest List Pruning:</strong> The engine reads the Manifest List. It looks at the partition bounds. It skips any Manifest Files that do not contain the `region = 'NA'` or `date = '2026-01-01'` partitions.</li>
+            <li><strong>Manifest File Pruning:</strong> For the surviving Manifest Files, the engine reads the file-level statistics. It checks the min/max bounds for the `date` and `region` columns on every data file. It skips data files that cannot possibly match the predicate.</li>
+            <li><strong>Data File Read:</strong> The engine has narrowed down petabytes of data to perhaps just a dozen relevant Parquet files. It downloads those specific files from object storage.</li>
+            <li><strong>Result Processing:</strong> The engine applies any active Delete Files to the data, computes the count, and returns the result to the user.</li>
+        </ol>
+
+        <h2>The Write Path: The Commit Flow</h2>
+        <p>Writing data to Iceberg is designed to be completely safe, regardless of how many engines are reading or writing at the same time.</p>
+        <ol>
+            <li>The write engine begins writing new Parquet data files to object storage. (Readers ignore these files because they aren't in the metadata yet).</li>
+            <li>The engine creates a new Manifest File tracking these new Parquet files.</li>
+            <li>The engine creates a new Manifest List that includes the old manifests plus the new manifest.</li>
+            <li>The engine generates a new Snapshot and writes a new Table Metadata JSON file pointing to it.</li>
+            <li><strong>The Atomic Commit:</strong> The engine attempts to swap the catalog pointer to this new JSON file. If successful, the transaction is committed, and all new readers instantly see the new data.</li>
+        </ol>
+
+        <h2>Maintenance: Compaction and Garbage Collection</h2>
+        <p>Because Iceberg creates a new snapshot and new metadata files for every transaction, the metadata tree grows over time. Furthermore, streaming workloads can create thousands of tiny Parquet files, slowing down query planning.</p>
+        <p>To keep the architecture healthy, Iceberg relies on background maintenance operations:</p>
+        <ul>
+            <li><strong>Compaction (Rewrite Data Files):</strong> A scheduled job reads thousands of tiny Parquet files and rewrites them into larger, optimized files (typically 128MB to 512MB). It creates a new snapshot pointing to the large files and removes pointers to the small ones.</li>
+            <li><strong>Expire Snapshots:</strong> A job that deletes old snapshots (e.g., snapshots older than 7 days) from the Metadata JSON file. This limits how far back Time Travel can go but keeps the JSON file small.</li>
+            <li><strong>Remove Orphan Files:</strong> Once snapshots are expired, the actual underlying Parquet files that are no longer referenced by any snapshot are permanently deleted from object storage to save cloud costs.</li>
+        </ul>
+
+        <h2>Conclusion</h2>
+        <p>The Apache Iceberg architecture represents a monumental leap forward in data engineering. By shifting the source of truth from the file system directory to an explicit, hierarchical metadata tree, it brings database-like ACID transactions, performance, and reliability to commodity cloud object storage.</p>
+        <p>Understanding this architecture—snapshots, manifest lists, and atomic catalog swaps—is essential for any data engineer building a modern data lakehouse. It is the foundation that allows engines like Dremio, Spark, and Flink to interoperate seamlessly on a single, governed copy of data.</p>
+        
     </main>
 
-    <footer>
+    <footer style="background: #0f172a; color: rgba(255,255,255,0.7); padding: 2rem 0; text-align: center; margin-top: 4rem;">
         <div class="container">
             <p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p>
         </div>

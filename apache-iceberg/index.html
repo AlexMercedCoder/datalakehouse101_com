@@ -3,49 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apache Iceberg Explained: Architecture, Features, and Guide</title>
-    <meta name="description" content="Learn what Apache Iceberg is, how its architecture works, and why it is the standard open table format for the data lakehouse.">
+    <title>Apache Iceberg Explained: The Open Table Format Standard</title>
+    <meta name="description" content="A comprehensive guide to Apache Iceberg. Learn what Iceberg is, why it was created, its core abstraction, and how it enables the modern data lakehouse.">
     <link rel="canonical" href="https://datalakehouse101.com/apache-iceberg/">
     
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://datalakehouse101.com/apache-iceberg/">
-    <meta property="og:title" content="Apache Iceberg Explained">
-    <meta property="og:description" content="Learn what Apache Iceberg is, how its architecture works, and why it is the standard open table format for the data lakehouse.">
-
     <link rel="icon" type="image/png" href="../assets/img/favicon.png">
-    
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="../style.css">
     
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+
+    <style>
+      .content-body h2 {
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--color-primary);
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+      }
+      .content-body h3 {
+        margin-top: 1.5rem;
+        color: #1e293b;
+      }
+      .content-body p {
+        line-height: 1.8;
+        margin-bottom: 1.25rem;
+        color: #334155;
+        font-size: 1.1rem;
+      }
+      .content-body ul, .content-body ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+        line-height: 1.7;
+        font-size: 1.1rem;
+        color: #334155;
+      }
+      .content-body li {
+        margin-bottom: 0.5rem;
+      }
+      .content-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+        font-size: 1rem;
+      }
+      .content-body th, .content-body td {
+        border: 1px solid #e2e8f0;
+        padding: 1rem;
+        text-align: left;
+      }
+      .content-body th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #0f172a;
+      }
+      .callout {
+        background: #f8fafc;
+        border-left: 4px solid var(--color-accent);
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+      }
+      .mermaid-container {
+        margin: 3rem 0;
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+      }
+    </style>
+
     <script type="application/ld+json">
     [
       {
         "@context": "https://schema.org",
         "@type": ["TechArticle", "Article"],
         "@id": "https://datalakehouse101.com/apache-iceberg/#article",
-        "headline": "Apache Iceberg Explained",
-        "description": "Learn what Apache Iceberg is, how its architecture works, and why it is the standard open table format.",
+        "headline": "Apache Iceberg Explained: The Open Table Format Standard",
+        "description": "A comprehensive guide to Apache Iceberg. Learn what Iceberg is, why it was created, its core abstraction, and how it enables the modern data lakehouse.",
         "mainEntityOfPage": {
           "@type": "WebPage",
           "@id": "https://datalakehouse101.com/apache-iceberg/"
         },
         "author": {
           "@type": "Person",
-          "name": "Alex Merced",
-          "url": "https://alexmerced.com"
+          "name": "Alex Merced"
         },
         "publisher": {
           "@type": "Organization",
-          "name": "DataLakehouse101",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://datalakehouse101.com/assets/img/favicon.png"
-          }
+          "name": "DataLakehouse101"
         },
         "datePublished": "2026-05-15"
       },
@@ -71,31 +123,132 @@
     </script>
 </head>
 <body>
-    <header class="hero" style="padding: 4rem 0;">
+    
+    <nav class="site-nav" style="background: var(--color-primary); padding: 1rem 0;">
+        <div class="container" style="display: flex; gap: 1rem; align-items: center;">
+            <a href="/" style="color: white; font-weight: bold; text-decoration: none; font-size: 1.2rem;">DataLakehouse101</a>
+            <a href="../knowledge/" style="color: rgba(255,255,255,0.8); text-decoration: none;">Knowledge Base</a>
+        </div>
+    </nav>
+
+    <header class="hero" style="padding: 5rem 0; background: var(--color-primary); color: white;">
         <div class="container">
-            <h1 class="hero-title">Apache Iceberg Explained</h1>
-            <p class="hero-description">The standard open table format powering the modern data lakehouse.</p>
+            <h1 class="hero-title" style="font-size: 3rem; margin-bottom: 1rem;">Apache Iceberg Explained</h1>
+            <p class="hero-description" style="font-size: 1.4rem; opacity: 0.9;">The open table format powering the modern data lakehouse.</p>
         </div>
     </header>
 
-    <main class="container" style="padding: 2rem 0;">
-        <article class="article-body">
-            <h2>What is Apache Iceberg?</h2>
-            <p>Apache Iceberg is a high-performance format for huge analytic tables. Iceberg brings the reliability and simplicity of SQL tables to big data, while making it possible for engines like Spark, Trino, Flink, and Dremio to safely work with the same tables, at the same time.</p>
-            
-            <h2>Key Capabilities</h2>
-            <ul>
-                <li><strong>Schema Evolution:</strong> Add, drop, update, or rename, and reorder columns without side-effects.</li>
-                <li><strong>Hidden Partitioning:</strong> Iceberg handles the tedious and error-prone task of producing partition values for rows.</li>
-                <li><strong>Time Travel & Rollback:</strong> Reproducible queries using exact table snapshots, or easily roll back to earlier versions.</li>
-            </ul>
-            
-            <h2>Dive Deeper</h2>
-            <p>Learn more about the <a href="../apache-iceberg-architecture/">Apache Iceberg Architecture</a> and how it compares in our <a href="../apache-iceberg-vs-delta-lake-vs-hudi/">Iceberg vs Delta Lake vs Hudi</a> guide.</p>
-        </article>
+    <main class="container content-body" style="padding: 4rem 0; max-width: 900px; margin: 0 auto;">
+        
+        <h2>What is Apache Iceberg?</h2>
+        <p>To paraphrase the official project definition: <strong>Apache Iceberg is a high-performance format for huge analytic tables.</strong></p>
+        <p>It is an open-source standard that brings SQL-like reliability and simplicity to big data, while making it possible for multiple compute engines (like Spark, Trino, Flink, and Dremio) to work with the exact same data simultaneously without stepping on each other's toes.</p>
+        <p>Crucially, Apache Iceberg is <em>not</em> a query engine (it doesn't process data) and it is <em>not</em> a file format (like Parquet or CSV). It is an <strong>Open Table Format</strong>—a metadata layer that sits between your query engines and your storage files, acting as an intelligent directory that tells engines exactly where data lives, how it is partitioned, and what version of the data they should read.</p>
+
+        <h2>Why Iceberg Was Created: The Fall of the Hive Metastore</h2>
+        <p>To understand why Iceberg is a massive breakthrough, we must understand the problem it solved. Before Iceberg, the Hadoop and big data ecosystem relied on the <strong>Apache Hive Metastore</strong>.</p>
+        <p>Hive defined a table as a physical directory in a file system, and partitions as subdirectories (e.g., `/data/year=2026/month=05/`). When you queried a Hive table, the engine had to perform a "directory listing" to find all the files inside the relevant folder. On cloud object storage like Amazon S3, directory listing is incredibly slow. As tables grew to millions of files, queries began to time out just trying to figure out which files to read.</p>
+        <p>Worse, the directory model made safe concurrent writes impossible. If a Spark job crashed halfway through writing data into a directory, half the files were there, and any query running at that moment would read partial, corrupted data.</p>
+        <p>Netflix engineers created Apache Iceberg to solve these exact problems. They realized that by tracking data at the <em>file level</em> instead of the directory level, they could eliminate directory listings entirely and provide true database-like transactions.</p>
+
+        <h2>The Core Abstraction: File-Level Tracking</h2>
+        <p>The core architectural difference between legacy systems and Apache Iceberg is <strong>File-Level Metadata Tracking</strong>. Iceberg maintains an explicit, hierarchical list of every single file that belongs to a table.</p>
+        <p>When an engine queries an Iceberg table, it doesn't look at folders. It reads Iceberg's metadata. If a Parquet file exists in the cloud storage bucket but is not explicitly listed in Iceberg's metadata, the query engine completely ignores it. This abstraction is the secret behind all of Iceberg's powerful capabilities.</p>
+
+        <div class="mermaid-container">
+            <pre class="mermaid">
+            graph TD
+                subgraph "The Iceberg Stack"
+                    Engine[Query Engine: Dremio, Spark, Flink]
+                    Cat[Iceberg Catalog]
+                    Meta[Iceberg Metadata Tree]
+                    Files[(Data Files: Parquet, ORC, Avro)]
+                end
+
+                Engine -->|1. Asks for current state| Cat
+                Cat -->|2. Returns pointer to| Meta
+                Engine -->|3. Reads index & filters| Meta
+                Meta -->|4. Points to specific| Files
+                Engine -->|5. Downloads ONLY needed| Files
+
+                style Engine fill:#fef08a,stroke:#ca8a04
+                style Cat fill:#dbeafe,stroke:#2563eb
+                style Meta fill:#e0f2fe,stroke:#0284c7
+                style Files fill:#dcfce7,stroke:#22c55e
+            </pre>
+        </div>
+
+        <h2>Key Capabilities</h2>
+
+        <h3>1. ACID Transactions (Serializable Isolation)</h3>
+        <p>Because Iceberg tracks explicit files, writing to a table is an atomic operation. A writer creates new data files in the background, but readers can't see them yet. Once the write is finished, the writer performs an atomic swap in the catalog to update the metadata pointer. The table state changes instantaneously. Readers either see the table before the write, or after the write—they never see a partial state.</p>
+
+        <h3>2. Schema Evolution</h3>
+        <p>In the Hive era, renaming a column or changing its type was a nightmare that often required rewriting petabytes of data. Iceberg solves this using unique ID tracking for columns. You can add, drop, rename, or reorder columns instantly as a simple metadata operation. If you drop a column, it just stops being read. If you rename a column, its underlying ID stays the same, so historical data is perfectly preserved.</p>
+
+        <h3>3. Hidden Partitioning</h3>
+        <p>Partitioning in Hive required the user to physically add partition columns to their data and explicitly query them (e.g., `WHERE event_date = '2026-05-15'`). If the user forgot, they would trigger a full table scan, costing thousands of dollars.</p>
+        <p>Iceberg introduces <strong>Hidden Partitioning</strong>. The partition logic is defined in the metadata, not the data. If you partition by `day(timestamp)`, users simply query `WHERE timestamp = '2026-05-15 10:00:00'`, and Iceberg automatically translates that under the hood to prune the correct daily partitions. Furthermore, you can change the partition strategy (e.g., from daily to hourly) on the fly without rewriting historical data!</p>
+
+        <h3>4. Time Travel and Rollbacks</h3>
+        <p>Because Iceberg creates a new "snapshot" every time the table is modified, it natively supports Time Travel. You can query the table exactly as it looked last Tuesday. If an ETL job writes bad data, you can instantly rollback the table to the previous snapshot with a single command.</p>
+
+        <h2>Where Iceberg Fits in the Lakehouse</h2>
+        <p>Apache Iceberg is the crucial middle layer of the Data Lakehouse architecture. It bridges the gap between raw, cheap cloud storage and powerful, distributed compute engines.</p>
+        <p>By providing a unified, open standard, Iceberg prevents <strong>vendor lock-in</strong>. Because the metadata format is open source, any tool can implement a reader or writer for it. You can ingest data with Flink, transform it with Spark, and serve dashboards with Dremio—all pointing at the exact same Iceberg table, with zero data movement or duplication.</p>
+
+        <h2>Iceberg vs. Plain Parquet Folders</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Plain Parquet in Hive/S3</th>
+                    <th>Apache Iceberg</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Safe Concurrent Writes</strong></td>
+                    <td>No (Data corruption risk)</td>
+                    <td>Yes (ACID Guarantees)</td>
+                </tr>
+                <tr>
+                    <td><strong>Schema Evolution</strong></td>
+                    <td>Painful / Requires Rewrites</td>
+                    <td>Instant / In-Place</td>
+                </tr>
+                <tr>
+                    <td><strong>Partition Evolution</strong></td>
+                    <td>Impossible</td>
+                    <td>Yes (Hidden Partitioning)</td>
+                </tr>
+                <tr>
+                    <td><strong>Time Travel</strong></td>
+                    <td>No</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Performance</strong></td>
+                    <td>Slow (Directory Listings)</td>
+                    <td>Fast (Metadata File Pruning)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>When NOT to use Iceberg</h2>
+        <p>Iceberg is incredibly powerful, but it is specifically designed for <em>huge analytic tables</em>. You should reconsider using Iceberg if:</p>
+        <ul>
+            <li><strong>You have tiny datasets:</strong> If your entire database is 50MB, the overhead of Iceberg's metadata tree will actually make queries slower than just reading a raw CSV or SQLite file.</li>
+            <li><strong>You need high-frequency, single-row OLTP transactions:</strong> Iceberg is an OLAP (analytics) format. If you need to process 10,000 individual single-row updates per second (like a banking application), you need a traditional operational database like PostgreSQL or Cassandra, not a lakehouse.</li>
+        </ul>
+
+        <h2>Conclusion</h2>
+        <p>Apache Iceberg has won the table format war because it solved the hardest problems of data lakes (performance at scale, data correctness, and schema management) through an elegant, file-level metadata abstraction.</p>
+        <p>By standardizing how compute engines interact with data lakes, Iceberg has made the unified Data Lakehouse a reality, allowing organizations to achieve data warehouse performance at cloud object storage prices.</p>
+        
     </main>
 
-    <footer>
+    <footer style="background: #0f172a; color: rgba(255,255,255,0.7); padding: 2rem 0; text-align: center; margin-top: 4rem;">
         <div class="container">
             <p>&copy; 2026 DataLakehouse101.com. All rights reserved.</p>
         </div>
