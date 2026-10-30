@@ -186,6 +186,7 @@ const html = `<!DOCTYPE html>
   <script type="application/ld+json">
 ${ldJson}
   </script>
+<script defer src="/network-analytics.js"></script>
 </head>
 <body>
   <div id="reading-progress"></div>
